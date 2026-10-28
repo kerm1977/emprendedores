@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Emprende</string>
+    <string name="title_activity_main">Emprende</string>
+    <string name="package_name">com.emprende.directorio</string>
+    <string name="custom_url_scheme">com.emprende.directorio</string>
+</resources>

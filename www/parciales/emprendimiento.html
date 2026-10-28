@@ -1,0 +1,175 @@
+<!-- Registro de emprendimiento: wizard por pasos + visor QR + vista contacto -->
+<section class="app-view" id="view-registro-emp">
+    <h3 class="section-title">Registrar mi emprendimiento</h3>
+    <div class="wizard-pasos" id="wizard-pasos">Paso 1 de 6</div>
+    <form class="emp-form" id="form-emprendimiento">
+
+        <div class="paso" data-paso="1">
+            <div class="emp-campo">
+                <span>Categoría *</span>
+                <button type="button" class="emp-cat-btn" id="emp-cat-btn">
+                    <i class="fas fa-tag"></i>
+                    <span id="emp-cat-texto">Elegí una categoría...</span>
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+                <input type="hidden" id="emp-categoria">
+            </div>
+        </div>
+
+        <div class="paso" data-paso="2" hidden>
+            <label class="emp-campo">
+                <span>Nombre del emprendimiento *</span>
+                <input type="text" id="emp-nombre" placeholder="Ej: Soda La Esquina">
+            </label>
+            <label class="emp-campo">
+                <span>Nombre del contacto</span>
+                <input type="text" id="emp-contacto" placeholder="Persona de contacto">
+            </label>
+        </div>
+
+        <div class="paso" data-paso="3" hidden>
+            <label class="emp-campo">
+                <span>Número de teléfono</span>
+                <input type="tel" id="emp-telefono" placeholder="Ej: 8888 1234">
+            </label>
+            <label class="emp-campo">
+                <span>Número de WhatsApp</span>
+                <input type="tel" id="emp-whatsapp" placeholder="Ej: 8888 1234">
+            </label>
+            <label class="emp-campo">
+                <span>Otro teléfono</span>
+                <input type="tel" id="emp-telefono2" placeholder="Opcional">
+            </label>
+            <label class="emp-campo">
+                <span>Correo electrónico</span>
+                <input type="email" id="emp-email" placeholder="correo@ejemplo.com">
+            </label>
+        </div>
+
+        <div class="paso" data-paso="4" hidden>
+            <div class="emp-campo">
+                <span>Tocá el mapa para marcar tu ubicación</span>
+                <div id="emp-mapa" class="emp-mapa-pick"></div>
+                <button type="button" class="emp-geo" id="emp-geo">
+                    <i class="fas fa-location-crosshairs"></i> Usar mi ubicación actual
+                </button>
+            </div>
+            <label class="emp-campo">
+                <span>Ubicación (texto)</span>
+                <input type="text" id="emp-lugar" placeholder="Cantón, distrito...">
+            </label>
+            <div class="mapa-mini" id="prev-maps" hidden>
+                <a id="prev-maps-a" href="#" target="_blank" rel="noopener">
+                    <i class="fas fa-location-dot"></i>
+                    <span>Google Maps · toca para abrir</span>
+                </a>
+            </div>
+            <div class="mapa-mini waze" id="prev-waze" hidden>
+                <a id="prev-waze-a" href="#" target="_blank" rel="noopener">
+                    <i class="fas fa-location-dot"></i>
+                    <span>Waze · toca para abrir</span>
+                </a>
+            </div>
+            <input type="hidden" id="emp-maps">
+            <input type="hidden" id="emp-waze">
+            <input type="hidden" id="emp-lat">
+            <input type="hidden" id="emp-lng">
+        </div>
+
+        <div class="paso" data-paso="5" hidden>
+            <label class="emp-campo">
+                <span>Facebook</span>
+                <input type="url" id="emp-facebook" placeholder="https://facebook.com/...">
+            </label>
+            <label class="emp-campo">
+                <span>TikTok</span>
+                <input type="url" id="emp-tiktok" placeholder="https://tiktok.com/@...">
+            </label>
+            <label class="emp-campo">
+                <span>Instagram</span>
+                <input type="url" id="emp-instagram" placeholder="https://instagram.com/...">
+            </label>
+            <label class="emp-campo">
+                <span>Telegram</span>
+                <input type="url" id="emp-telegram" placeholder="https://t.me/...">
+            </label>
+        </div>
+
+        <div class="paso" data-paso="6" hidden>
+            <div class="emp-campo">
+                <span>Pluses (tocá para activar)</span>
+                <div class="emp-pluses" id="emp-pluses"></div>
+            </div>
+            <div class="emp-campo">
+                <span>Días y horario (marcá los días que trabajás)</span>
+                <div class="emp-agenda" id="emp-agenda"></div>
+            </div>
+            <label class="emp-campo">
+                <span>Descripción breve</span>
+                <textarea id="emp-desc" rows="3" placeholder="¿Qué ofrecés?"></textarea>
+            </label>
+        </div>
+
+        <div class="wizard-nav">
+            <button type="button" class="wizard-btn atras" id="w-atras" hidden>
+                <i class="fas fa-arrow-left"></i> Atrás
+            </button>
+            <button type="button" class="wizard-btn siguiente" id="w-sig">
+                Siguiente <i class="fas fa-arrow-right"></i>
+            </button>
+            <button type="submit" class="emp-btn-guardar" id="w-guardar" hidden>
+                <i class="fas fa-store"></i> Publicar emprendimiento
+            </button>
+        </div>
+    </form>
+</section>
+
+<!-- Vista de contacto: se abre al tocar un contacto del directorio -->
+<section class="app-view" id="view-contacto">
+    <div class="perfil-card">
+        <div class="perfil-avatar"><i class="fas fa-store"></i></div>
+        <h3 id="con-emp">—</h3>
+        <p class="perfil-rol" id="con-nombre">—</p>
+        <div class="perfil-datos">
+            <div class="perfil-dato">
+                <i class="fas fa-phone"></i><span id="con-telefono">—</span>
+            </div>
+            <div class="perfil-dato">
+                <i class="fas fa-clock"></i><span id="con-horario">—</span>
+            </div>
+            <div class="perfil-dato">
+                <i class="fas fa-location-dot"></i><span id="con-lugar">—</span>
+            </div>
+        </div>
+        <div class="con-acciones">
+            <a class="btn-llamar" id="btn-llamar" href="#">
+                <i class="fas fa-phone"></i> Llamar
+            </a>
+            <a class="btn-whatsapp" id="btn-whatsapp" href="#">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom-sheet de categorias con fondo blur -->
+<div class="modal-cat" id="modal-cat" hidden>
+    <div class="modal-cat-hoja">
+        <div class="modal-cat-encabezado">
+            <div class="modal-cat-titulo">Elegí una categoría</div>
+            <button type="button" class="modal-cat-x" id="modal-cat-x">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-cat-lista" id="modal-cat-lista"></div>
+    </div>
+</div>
+
+<div class="modal-qr" id="modal-qr" hidden>
+    <div class="modal-qr-caja" role="dialog" aria-modal="true">
+        <h3>Comparte tu código QR</h3>
+        <canvas id="qr-canvas" width="220" height="220"></canvas>
+        <p id="qr-nombre">—</p>
+        <button class="emp-btn-guardar" id="btn-cerrar-qr">Cerrar</button>
+    </div>
+</div>

@@ -1,0 +1,135 @@
+/* buscador.css - Buscador global bajo el logo + panel de resultados */
+
+.topbar-buscar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1.5px solid var(--buscar-borde);
+    border-radius: 999px;
+    padding: 13px 18px;
+    color: var(--text-soft);
+    margin-top: 6px;
+    box-shadow:
+        inset 0 1px 2px rgba(17, 27, 33, 0.05),
+        0 2px 6px rgba(17, 27, 33, 0.05);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.topbar-buscar:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.18);
+}
+
+.topbar-buscar i {
+    color: var(--primary-dark);
+    font-size: 1rem;
+}
+
+.topbar-buscar input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+.resultados-global {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--page-bg);
+    border-bottom: 1px solid var(--border-soft);
+    box-shadow: 0 12px 24px rgba(17, 27, 33, 0.10);
+    max-height: 55vh;
+    overflow-y: auto;
+    padding: 8px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    z-index: 1029;
+}
+
+/* Fondo difuminado detrás de los resultados */
+.buscador-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1028;
+    background: rgba(255, 255, 255, 0.40);
+    backdrop-filter: blur(7px) saturate(0.9);
+    -webkit-backdrop-filter: blur(7px) saturate(0.9);
+    animation: view-in 0.2s ease-out;
+}
+
+.tema-oscuro .buscador-backdrop {
+    background: rgba(15, 23, 42, 0.50);
+}
+
+.res-grupo {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-soft);
+    margin: 12px 0 6px;
+}
+
+.res-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.res-item:hover,
+.res-item:active {
+    background: var(--bg-soft);
+}
+
+.res-icono {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--logo-bg);
+    color: var(--logo-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.res-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.res-nombre {
+    font-weight: 600;
+    font-size: 0.88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.res-detalle {
+    font-size: 0.74rem;
+    color: var(--text-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.res-vacio {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+}
+
+/* Resaltado temporal al saltar a un resultado */
+.resaltado {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25) !important;
+}

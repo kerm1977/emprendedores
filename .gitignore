@@ -10,3 +10,14 @@ venv/
 *.sqlite
 *.db
 .DS_Store
+
+# Node y builds
+node_modules/
+nul
+
+# Android/Capacitor (artefactos de compilacion)
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/app/release/

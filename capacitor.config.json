@@ -1,0 +1,8 @@
+{
+    "appId": "com.emprende.directorio",
+    "appName": "Emprende",
+    "webDir": "www",
+    "server": {
+        "androidScheme": "https"
+    }
+}

@@ -1,0 +1,241 @@
+/* app.css - Base de la app: variables, body, topbar, vistas, hero, stats */
+
+:root {
+    --primary-color: #f97316;
+    --primary-dark: #ea580c;
+    --accent-strong: var(--primary-dark);
+    --page-bg: #ffffff;
+    --surface: #ffffff;
+    --bg-soft: #f8fafc;
+    --logo-bg: #fff7ed;
+    --logo-color: var(--primary-dark);
+    --text-dark: #111b21;
+    --text-soft: #64748b;
+    --border-soft: #eef2f6;
+    --nav-bg: #ffffff;
+    --nav-border: #e6ebf1;
+    --nav-icon: #8b9bb4;
+    --buscar-borde: #cbd5e1;
+    --topbar-bg: rgba(255, 255, 255, 0.92);
+    --radius: 16px;
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--page-bg);
+    color: var(--text-dark);
+    transition: background-color 0.3s, color 0.3s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    padding-top: calc(124px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(116px + env(safe-area-inset-bottom, 0px));
+    overflow-x: hidden;
+}
+
+/* ============ Barra superior ============ */
+.app-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(118px + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) 16px 10px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    background-color: var(--topbar-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    z-index: 1030;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.topbar-logo {
+    display: block;
+    margin: 6px auto 8px;
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+}
+
+.sync-btn {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    right: 16px;
+    border: none;
+    background: var(--bg-soft);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    color: var(--text-soft);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s, background 0.3s, transform 0.2s;
+}
+
+.sync-btn:active {
+    transform: scale(0.9);
+}
+
+.sync-btn.sync-ok {
+    color: #16a34a;
+    background: #f0fdf4;
+}
+
+.sync-btn.sync-pend {
+    color: #d97706;
+    background: #fffbeb;
+}
+
+.sync-btn.sync-off {
+    color: #94a3b8;
+    background: var(--bg-soft);
+}
+
+.sync-btn.sync-spin i {
+    animation: sync-giro 1s linear infinite;
+}
+
+@keyframes sync-giro {
+    to { transform: rotate(360deg); }
+}
+
+/* ============ Contenido y vistas ============ */
+.app-main {
+    width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+.app-view {
+    display: none;
+}
+
+.app-view.active {
+    display: block;
+    animation: view-in 0.28s ease-out;
+}
+
+@keyframes view-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-soft);
+    margin: 20px 0 12px;
+}
+
+.vista-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 4px 0 14px;
+}
+
+/* ============ Hero (vista Inicio) ============ */
+.hero-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(234, 88, 12, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.hero-izq {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.hero-saludo {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin: 0;
+}
+
+.hero-nombre {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.hero-fecha {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.hero-anunciate {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: anunciate-pulso 2s ease-in-out infinite;
+    transition: transform 0.15s;
+}
+
+.hero-anunciate:active {
+    transform: scale(0.95);
+}
+
+/* ============ Fila de estadísticas (Flexbox) ============ */
+.stats-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.stat-card {
+    flex: 1;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 14px 10px;
+    text-align: center;
+}
+
+.stat-numero {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--accent-strong);
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.68rem;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+}

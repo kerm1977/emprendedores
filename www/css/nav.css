@@ -1,0 +1,196 @@
+/* nav.css - Magic navbar: dock flotante con notch + FAB
+   El borde del indicador usa --nav-bg (color de la barra) para que la
+   rueda quede fusionada con la barra; las esquinas usan --page-bg. */
+
+/* ============ Dock flotante ============ */
+/* Móvil: barra adherida al borde inferior y a los lados */
+.magic-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1030;
+    padding: 0;
+}
+
+.magic-nav-list {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    margin: 0 auto;
+    padding: 0 0 env(safe-area-inset-bottom, 0px);
+    max-width: none;
+    height: calc(66px + env(safe-area-inset-bottom, 0px));
+    background: var(--nav-bg);
+    border-radius: 22px 22px 0 0;
+    border: 2px solid var(--nav-border);
+    border-bottom: none;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* PC (>=768px): dock flotante como antes */
+@media (min-width: 768px) {
+    .magic-nav {
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+        padding: 0 14px;
+    }
+    .magic-nav-list {
+        max-width: 520px;
+        height: 66px;
+        border-radius: 22px;
+        border: 2px solid var(--nav-border);
+        padding-bottom: 0;
+    }
+}
+
+.magic-item {
+    position: relative;
+    flex: 1;
+    list-style: none;
+    z-index: 1;
+}
+
+.magic-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 66px;
+    text-decoration: none;
+}
+
+.magic-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    line-height: 1;
+    font-size: 1.25rem;
+    color: var(--nav-icon);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s;
+}
+
+.magic-icon i {
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.magic-text {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translate(-50%, 10px);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--accent-strong);
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.3s, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.magic-item.active .magic-icon {
+    transform: translateY(-34px);
+    color: #ffffff;
+}
+
+.magic-item.active .magic-text {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+
+
+
+/* ============ Indicador fusionado con la barra ============
+   El borde del círculo es del color de la barra (--nav-bg), así la
+   rueda parece parte de la barra que sobresale. */
+.magic-indicator {
+    position: absolute;
+    top: -30px;
+    left: 0;
+    width: 58px;
+    height: 58px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: 50%;
+    border: 2px solid var(--nav-bg);
+    box-shadow: 0 8px 18px rgba(234, 88, 12, 0.4);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s;
+    z-index: 0;
+    list-style: none;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: none;
+    cursor: pointer;
+}
+
+
+
+/* ============ Botón flotante ============ */
+.fab {
+    position: fixed;
+    bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+    right: calc(24px + env(safe-area-inset-right, 0px));
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: #fff;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.4);
+    z-index: 1020;
+    transition: transform 0.15s;
+}
+
+.fab:active {
+    transform: scale(0.92);
+}
+
+/* ============ Responsivo ============ */
+@media (max-width: 360px) {
+    .magic-nav-list {
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
+        border-radius: 18px 18px 0 0;
+    }
+    .magic-link {
+        height: 60px;
+    }
+    .magic-icon {
+        font-size: 1.1rem;
+    }
+    .magic-item.active .magic-icon {
+        transform: translateY(-30px);
+    }
+    .magic-indicator {
+        width: 52px;
+        height: 52px;
+        top: -26px;
+        border-width: 5px;
+    }
+    .magic-indicator::before,
+    .magic-indicator::after {
+        width: 18px;
+        height: 18px;
+    }
+    .magic-indicator::before {
+        left: -20px;
+        border-top-right-radius: 18px;
+    }
+    .magic-indicator::after {
+        right: -20px;
+        border-top-left-radius: 18px;
+    }
+    .magic-text {
+        font-size: 0.58rem;
+    }
+}

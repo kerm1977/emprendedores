@@ -1,0 +1,237 @@
+/* mapas.css - Cuadritos de mapa con gotita (preview del form y tarjetas) */
+
+/* Cuadrito de mapa con gotita (form preview y tarjeta) */
+.mapa-mini a,
+a.mapa-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 104px;
+    min-height: 58px;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-soft);
+    background:
+        repeating-linear-gradient(45deg, transparent 0 10px, rgba(148,163,184,.12) 10px 11px),
+        repeating-linear-gradient(-45deg, transparent 0 10px, rgba(148,163,184,.12) 10px 11px),
+        var(--bg-soft);
+    color: #1a73e8;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.mapa-mini a i,
+a.mapa-mini i {
+    font-size: 1.1rem;
+    color: #ea4335;
+}
+
+.mapa-mini.waze a,
+a.mapa-mini.waze {
+    color: #0097a7;
+}
+
+.mapa-mini.waze a i,
+a.mapa-mini.waze i {
+    color: #33ccff;
+}
+
+/* Wizard por pasos del registro */
+#view-registro-emp .section-title {
+    text-align: center;
+}
+
+.wizard-pasos {
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 16px;
+    letter-spacing: 0.04em;
+}
+
+/* Cada paso centra su contenido horizontal y verticalmente;
+   si crece mucho, simplemente fluye hacia abajo. */
+#form-emprendimiento .paso {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 42vh;
+    gap: 14px;
+}
+
+#form-emprendimiento .paso[hidden] {
+    display: none;
+}
+
+#form-emprendimiento .paso .emp-campo {
+    width: 100%;
+    text-align: center;
+}
+
+.wizard-nav {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.wizard-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-soft);
+    background: var(--bg-soft);
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.wizard-btn.siguiente {
+    border: none;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: #fff;
+}
+
+.emp-mapa-pick {
+    height: 220px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border-soft);
+    overflow: hidden;
+    z-index: 0;
+}
+
+.emp-geo {
+    margin-top: 8px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-soft);
+    background: var(--bg-soft);
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Boton que abre el selector de categoria */
+.emp-cat-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1.5px solid var(--primary-color);
+    background: var(--surface);
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.emp-cat-btn.elegida {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Bottom-sheet con blur: las categorias suben desde abajo */
+.modal-cat {
+    position: fixed;
+    inset: 0;
+    z-index: 1070;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.modal-cat[hidden] {
+    display: none;
+}
+
+.modal-cat-hoja {
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    background: var(--surface);
+    border-radius: 22px;
+    border: 1px solid var(--border-soft);
+    padding: 16px;
+    overflow-y: auto;
+    animation: hoja-baja 0.3s ease-out;
+}
+
+@keyframes hoja-baja {
+    from { transform: translateY(-40px) scale(0.96); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-cat-encabezado {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.modal-cat-titulo {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--text-dark);
+}
+
+/* X roja fija: siempre visible aunque se haga scroll */
+.modal-cat-x {
+    position: fixed;
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: #dc2626;
+    color: #fff;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+    z-index: 1071;
+}
+
+.mcat-grupo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary-color);
+    padding: 12px 6px 6px;
+    text-align: center;
+}
+
+.cat-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border: none;
+    border-radius: 10px;
+    background: var(--bg-soft);
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.cat-item i {
+    color: var(--primary-color);
+    width: 18px;
+    text-align: center;
+}

@@ -1,0 +1,40 @@
+<!-- Vista Perfil + modal de confirmacion de cierre de sesion -->
+<section class="app-view" id="view-perfil">
+    <div class="perfil-card">
+        <div class="perfil-avatar"><i class="fas fa-user"></i></div>
+        <h3 id="perfil-nombre">—</h3>
+        <p class="perfil-rol" id="perfil-rol">—</p>
+        <div class="perfil-datos">
+            <div class="perfil-dato">
+                <i class="fas fa-envelope"></i>
+                <span id="perfil-email">—</span>
+            </div>
+            <div class="perfil-dato">
+                <i class="fas fa-phone"></i>
+                <span id="perfil-telefono">—</span>
+            </div>
+            <div class="perfil-dato">
+                <i class="fas fa-id-card"></i>
+                <span id="perfil-cedula">—</span>
+            </div>
+        </div>
+        <button class="perfil-btn-ajustes" id="btn-ajustes-perfil" hidden>
+            <i class="fas fa-gear"></i> Ajustes
+        </button>
+        <button class="perfil-btn-salir" id="btn-salir-perfil">
+            <i class="fas fa-right-from-bracket"></i> Cerrar sesión
+        </button>
+    </div>
+</section>
+
+<div class="modal-salir" id="modal-salir" hidden>
+    <div class="modal-salir-caja" role="dialog" aria-modal="true">
+        <div class="modal-salir-icono"><i class="fas fa-right-from-bracket"></i></div>
+        <h3>¿Cerrar sesión?</h3>
+        <p>Se cerrará tu sesión en este dispositivo.</p>
+        <div class="modal-salir-btns">
+            <button class="btn-cancelar" id="btn-cancelar-salir">Cancelar</button>
+            <button class="btn-salir" id="btn-confirmar-salir">Sí, salir</button>
+        </div>
+    </div>
+</div>

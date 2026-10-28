@@ -1,0 +1,78 @@
+<div class="login-overlay" id="login-overlay">
+    <div class="login-card">
+        <img src="img/logo-emprendedores.png" alt="Emprendedores" class="login-logo">
+
+        <div class="login-tabs">
+            <button type="button" class="login-tab active" data-tab="ingresar">Ingresar</button>
+            <button type="button" class="login-tab" data-tab="registro">Registrarse</button>
+        </div>
+
+        <form id="form-login" class="login-form" autocomplete="off">
+            <label class="login-label">Correo electrónico
+                <input type="email" id="login-email" class="login-input" required autocomplete="username">
+            </label>
+            <label class="login-label">Contraseña
+                <span class="pass-wrap">
+                    <input type="password" id="login-pass" class="login-input" required autocomplete="current-password">
+                    <button type="button" class="pass-ojo" data-ojo="login-pass" title="Ver contraseña"><i class="fas fa-eye"></i></button>
+                </span>
+            </label>
+            <p class="login-error" id="login-error"></p>
+            <button type="submit" class="btn-login">Ingresar</button>
+        </form>
+
+        <form id="form-registro" class="login-form" hidden autocomplete="off">
+            <div class="login-fila">
+                <label class="login-label">Nombre
+                    <input type="text" id="reg-nombre" class="login-input" required>
+                </label>
+                <label class="login-label">Apellido
+                    <input type="text" id="reg-apellido" class="login-input">
+                </label>
+            </div>
+            <label class="login-label">Correo electrónico
+                <input type="email" id="reg-email" class="login-input" required>
+            </label>
+            <div class="login-fila">
+                <label class="login-label">Teléfono
+                    <input type="tel" id="reg-telefono" class="login-input">
+                </label>
+                <label class="login-label">Cédula
+                    <input type="text" id="reg-cedula" class="login-input">
+                </label>
+            </div>
+            <label class="login-label">Contraseña
+                <span class="pass-wrap">
+                    <input type="password" id="reg-pass" class="login-input" required autocomplete="new-password">
+                    <button type="button" class="pass-ojo" data-ojo="reg-pass" title="Ver contraseña"><i class="fas fa-eye"></i></button>
+                </span>
+            </label>
+            <label class="login-label">Confirmar contraseña
+                <span class="pass-wrap">
+                    <input type="password" id="reg-pass2" class="login-input" required autocomplete="new-password">
+                    <button type="button" class="pass-ojo" data-ojo="reg-pass2" title="Ver contraseña"><i class="fas fa-eye"></i></button>
+                </span>
+            </label>
+            <p class="login-error" id="reg-error"></p>
+            <button type="submit" class="btn-login">Crear cuenta</button>
+        </form>
+
+        <button type="button" class="emergencia-toggle" id="emergencia-toggle">
+            <i class="fas fa-key"></i> Acceso de emergencia
+        </button>
+
+        <div id="emergencia-panel" hidden>
+            <div id="emergencia-paso1" class="emergencia-paso1">
+                <input type="password" id="emergencia-codigo" class="login-input"
+                       inputmode="numeric" placeholder="Código de emergencia">
+                <button type="button" class="btn-login btn-sm" id="emergencia-verificar">Verificar</button>
+            </div>
+            <div id="emergencia-supers" hidden></div>
+            <p class="login-error" id="emergencia-error"></p>
+        </div>
+
+        <button type="button" class="emergencia-toggle" id="login-cerrar">
+            Continuar sin cuenta
+        </button>
+    </div>
+</div>

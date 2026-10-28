@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <title>Emprende - Directorio</title>
+    <script>
+        /* Aplica el tema guardado antes de pintar (evita parpadeo) */
+        try {
+            if (localStorage.getItem('emprende-tema') === 'oscuro') {
+                document.documentElement.classList.add('tema-oscuro');
+            }
+        } catch (e) {}
+    </script>
+    <link rel="stylesheet" href="vendor/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/css/all.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/componentes.css">
+    <link rel="stylesheet" href="css/extras.css">
+    <link rel="stylesheet" href="css/categorias.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/buscador.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/perfil.css">
+    <link rel="stylesheet" href="css/emprendimiento.css">
+    <link rel="stylesheet" href="css/mapas.css">
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/tema.css">
+    <link rel="stylesheet" href="css/nav.css">
+</head>
+<body>
+
+    <!-- Barra superior de la app -->
+    <header class="app-topbar">
+        <img src="img/logo-emprendedores.png" alt="Emprendedores" class="topbar-logo">
+        <button class="perfil-top" id="perfil-top" title="Mi perfil" hidden>
+            <i class="fas fa-user"></i>
+        </button>
+        <div class="topbar-buscar">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="search" id="buscar-global" placeholder="Busca negocio, categoría, contacto, teléfono o nota...">
+        </div>
+        <div class="resultados-global" id="resultados-global" hidden></div>
+    </header>
+
+    <!-- Fondo difuminado mientras el buscador muestra resultados -->
+    <div class="buscador-backdrop" id="buscador-backdrop" hidden></div>
+
+    <main class="app-main">
+
+        <!-- VISTA: Inicio -->
+        <section class="app-view active" id="view-inicio">
+            <div class="hero-card">
+                <div class="hero-izq">
+                    <p class="hero-saludo" id="hero-saludo"></p>
+                    <h2 class="hero-nombre">Emprendedores</h2>
+                    <p class="hero-fecha" id="hero-fecha"></p>
+                </div>
+                <button class="hero-anunciate" id="btn-anunciate">
+                    <i class="fas fa-bullhorn"></i> Anúnciate
+                </button>
+            </div>
+            <div class="stats-row" id="stats-row"></div>
+            <h3 class="section-title">Categorías</h3>
+            <div id="home-categorias"></div>
+            <h3 class="section-title" id="titulo-destacados" hidden>Destacados</h3>
+            <div id="home-destacados" class="cards-grid" hidden></div>
+        </section>
+
+        <!-- VISTA: Emprendimientos -->
+        <section class="app-view" id="view-emprendimientos">
+            <div class="vista-encabezado">
+                <h3 class="section-title mb-0">Emprendimientos</h3>
+                <button class="filtro-chip" id="filtro-activo" hidden>
+                    <span id="filtro-nombre"></span><i class="fas fa-xmark"></i>
+                </button>
+                <span class="badge rounded-pill text-bg-light" id="emprendimientos-count"></span>
+            </div>
+            <div id="lista-emprendimientos" class="cards-grid"></div>
+        </section>
+
+        <!-- VISTA: Directorio de emprendedores -->
+        <section class="app-view" id="view-directorio">
+            <div class="buscador">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="search" id="buscar-contacto" placeholder="Buscar emprendedor o negocio...">
+            </div>
+            <div id="lista-directorio" class="cards-grid mt-3"></div>
+        </section>
+
+        <!-- VISTA: Notas -->
+        <section class="app-view" id="view-notas">
+            <h3 class="section-title">Notas</h3>
+            <div id="lista-notas" class="notas-grid"></div>
+        </section>
+
+        <!-- VISTA: Ajustes -->
+        <section class="app-view" id="view-ajustes">
+            <h3 class="section-title">Ajustes</h3>
+            <div class="list-group ajustes-lista">
+                <button class="list-group-item list-group-item-action" id="btn-sync-ahora">
+                    <i class="fas fa-cloud-arrow-up ajuste-icono" id="sync-icon"></i>
+                    <div>
+                        <div class="ajuste-titulo">Sincronizar ahora</div>
+                        <div class="ajuste-sub" id="sync-detalle">Copia local lista</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action">
+                    <i class="fas fa-database ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Base de datos</div>
+                        <div class="ajuste-sub">SQLite local / PythonAnywhere</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action">
+                    <i class="fas fa-cloud ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Servidor Flask</div>
+                        <div class="ajuste-sub" id="server-url">Solo conectividad API</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action" id="btn-usuarios">
+                    <i class="fas fa-users-gear ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Usuarios</div>
+                        <div class="ajuste-sub">Gestionar usuarios registrados</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action">
+                    <i class="fas fa-circle-info ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Acerca de</div>
+                        <div class="ajuste-sub">Emprende · offline-first</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action" id="btn-logout">
+                    <i class="fas fa-right-from-bracket ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Cerrar sesión</div>
+                        <div class="ajuste-sub" id="sesion-usuario">Invitado</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- VISTA: Usuarios (se construye por JS) -->
+        <section class="app-view" id="view-usuarios"></section>
+
+    </main>
+
+    <!-- Botón flotante -->
+    <button class="fab" id="main-fab" aria-label="Agregar" hidden>
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Magic navbar inferior -->
+    <nav class="magic-nav" aria-label="Navegacion principal">
+        <ul class="magic-nav-list">
+            <li class="magic-item active" data-view="view-inicio" data-title="Inicio">
+                <a href="#" class="magic-link">
+                    <span class="magic-icon"><i class="fas fa-house"></i></span>
+                    <span class="magic-text">Inicio</span>
+                </a>
+            </li>
+            <li class="magic-item" data-view="view-emprendimientos" data-title="Emprendimientos">
+                <a href="#" class="magic-link">
+                    <span class="magic-icon"><i class="fas fa-store"></i></span>
+                    <span class="magic-text">Negocios</span>
+                </a>
+            </li>
+            <li class="magic-item" data-view="view-directorio" data-title="Directorio">
+                <a href="#" class="magic-link">
+                    <span class="magic-icon"><i class="fas fa-users"></i></span>
+                    <span class="magic-text">Directorio</span>
+                </a>
+            </li>
+            <li class="magic-item" data-view="view-notas" data-title="Notas">
+                <a href="#" class="magic-link">
+                    <span class="magic-icon"><i class="fas fa-note-sticky"></i></span>
+                    <span class="magic-text">Notas</span>
+                </a>
+            </li>
+            <li class="magic-item" data-view="view-ajustes" data-title="Perfil" data-perfil>
+                <a href="#" class="magic-link">
+                    <span class="magic-icon"><i class="fas fa-user"></i></span>
+                    <span class="magic-text">Perfil</span>
+                </a>
+            </li>
+            <li class="magic-indicator" aria-hidden="true" title="Mantén presionado para cambiar el tema"></li>
+        </ul>
+    </nav>
+
+    <div class="toast-mini" id="toast-mini" role="status"></div>
+
+    <!-- Contenedor de la pantalla de login (se carga como parcial) -->
+    <div id="login-root"></div>
+
+    <script src="vendor/js/localforage.min.js"></script>
+    <script src="vendor/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/js/bcrypt.min.js"></script>
+    <script src="js/00-categorias.js"></script>
+    <script src="js/00-categorias-ui.js"></script>
+    <script src="js/01-estado.js"></script>
+    <script src="js/02-datos.js"></script>
+    <script src="js/03-ui.js"></script>
+    <script src="js/04-nav.js"></script>
+    <script src="js/05-render.js"></script>
+    <script src="js/06-tema.js"></script>
+    <script src="js/07-auth.js"></script>
+    <script src="js/08-usuarios.js"></script>
+    <script src="js/09-emergencia.js"></script>
+    <script src="js/10-buscador.js"></script>
+    <script src="js/11-buscador-ui.js"></script>
+    <script src="js/12-perfil.js"></script>
+    <script src="js/13-emprendimientos.js"></script>
+    <script src="js/14-contacto.js"></script>
+    <script src="js/15-tarjeta.js"></script>
+    <script src="js/16-mapas.js"></script>
+    <script src="vendor/leaflet/leaflet.js"></script>
+    <script src="js/17-registro-wizard.js"></script>
+    <script src="js/18-qr.js"></script>
+    <script src="vendor/js/qrious.min.js"></script>
+    <script src="js/99-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+/* responsive.css - Distribución a página completa (Flexbox) */
+
+/* ============ Grilla fluida de tarjetas ============ */
+.cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.cards-grid > * {
+    flex: 1 1 300px;
+    min-width: 0;
+}
+
+/* ============ Tablet / escritorio ============ */
+@media (min-width: 768px) {
+    .app-main {
+        padding: 24px 36px;
+        padding-left: max(36px, env(safe-area-inset-left, 0px));
+        padding-right: max(36px, env(safe-area-inset-right, 0px));
+    }
+    .app-topbar {
+        padding-left: max(36px, env(safe-area-inset-left, 0px));
+        padding-right: max(36px, env(safe-area-inset-right, 0px));
+    }
+
+    /* Inicio: hero y stats lado a lado */
+    #view-inicio.active {
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 16px;
+        align-items: stretch;
+    }
+    #view-inicio .hero-card {
+        flex: 1 1 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    #view-inicio .stats-row {
+        flex: 1 1 300px;
+        margin-top: 0;
+    }
+    #view-inicio .section-title,
+    #view-inicio #home-categorias,
+    #view-inicio #home-destacados {
+        flex-basis: 100%;
+    }
+}
+
+/* ============ Pantallas muy anchas ============ */
+@media (min-width: 1400px) {
+    .app-main {
+        padding: 28px 48px;
+        padding-left: max(48px, env(safe-area-inset-left, 0px));
+        padding-right: max(48px, env(safe-area-inset-right, 0px));
+    }
+    .app-topbar {
+        padding-left: max(48px, env(safe-area-inset-left, 0px));
+        padding-right: max(48px, env(safe-area-inset-right, 0px));
+    }
+}
