@@ -110,6 +110,8 @@ async function initEmprendimientos() {
     if (vista && main) main.appendChild(vista);
     var vistaCon = tmp.querySelector('#view-contacto');
     if (vistaCon && main) main.appendChild(vistaCon);
+    var vistaDet = tmp.querySelector('#view-emprendimiento');
+    if (vistaDet && main) main.appendChild(vistaDet);
     if (modal) document.body.appendChild(modal);
     var modalCat = tmp.querySelector('#modal-cat');
     if (modalCat) document.body.appendChild(modalCat);

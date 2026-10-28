@@ -63,12 +63,13 @@ async function guardarEmprendimiento(e) {
     irAVista('view-emprendimientos', 'Negocios');
 }
 
-/* FAB: solo aparece dentro de Perfil y con sesion activa */
+/* FAB: en Perfil con sesion (registrar emprendimiento) y en Ferias */
 function actualizarFab(viewId) {
     var fab = document.getElementById('main-fab');
     if (!fab) return;
     var logueado = typeof usuarioActual === 'function' && !!usuarioActual();
-    fab.hidden = !(viewId === 'view-perfil' && logueado);
+    fab.hidden = !((viewId === 'view-perfil' && logueado) ||
+                   viewId === 'view-notas');
 }
 
 /* QR: se genera al registrar; el icono abre el visor para escanear */

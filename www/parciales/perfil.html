@@ -18,6 +18,9 @@
                 <span id="perfil-cedula">—</span>
             </div>
         </div>
+        <button class="perfil-btn-ajustes" id="btn-dashboard" hidden>
+            <i class="fas fa-gauge-high"></i> Dashboard
+        </button>
         <button class="perfil-btn-ajustes" id="btn-ajustes-perfil" hidden>
             <i class="fas fa-gear"></i> Ajustes
         </button>
@@ -26,6 +29,67 @@
         </button>
     </div>
 </section>
+
+<!-- Dashboard del superusuario: activa/desactiva criterios de busqueda -->
+<section class="app-view" id="view-dashboard">
+    <div class="perfil-card">
+        <div class="perfil-avatar"><i class="fas fa-gauge-high"></i></div>
+        <h3>Dashboard</h3>
+        <p class="perfil-rol">Superusuario</p>
+        <div class="perfil-datos">
+            <label class="perfil-dato dash-fila">
+                <span>
+                    <i class="fas fa-magnifying-glass"></i>
+                    <b>Búsqueda inteligente</b><br>
+                    <small>Sinónimos y criterios por categoría</small>
+                </span>
+                <input type="checkbox" id="dash-alias" checked>
+            </label>
+        </div>
+        <p class="dash-nota">Desactivado, el buscador solo encuentra
+           categorías por su nombre exacto.</p>
+        <button class="perfil-btn-ajustes" id="dash-dic-ver" type="button">
+            <i class="fas fa-book-open"></i> Ver diccionario de palabras
+        </button>
+        <div id="dash-dic-lista" hidden></div>
+    </div>
+</section>
+
+<!-- Modal tematico del diccionario (mismo estilo que modal-salir) -->
+<div class="modal-salir" id="dic-modal" hidden>
+    <div class="salir-caja">
+        <h3 id="dic-modal-titulo">—</h3>
+        <p id="dic-modal-texto">—</p>
+        <input type="text" id="dic-modal-input" hidden>
+        <div class="salir-btns">
+            <button class="salir-cancelar" id="dic-modal-no" type="button">
+                Cancelar
+            </button>
+            <button class="salir-si" id="dic-modal-si" type="button">
+                Aceptar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Menu de acciones por palabra -->
+<div class="modal-salir" id="dic-menu" hidden>
+    <div class="salir-caja">
+        <h3 id="dic-menu-titulo">—</h3>
+        <p id="dic-menu-cat" class="dash-nota">—</p>
+        <div class="salir-btns">
+            <button class="salir-cancelar" id="dic-menu-cancel" type="button">
+                Cancelar
+            </button>
+            <button class="salir-cancelar" id="dic-menu-edit" type="button">
+                <i class="fas fa-pen"></i> Editar
+            </button>
+            <button class="salir-si" id="dic-menu-del" type="button">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
+        </div>
+    </div>
+</div>
 
 <div class="modal-salir" id="modal-salir" hidden>
     <div class="modal-salir-caja" role="dialog" aria-modal="true">

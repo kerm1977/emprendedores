@@ -8,8 +8,8 @@ function soloDigitos(t) {
 
 function enlaceTarjeta(href, clase, texto) {
     return href
-        ? '<a class="' + clase + '" href="' + href + '" target="_blank">' +
-          texto + '</a>'
+        ? '<a class="' + clase + '" href="' + href +
+          '" target="_blank" rel="noopener">' + texto + '</a>'
         : '';
 }
 

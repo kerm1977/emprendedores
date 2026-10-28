@@ -28,6 +28,14 @@ function levCorto(a, b) {
 
 /* Fuzzy: cada palabra del campo acepta errores de dedo.
    "hard" -> "jard..." (dist 1), "rest" -> "restaurante" (substring) */
+/* Alias: match exacto/substring normalizado (sin fuzzy, evita
+   falsos positivos tipo "menta" -> "venta") */
+function aliasCoincide(alias, q) {
+    var a = norm(alias);
+    var b = norm(q);
+    return b.length >= 3 && (a.indexOf(b) !== -1 || b.indexOf(a) !== -1);
+}
+
 function coincideFuzzy(campo, q) {
     var t = norm(campo);
     if (t.indexOf(q) !== -1) return true;
@@ -94,6 +102,27 @@ function resContacto(p) {
 /* Busca grupos de categorías y categorías sueltas del catálogo */
 function buscarCategorias(q) {
     var res = [];
+    /* Sinonimos de plagas: recomiendan fumigacion/exterminio primero */
+    /* Alias por rubro (ALIAS_TABLA en 00-alias.js) + caso aceite.
+       Se desactivan desde el Dashboard del superusuario */
+    var aliasOn = App.data.aliasActivo !== false;
+    ALIAS_TABLA.forEach(function (t) {
+        if (!aliasOn) return;
+        if (t[0].some(function (a) { return aliasCoincide(a, q); })) {
+            t[1].forEach(function (c) {
+                res.push({ tipo: 'catitem', grupo: c[1], cat: c[0],
+                           icono: c[2], detalle: 'Recomendado · ' + c[1] });
+            });
+        }
+    });
+    if (aliasOn && esCalibreAceite(q)) {
+        [['Cambio de aceite', 'Mecánica', 'fa-oil-can'],
+         ['Mecánico automotriz', 'Mecánica', 'fa-car'],
+         ['Autorrepuestos', 'Mecánica', 'fa-gears']].forEach(function (c) {
+            res.push({ tipo: 'catitem', grupo: c[1], cat: c[0],
+                       icono: c[2], detalle: 'Recomendado · ' + c[1] });
+        });
+    }
     CATEGORIAS.forEach(function (g) {
         if (coincideFuzzy(g.grupo, q)) {
             res.push({ tipo: 'grupo', grupo: g.grupo, cat: '', icono: g.icono,
@@ -106,12 +135,23 @@ function buscarCategorias(q) {
             }
         });
     });
-    return res;
+    /* Sin duplicados: si la recomendacion ya salio por nombre directo */
+    var vistos = {};
+    return res.filter(function (r) {
+        var k = r.grupo + '|' + r.cat;
+        if (vistos[k]) return false;
+        vistos[k] = true;
+        return true;
+    });
 }
 
-function buscarNotas(q) {
-    return (App.data.notas || []).filter(function (n) {
-        return campoCoincide(n.titulo, q, '') || campoCoincide(n.texto, q, '');
+function buscarNotas(q, qDigitos) {
+    return (App.data.ferias || App.data.notas || []).filter(function (n) {
+        return campoCoincide(n.titulo, q, qDigitos) ||
+            campoCoincide(n.texto, q, qDigitos) ||
+            campoCoincide(n.lugar, q, qDigitos) ||
+            campoCoincide(n.contacto, q, qDigitos) ||
+            campoCoincide(n.telefono, q, qDigitos);
     });
 }
 

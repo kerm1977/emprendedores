@@ -35,6 +35,8 @@ function actualizarNavSesion() {
     var logueado = !!u;
     var btnAjustes = document.getElementById('btn-ajustes-perfil');
     if (btnAjustes) btnAjustes.hidden = !(u && u.rol === 'super');
+    var btnDash = document.getElementById('btn-dashboard');
+    if (btnDash) btnDash.hidden = !(u && u.rol === 'super');
     if (item) {
         var icono = item.querySelector('.magic-icon i');
         var texto = item.querySelector('.magic-text');
@@ -74,6 +76,25 @@ async function initPerfil() {
             irAVista('view-ajustes', 'Ajustes');
         });
     }
+    var vistaDash = tmp.querySelector('#view-dashboard');
+    if (vistaDash && main) main.appendChild(vistaDash);
+    var btnDash = document.getElementById('btn-dashboard');
+    if (btnDash) {
+        btnDash.addEventListener('click', function () {
+            irAVista('view-dashboard', 'Dashboard');
+        });
+    }
+    var dashAlias = document.getElementById('dash-alias');
+    if (dashAlias) {
+        dashAlias.checked = App.data.aliasActivo !== false;
+        dashAlias.addEventListener('change', async function () {
+            App.data.aliasActivo = dashAlias.checked;
+            await saveData();
+            showToast(dashAlias.checked
+                ? 'Búsqueda inteligente activada'
+                : 'Solo búsqueda por nombre de categoría');
+        });
+    }
     var btnPerfil = document.getElementById('btn-salir-perfil');
     if (btnPerfil) btnPerfil.addEventListener('click', abrirModalSalir);
     var btnCancel = document.getElementById('btn-cancelar-salir');
@@ -91,4 +112,6 @@ async function initPerfil() {
             if (e.target === modal) cerrarModalSalir();
         });
     }
+    if (typeof initDiccionario === 'function') initDiccionario();
+    if (typeof aplicarDiccionario === 'function') aplicarDiccionario();
 }

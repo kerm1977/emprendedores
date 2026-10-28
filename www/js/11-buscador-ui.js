@@ -19,7 +19,7 @@ function renderResultados(q, box) {
     var cats = buscarCategorias(ql);
     var emprends = buscarEmprendimientos(ql, qd);
     var contactos = buscarContactos(ql, qd);
-    var notas = buscarNotas(ql);
+    var notas = buscarNotas(ql, qd);
 
     var html = '';
     if (cats.length) {

@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="css/perfil.css">
     <link rel="stylesheet" href="css/emprendimiento.css">
     <link rel="stylesheet" href="css/mapas.css">
+    <link rel="stylesheet" href="css/negocios.css">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
     <link rel="stylesheet" href="css/tema.css">
     <link rel="stylesheet" href="css/nav.css">
@@ -93,9 +94,9 @@
             <div id="lista-directorio" class="cards-grid mt-3"></div>
         </section>
 
-        <!-- VISTA: Notas -->
+        <!-- VISTA: Ferias -->
         <section class="app-view" id="view-notas">
-            <h3 class="section-title">Notas</h3>
+            <h3 class="section-title">Ferias de emprendimientos</h3>
             <div id="lista-notas" class="notas-grid"></div>
         </section>
 
@@ -185,10 +186,10 @@
                     <span class="magic-text">Directorio</span>
                 </a>
             </li>
-            <li class="magic-item" data-view="view-notas" data-title="Notas">
+            <li class="magic-item" data-view="view-notas" data-title="Ferias">
                 <a href="#" class="magic-link">
-                    <span class="magic-icon"><i class="fas fa-note-sticky"></i></span>
-                    <span class="magic-text">Notas</span>
+                    <span class="magic-icon"><i class="fas fa-tents"></i></span>
+                    <span class="magic-text">Ferias</span>
                 </a>
             </li>
             <li class="magic-item" data-view="view-ajustes" data-title="Perfil" data-perfil>
@@ -209,6 +210,7 @@
     <script src="vendor/js/localforage.min.js"></script>
     <script src="vendor/js/bootstrap.bundle.min.js"></script>
     <script src="vendor/js/bcrypt.min.js"></script>
+    <script src="js/00-alias.js"></script>
     <script src="js/00-categorias.js"></script>
     <script src="js/00-categorias-ui.js"></script>
     <script src="js/01-estado.js"></script>
@@ -230,6 +232,8 @@
     <script src="vendor/leaflet/leaflet.js"></script>
     <script src="js/17-registro-wizard.js"></script>
     <script src="js/18-qr.js"></script>
+    <script src="js/19-ferias.js"></script>
+    <script src="js/20-diccionario.js"></script>
     <script src="vendor/js/qrious.min.js"></script>
     <script src="js/99-init.js"></script>
 </body>

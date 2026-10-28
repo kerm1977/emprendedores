@@ -187,7 +187,9 @@ async function registrarUsuario(e) {
         });
         var data = await res.json();
         if (!res.ok) { err.textContent = data.error; return; }
-        showToast('Cuenta creada, ya puedes ingresar');
+        showToast(data.merged
+            ? 'Cuenta vinculada: tus registros quedaron unidos'
+            : 'Cuenta creada, ya puedes ingresar');
         document.querySelector('.login-tab[data-tab="ingresar"]').click();
         document.getElementById('login-email').value = data.user.email;
     } catch (e2) {

@@ -49,6 +49,16 @@
     box-shadow: none;
 }
 
+.tema-oscuro .emprend-card:nth-child(odd) {
+    background: rgba(234, 88, 12, 0.10);
+    border-color: rgba(234, 88, 12, 0.22);
+}
+
+.tema-oscuro .emprend-card:nth-child(even) {
+    background: rgba(234, 88, 12, 0.17);
+    border-color: rgba(234, 88, 12, 0.32);
+}
+
 .tema-oscuro .buscador input {
     color: var(--text-dark);
 }

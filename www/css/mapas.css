@@ -4,13 +4,12 @@
 .mapa-mini a,
 a.mapa-mini {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    min-width: 104px;
-    min-height: 58px;
-    padding: 8px;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 14px;
     border-radius: 12px;
     border: 1.5px solid var(--border-soft);
     background:
@@ -18,14 +17,14 @@ a.mapa-mini {
         repeating-linear-gradient(-45deg, transparent 0 10px, rgba(148,163,184,.12) 10px 11px),
         var(--bg-soft);
     color: #1a73e8;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     font-weight: 700;
     text-decoration: none;
 }
 
 .mapa-mini a i,
 a.mapa-mini i {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: #ea4335;
 }
 
@@ -60,7 +59,7 @@ a.mapa-mini.waze i {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 42vh;
+    min-height: 30vh;
     gap: 14px;
 }
 

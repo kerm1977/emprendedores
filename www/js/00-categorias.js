@@ -9,6 +9,8 @@ var CATEGORIAS = [
         ['Panadería', 'fa-bread-slice'],
         ['Pastelería', 'fa-cake-candles'],
         ['Repostería', 'fa-ice-cream'],
+        ['Huevero', 'fa-egg'],
+        ['Verdurero', 'fa-carrot'],
         ['Cocinero', 'fa-kitchen-set'],
         ['Catering', 'fa-bell-concierge']
     ]},
@@ -37,13 +39,18 @@ var CATEGORIAS = [
         ['Enderezado y pintura', 'fa-spray-can'],
         ['Llantas', 'fa-circle-notch'],
         ['Autorrepuestos', 'fa-gears'],
+        ['Cambio de aceite', 'fa-oil-can'],
         ['Fibra de vidrio', 'fa-layer-group']
     ]},
     { grupo: 'Comercio y ventas', icono: 'fa-tag', items: [
         ['Venta de autos', 'fa-car-side'],
         ['Ferretería', 'fa-toolbox'],
         ['Bicicletas', 'fa-bicycle'],
-        ['Pulpería / Abastecedor', 'fa-basket-shopping']
+        ['Pulpería / Abastecedor', 'fa-basket-shopping'],
+        ['Distribuidor de gas', 'fa-fire'],
+        ['Lotería / Chances / Tiempos', 'fa-ticket'],
+        ['Joyería', 'fa-gem'],
+        ['Reciclaje de metales', 'fa-recycle']
     ]},
     { grupo: 'Electrónica', icono: 'fa-plug', items: [
         ['Técnico en electrónica', 'fa-microchip'],
@@ -76,7 +83,12 @@ var CATEGORIAS = [
         ['Pintura', 'fa-paint-roller'],
         ['Decoración de interiores', 'fa-couch'],
         ['Jardinería', 'fa-seedling'],
-        ['Cerrajería', 'fa-key']
+        ['Cerrajería', 'fa-key'],
+        ['Fumigación', 'fa-spray-can-sparkles'],
+        ['Exterminio de plagas', 'fa-bug-slash'],
+        ['Limpieza de tanques sépticos', 'fa-bucket'],
+        ['Vidrios y acrílicos', 'fa-window-restore'],
+        ['Vivero / Venta de plantas', 'fa-leaf']
     ]},
     { grupo: 'Salud', icono: 'fa-briefcase-medical', items: [
         ['Farmacia', 'fa-prescription-bottle-medical'],
@@ -90,7 +102,8 @@ var CATEGORIAS = [
         ['Ultrasonido', 'fa-heart-pulse'],
         ['Rayos X', 'fa-x-ray'],
         ['Cuidador de pacientes', 'fa-hand-holding-heart'],
-        ['Cuidador de adulto mayor', 'fa-person-cane']
+        ['Cuidador de adulto mayor', 'fa-person-cane'],
+        ['Microbiótica', 'fa-bacteria']
     ]},
     { grupo: 'Deporte', icono: 'fa-dumbbell', items: [
         ['Gimnasio', 'fa-dumbbell'],
@@ -145,7 +158,11 @@ var CATEGORIAS = [
         ['Organización de eventos', 'fa-champagne-glasses'],
         ['Decoración de fiestas', 'fa-wand-magic-sparkles'],
         ['Decoración con globos', 'fa-gifts'],
-        ['Globoflexia', 'fa-wand-magic-sparkles']
+        ['Globoflexia', 'fa-wand-magic-sparkles'],
+        ['Alquiler de trajes', 'fa-user-tie'],
+        ['Alquiler trajes de matrimonio', 'fa-ring'],
+        ['Alquiler trajes de fiesta', 'fa-champagne-glasses'],
+        ['Alquiler trajes de disfraces', 'fa-mask']
     ]},
     { grupo: 'Transporte y mensajería', icono: 'fa-truck-fast', items: [
         ['Transporte', 'fa-van-shuttle'],
@@ -168,6 +185,7 @@ var CATEGORIAS = [
         ['Fotografía', 'fa-camera'],
         ['Lavandería', 'fa-soap'],
         ['Moda y accesorios', 'fa-shirt'],
-        ['Artesanía', 'fa-palette']
+        ['Artesanía', 'fa-palette'],
+        ['Funeraria', 'fa-dove']
     ]}
 ];

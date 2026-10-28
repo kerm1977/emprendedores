@@ -9,20 +9,13 @@ function tarjetaEmprendimiento(e) {
             '<div class="emprend-info">' +
                 '<div class="emprend-nombre">' + escapeHtml(e.nombre) + '</div>' +
                 '<div class="emprend-detalle">' +
-                    escapeHtml(e.categoria) + ' · ' + escapeHtml(e.lugar) +
+                    escapeHtml(e.categoria) +
                 '</div>' +
-                extrasEmprendimiento(e) +
             '</div>' +
-            '<span class="emprend-badge estado-' + escapeHtml(e.estado) + '">' +
-                estadoTexto(e.estado) +
-            '</span>' +
             '<div class="emp-acc">' +
                 '<button class="emp-fav' + esDestacado(e.id) +
                     '" title="Destacar">' +
                     '<i class="fas fa-heart"></i>' +
-                '</button>' +
-                '<button class="emp-qr" title="Comparte tu código QR">' +
-                    '<i class="fas fa-qrcode"></i>' +
                 '</button>' +
                 '<button class="emp-dl" title="Descargar tarjeta digital">' +
                     '<i class="fas fa-address-card"></i>' +
@@ -191,7 +184,7 @@ function renderDirectorio(filtro) {
                         '</div>' +
                         '<div class="contacto-tel">' +
                             escapeHtml(p.nombre) +
-                            ' · <i class="fab fa-whatsapp"></i> ' + escapeHtml(p.telefono) +
+                            ' · ' + escapeHtml(p.telefono) +
                         '</div>' +
                     '</div>' +
                     '<i class="fas fa-chevron-right contacto-flecha"></i>' +
@@ -201,16 +194,31 @@ function renderDirectorio(filtro) {
 }
 
 function renderNotas() {
-    var notas = App.data.notas || [];
-    document.getElementById('lista-notas').innerHTML = notas.length
-        ? notas.map(function (n) {
+    var ferias = App.data.ferias || App.data.notas || [];
+    document.getElementById('lista-notas').innerHTML = ferias.length
+        ? ferias.map(function (n) {
+            var fecha = n.fecha
+                ? new Date(n.fecha + 'T00:00').toLocaleDateString('es-CR',
+                    { day: 'numeric', month: 'short', year: 'numeric' })
+                : '';
             return '' +
                 '<div class="nota-card" data-id="' + n.id + '">' +
-                    '<div class="nota-titulo">' + escapeHtml(n.titulo) + '</div>' +
-                    '<p class="nota-texto">' + escapeHtml(n.texto) + '</p>' +
+                    '<div class="nota-titulo">' +
+                        '<i class="fas fa-tents"></i> ' + escapeHtml(n.titulo) +
+                    '</div>' +
+                    '<div class="nota-feria">' +
+                        (fecha ? '<span><i class="fas fa-calendar"></i> ' + fecha + '</span>' : '') +
+                        (n.lugar ? '<span><i class="fas fa-location-dot"></i> ' +
+                            escapeHtml(n.lugar) + '</span>' : '') +
+                        (n.contacto ? '<span><i class="fas fa-user"></i> ' +
+                            escapeHtml(n.contacto) + '</span>' : '') +
+                        (n.telefono ? '<span><i class="fas fa-phone"></i> ' +
+                            escapeHtml(n.telefono) + '</span>' : '') +
+                    '</div>' +
+                    (n.texto ? '<p class="nota-texto">' + escapeHtml(n.texto) + '</p>' : '') +
                 '</div>';
         }).join('')
-        : '<div class="vacio"><i class="fas fa-note-sticky"></i>No hay notas</div>';
+        : '<div class="vacio"><i class="fas fa-tents"></i>No hay ferias registradas</div>';
 }
 
 function renderTodo() {

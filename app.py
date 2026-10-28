@@ -6,6 +6,7 @@ from flask import Flask, render_template, send_from_directory, redirect
 from db import close_db, ensure_db
 from data_routes import data_bp
 from auth_routes import auth_bp
+from emergency_routes import emerg_bp
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WWW_DIR = os.path.join(BASE_DIR, "www")
@@ -14,6 +15,7 @@ app = Flask(__name__)
 app.teardown_appcontext(close_db)
 app.register_blueprint(data_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(emerg_bp)
 
 
 @app.route("/")

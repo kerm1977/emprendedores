@@ -37,17 +37,31 @@ document.addEventListener('DOMContentLoaded', async function () {
                     if (typeof toggleDestacado === 'function') {
                         toggleDestacado(card.dataset.id);
                     }
-                } else if (e.target.closest('.emp-qr')) {
-                    if (typeof mostrarQR === 'function') mostrarQR(card.dataset.id);
                 } else if (e.target.closest('.emp-dl')) {
                     if (typeof descargarTarjeta === 'function') {
                         descargarTarjeta(card.dataset.id);
                     }
                 } else {
                     registrarClic(card.dataset.id);
+                    if (typeof verEmprendimiento === 'function') {
+                        verEmprendimiento(card.dataset.id);
+                    }
                 }
             }
         });
+    });
+
+    /* Enlaces externos (Maps, Waze, redes): se abren fuera,
+       sin que la app abandone la vista */
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest('a[href^="http"]');
+        if (!a) return;
+        e.preventDefault();
+        try {
+            window.open(a.href, '_system');
+        } catch (err) {
+            window.open(a.href, '_blank');
+        }
     });
 
     /* Tocar un contacto abre su detalle (llamar / WhatsApp) */
@@ -71,14 +85,21 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     /* FAB: registrar emprendimiento requiere cuenta */
-    var registrarEmp = function () {
-        if (requiereLogin()) {
+    /* Anúnciate es público: cualquiera registra sin login */
+    var btnAnuncio = document.getElementById('btn-anunciate');
+    if (btnAnuncio) {
+        btnAnuncio.addEventListener('click', function () {
+            irAVista('view-registro-emp', 'Registrar');
+        });
+    }
+    /* El FAB: en Ferias agrega feria, en Perfil registra emprendimiento */
+    document.getElementById('main-fab').addEventListener('click', function () {
+        if (App.vistaActual === 'view-notas') {
+            irAVista('view-feria', 'Nueva feria');
+        } else if (requiereLogin()) {
             irAVista('view-registro-emp', 'Registrar');
         }
-    };
-    document.getElementById('main-fab').addEventListener('click', registrarEmp);
-    var btnAnuncio = document.getElementById('btn-anunciate');
-    if (btnAnuncio) btnAnuncio.addEventListener('click', registrarEmp);
+    });
 
     /* Estado de conexión */
     window.addEventListener('online', syncDesdeServidor);
@@ -90,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     /* Sesión opcional: la app es pública, solo restaura la sesión */
     if (typeof initPerfil === 'function') await initPerfil();
     if (typeof initEmprendimientos === 'function') await initEmprendimientos();
+    if (typeof initFerias === 'function') await initFerias();
     await initAuth();
 
     /* Service worker para offline-first */

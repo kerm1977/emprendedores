@@ -1,0 +1,35 @@
+<!-- Registro de feria de emprendimientos (pagina completa) -->
+<section class="app-view" id="view-feria">
+    <h3 class="section-title">Nueva feria</h3>
+    <form class="emp-form" id="form-feria">
+        <label class="emp-campo">
+            <span>Nombre de la feria *</span>
+            <input type="text" id="fer-nombre" required
+                   placeholder="Ej: Feria del Emprendedor">
+        </label>
+        <label class="emp-campo">
+            <span>Fecha de la feria</span>
+            <input type="date" id="fer-fecha">
+        </label>
+        <label class="emp-campo">
+            <span>Lugar</span>
+            <input type="text" id="fer-lugar" placeholder="Cantón, distrito, local...">
+        </label>
+        <label class="emp-campo">
+            <span>Contacto de la feria</span>
+            <input type="text" id="fer-contacto" placeholder="Organizador">
+        </label>
+        <label class="emp-campo">
+            <span>Teléfono de la feria</span>
+            <input type="tel" id="fer-telefono" placeholder="Ej: 8888 1234">
+        </label>
+        <label class="emp-campo">
+            <span>Descripción</span>
+            <textarea id="fer-desc" rows="3"
+                      placeholder="Detalles, horario, costo de espacio..."></textarea>
+        </label>
+        <button type="submit" class="emp-btn-guardar">
+            <i class="fas fa-tents"></i> Guardar feria
+        </button>
+    </form>
+</section>
