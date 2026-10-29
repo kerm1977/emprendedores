@@ -74,3 +74,17 @@
 - **Negocios**: paginacion de 10 por pagina con reinicio al cambiar filtro.
 - **Sistema de antiduplicidad**: registro hace merge por cedula/telefono/
   email (nunca duplica) y vincula emprendimientos al mismo usuario.
+- **Motores de busqueda por vista (BLINDADO - el alma del buscador)**:
+  misma barra, motor distinto segun `App.vistaActual` en
+  `renderResultados`. Negocios = solo emprendimientos; Directorio = solo
+  contactos (emprendimiento/referencia/telefono); Ferias = solo ferias;
+  demas vistas = busqueda global completa. El placeholder refleja el
+  motor activo. NUNCA mezclar los motores entre pestanas.
+- **Motor de ubicacion del registro (BLINDADO TOTAL, orden del
+  usuario)**: PROHIBIDO tocar `resolverUbicacion`, `ponerMarcador`,
+  `usarGeolocalizacion` en `17-registro-wizard.js` ni `22-geo-cr.js`
+  salvo orden explicita. Flujo aprobado: GPS siempre vuelve (flyTo
+  + alta precision); API = verdad (una sola escritura, sin parpadeo);
+  anti-carrera `_ubiSeq`; poligonos locales solo sin red. Links
+  Maps/Waze se guardan con el emprendimiento para navegar desde la
+  ubicacion del usuario. La ubicacion queda persistida y editable.

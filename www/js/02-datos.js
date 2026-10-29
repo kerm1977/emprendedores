@@ -34,15 +34,31 @@ async function saveData() {
     await syncHaciaServidor();
 }
 
+/* Solo llama a /api/data cuando el servidor puede tenerlo:
+   Flask local (:5000 o /app/), PythonAnywhere o API ya vista.
+   En un estatico (preview/Capacitor) ni se intenta -> sin 404 rojo. */
+function apiDisponible() {
+    if (App._apiVista === true) return true;
+    var h = location.hostname, p = location.port, ruta = location.pathname;
+    return p === '5000' || ruta.indexOf('/app') === 0 ||
+        h.indexOf('pythonanywhere') !== -1 ||
+        (p !== '50335' && !!API_BASE); /* app/Capacitor -> API remoto */
+}
+
 /* Intenta subir la copia local al API de Flask */
 async function syncHaciaServidor() {
+    if (!apiDisponible()) {
+        marcarSync('off');
+        return false;
+    }
     try {
-        var res = await fetch(API_URL, {
+        var res = await fetch(apiUrl(API_URL), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(App.data)
         });
         if (!res.ok) throw new Error('HTTP ' + res.status);
+        App._apiVista = true;
         marcarSync('ok');
         actualizarDetalleSync('Sincronizado ' + new Date().toLocaleTimeString('es-CR'));
         return true;
@@ -55,14 +71,20 @@ async function syncHaciaServidor() {
 
 /* Trae datos del servidor solo si la copia local está vacía */
 async function syncDesdeServidor() {
+    if (!apiDisponible()) {
+        marcarSync(navigator.onLine ? 'pend' : 'off');
+        return;
+    }
     marcarSync('spin');
     try {
-        var res = await fetch(API_URL);
+        var res = await fetch(apiUrl(API_URL));
         if (!res.ok) throw new Error('HTTP ' + res.status);
+        App._apiVista = true;
         var remoto = await res.json();
+        /* PYTHONANYWHERE FIRST: el servidor es la fuente de verdad;
+           IndexedDB queda como respaldo/offline */
         var remotoVacio = !remoto || Object.keys(remoto).length === 0;
-        var localVacio = !App.data || (App.data.emprendimientos || []).length === 0;
-        if (!remotoVacio && localVacio) {
+        if (!remotoVacio) {
             App.data = remoto;
             await localforage.setItem(STORAGE_KEY, remoto);
             renderTodo();

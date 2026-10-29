@@ -181,3 +181,55 @@
     justify-content: center;
 }
 .login-x:active { transform: scale(0.92); }
+
+/* Registro: titulo grande separado, geo-button grande, buscador fuera */
+.registro-titulo {
+    font-size: 1.3rem;
+    margin-top: 8px;
+    margin-bottom: 18px;
+}
+
+#view-registro-emp .wizard-pasos {
+    margin-bottom: 22px;
+}
+
+.emp-geo {
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 14px 18px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 14px;
+}
+
+/* Boton de geolocalizacion: grande y parpadeando (invita a tocarlo) */
+.emp-geo {
+    animation: emp-geo-pulso 1.8s infinite;
+}
+@keyframes emp-geo-pulso {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234,88,12,.55); }
+    50% { transform: scale(1.04); box-shadow: 0 0 0 10px rgba(234,88,12,0); }
+}
+
+/* Botones Maps/Waze horizontales */
+.mapa-btns { display: flex; gap: 10px; }
+.mapa-btn {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    gap: 7px; padding: 11px; border-radius: 12px;
+    font-size: 0.82rem; font-weight: 700; text-decoration: none;
+    color: #fff; background: #4285f4;
+}
+.mapa-btn.waze { background: #33ccff; color: #083b5c; }
+
+/* Logo del emprendimiento como marcador del mapa */
+.emp-logo-prev {
+    width: 64px; height: 64px; object-fit: cover;
+    border-radius: 50%; border: 3px solid var(--primary-color);
+    margin-top: 8px;
+}
+.marcador-logo {
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.45);
+    object-fit: cover; background: #fff;
+}

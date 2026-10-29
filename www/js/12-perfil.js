@@ -113,5 +113,5 @@ async function initPerfil() {
         });
     }
     if (typeof initDiccionario === 'function') initDiccionario();
-    if (typeof aplicarDiccionario === 'function') aplicarDiccionario();
+    if (typeof aplicarDiccionario === 'function') await aplicarDiccionario();
 }

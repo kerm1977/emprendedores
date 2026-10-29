@@ -16,10 +16,21 @@ function resCategoria(c) {
 function renderResultados(q, box) {
     var ql = norm(q);
     var qd = soloDigitos(q);
-    var cats = buscarCategorias(ql);
-    var emprends = buscarEmprendimientos(ql, qd);
-    var contactos = buscarContactos(ql, qd);
-    var notas = buscarNotas(ql, qd);
+    /* Motor por vista: cada pestana busca solo su rubro */
+    var vista = App.vistaActual || '';
+    var cats = [], emprends = [], contactos = [], notas = [];
+    if (vista === 'view-emprendimientos') {
+        emprends = buscarEmprendimientos(ql, qd);
+    } else if (vista === 'view-directorio') {
+        contactos = buscarContactos(ql, qd);
+    } else if (vista === 'view-notas') {
+        notas = buscarNotas(ql, qd);
+    } else {
+        cats = buscarCategorias(ql);
+        emprends = buscarEmprendimientos(ql, qd);
+        contactos = buscarContactos(ql, qd);
+        notas = buscarNotas(ql, qd);
+    }
 
     var html = '';
     if (cats.length) {
@@ -35,7 +46,7 @@ function renderResultados(q, box) {
                 contactos.slice(0, 8).map(resContacto).join('');
     }
     if (notas.length) {
-        html += '<div class="res-grupo">Notas</div>' +
+        html += '<div class="res-grupo">Ferias</div>' +
                 notas.slice(0, 6).map(resNota).join('');
     }
     box.innerHTML = html || '<div class="res-vacio">Sin resultados para "' +

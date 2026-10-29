@@ -114,7 +114,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (typeof initPerfil === 'function') await initPerfil();
     if (typeof initEmprendimientos === 'function') await initEmprendimientos();
     if (typeof initFerias === 'function') await initFerias();
+    if (typeof initEditar === 'function') await initEditar();
     await initAuth();
+    /* Socket.io desactivado hasta que el servidor lo soporte */
+    /* if (typeof initSocket === 'function') initSocket(); */
 
     /* Service worker para offline-first */
     if ('serviceWorker' in navigator) {

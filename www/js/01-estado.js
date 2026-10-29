@@ -9,7 +9,17 @@ var App = {
 
 var STORAGE_KEY = 'emprende-data';
 var DATA_VERSION = 3;
+/* Base del API: mismo origen si es Flask (:5000 o /app/),
+   remoto a PythonAnywhere para la app instalada en el mundo */
+var API_BASE = 'https://kenth1977.pythonanywhere.com';
 var API_URL = '/api/data';
+function apiUrl(ruta) {
+    var local = location.protocol.indexOf('http') === 0 &&
+        (location.port === '5000' ||
+         location.pathname.indexOf('/app') === 0 ||
+         location.hostname.indexOf('pythonanywhere') !== -1);
+    return local ? ruta : API_BASE + ruta;
+}
 
 /* Datos de muestra para la primera ejecución (offline-first) */
 function datosSemilla() {

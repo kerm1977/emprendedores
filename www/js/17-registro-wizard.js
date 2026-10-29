@@ -3,7 +3,26 @@
 
 var _mapa = null;
 var _marcador = null;
-var PASO_TOTAL = 6;
+
+function _iconoEmp() {
+    /* Logo del emprendimiento como gotita del mapa */
+    if (App._empLogoTmp) {
+        return L.divIcon({
+            className: '',
+            html: '<img class="marcador-logo" src="' +
+                  App._empLogoTmp + '">',
+            iconSize: [46, 46], iconAnchor: [23, 46]
+        });
+    }
+    return undefined; /* gotita Leaflet por defecto */
+}
+
+function _moverMarcador(ll) {
+    if (_marcador) { _marcador.setLatLng(ll); _marcador.setIcon(_iconoEmp() || _marcador.options.icon); }
+    else _marcador = L.marker(ll, { icon: _iconoEmp() }).addTo(_mapa);
+    if (App._empLogoTmp && _marcador.setIcon) _marcador.setIcon(_iconoEmp());
+}
+var PASO_TOTAL = 8;
 var pasoActual = 1;
 
 function mostrarPaso(n) {
@@ -49,6 +68,41 @@ function initWizard() {
     }
     var geo = document.getElementById('emp-geo');
     if (geo) geo.addEventListener('click', usarGeolocalizacion);
+    /* Ojos de contrasena del paso 8 */
+    var form = document.getElementById('form-emprendimiento');
+    if (form) form.addEventListener('click', function (e) {
+        var ojo = e.target.closest('.pass-ojo');
+        if (!ojo) return;
+        var inp = document.getElementById(ojo.dataset.ojo);
+        if (!inp) return;
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        ojo.classList.toggle('activo');
+        ojo.querySelector('i').className =
+            inp.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+    });
+    var logoIn = document.getElementById('emp-logo');
+    if (logoIn) logoIn.addEventListener('change', function () {
+        var f = logoIn.files && logoIn.files[0];
+        if (!f) return;
+        var rd = new FileReader();
+        rd.onload = function () {
+            /* Comprimir a 256px JPEG para no saturar el blob */
+            var img = new Image();
+            img.onload = function () {
+                var cv = document.createElement('canvas');
+                var k = Math.min(1, 256 / Math.max(img.width, img.height));
+                cv.width = img.width * k;
+                cv.height = img.height * k;
+                cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+                App._empLogoTmp = cv.toDataURL('image/jpeg', 0.8);
+                var prev = document.getElementById('emp-logo-prev');
+                if (prev) { prev.src = App._empLogoTmp; prev.hidden = false; }
+                if (_marcador) _marcador.setIcon(_iconoEmp());
+            };
+            img.src = rd.result;
+        };
+        rd.readAsDataURL(f);
+    });
     mostrarPaso(1);
 }
 
@@ -62,13 +116,63 @@ function ponerMarcador(lat, lng) {
     var waze = 'https://waze.com/ul?ll=' + lat + ',' + lng;
     document.getElementById('emp-maps').value = maps;
     document.getElementById('emp-waze').value = waze;
-    var pm = document.getElementById('prev-maps');
+    var pm = document.getElementById('prev-mapas');
     var pa = document.getElementById('prev-maps-a');
-    var pw = document.getElementById('prev-waze');
     var pb = document.getElementById('prev-waze-a');
-    if (pm && pa) { pa.href = urlDireccion(maps, 'maps'); pm.hidden = false; }
-    if (pw && pb) { pb.href = urlDireccion(waze, 'waze'); pw.hidden = false; }
+    if (pa) pa.href = urlDireccion(maps, 'maps');
+    if (pb) pb.href = urlDireccion(waze, 'waze');
+    if (pm) pm.hidden = false;
+    /* Anti-mezcla: el punto nuevo manda. Se limpia todo antes de
+       geocodificar para que nunca queden datos de otra ubicacion */
+    ['emp-provincia', 'emp-canton', 'emp-distrito', 'emp-lugar']
+        .forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+    resolverUbicacion(Number(lat), Number(lng));
 }
+
+/* Al marcar el mapa: provincia, canton y distrito se llenan solos
+   (Nominatim/OpenStreetMap; si no hay internet, queda manual) */
+/* OBLIGADO: al marcar el mapa o usar GPS, provincia, canton,
+   distrito y direccion se llenan SI O SI. Primero Nominatim;
+   si falla, BigDataCloud (ambos gratis, sin key). Si ninguno
+   responde, se avisa para llenar a mano. */
+function _normProv(txt) {
+    return (txt || '').toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+function _selProvincia(prov, state) {
+    if (!prov || !state) return;
+    var nState = _normProv(state);
+    var ok = false;
+    prov.querySelectorAll('option').forEach(function (o) {
+        var nOp = _normProv(o.textContent.trim());
+        if (nOp.length > 2 && nState.indexOf(nOp) !== -1) {
+            prov.value = o.textContent.trim();
+            ok = true;
+        }
+    });
+    if (!ok) prov.value = state;
+}
+
+function _llenarUbi(a, display) {
+    _selProvincia(document.getElementById('emp-provincia'),
+                  a.state || a.provincia);
+    var cant = document.getElementById('emp-canton');
+    var dist = document.getElementById('emp-distrito');
+    var lug = document.getElementById('emp-lugar');
+    if (cant) cant.value = a.county || a.city || a.canton || '';
+    if (dist) dist.value = a.town || a.suburb || a.village ||
+                           a.city_district || a.distrito || '';
+    if (lug) lug.value = a.road || a.neighbourhood || a.hamlet ||
+                         a.village || a.suburb ||
+                         (display || '').split(',')[0] || '';
+    return true;
+}
+
+var _ubiSeq = 0;
 
 function initMapaPick() {
     if (_mapa || typeof L === 'undefined') {
@@ -80,8 +184,7 @@ function initMapaPick() {
         attribution: '&copy; OpenStreetMap'
     }).addTo(_mapa);
     _mapa.on('click', function (e) {
-        if (_marcador) _marcador.setLatLng(e.latlng);
-        else _marcador = L.marker(e.latlng).addTo(_mapa);
+        _moverMarcador(e.latlng);
         ponerMarcador(e.latlng.lat.toFixed(6), e.latlng.lng.toFixed(6));
     });
     setTimeout(function () { _mapa.invalidateSize(); }, 250);
@@ -95,15 +198,20 @@ function usarGeolocalizacion() {
     navigator.geolocation.getCurrentPosition(function (pos) {
         var lat = pos.coords.latitude.toFixed(6);
         var lng = pos.coords.longitude.toFixed(6);
+        if (!_mapa && typeof L !== 'undefined') initMapaPick();
+        var ll = [pos.coords.latitude, pos.coords.longitude];
         if (_mapa) {
-            var ll = [pos.coords.latitude, pos.coords.longitude];
-            if (_marcador) _marcador.setLatLng(ll);
-            else _marcador = L.marker(ll).addTo(_mapa);
-            _mapa.setView(ll, 16);
+            _moverMarcador(ll);
+            _mapa.flyTo(ll, 16); /* siempre vuelve al GPS real */
         }
         ponerMarcador(lat, lng);
         showToast('Ubicación marcada');
-    }, function () {
-        showToast('No se pudo obtener la ubicación');
-    });
+    }, function (err) {
+        /* Sin ubicacion/GPS apagado: abrir ajustes de ubicacion */
+        showToast('Activá la ubicación del celular');
+        try {
+            window.location.href =
+                'intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end';
+        } catch (e2) { /* en navegador solo queda el aviso */ }
+    }, { enableHighAccuracy: true, timeout: 10000 });
 }

@@ -10,9 +10,22 @@ var PLUSES = [
     ['bilingue', 'Bilingüe', 'fa-language'],
     ['encargo', 'Por encargo', 'fa-clipboard-list'],
     ['parqueo', 'Parqueo', 'fa-square-parking'],
-    ['whatsapp', 'Responde WhatsApp', 'fa-whatsapp'],
+    ['whatsapp', 'Responde WhatsApp', 'fa-phone'],
     ['garantia', 'Garantía', 'fa-shield-halved'],
-    ['express', 'Entrega express', 'fa-bolt']
+    ['express', 'Entrega express', 'fa-bolt'],
+    ['emergencias', 'Atiende emergencias', 'fa-truck-medical'],
+    ['24h', 'Atención 24h', 'fa-clock'],
+    ['factura', 'Factura electrónica', 'fa-file-invoice'],
+    ['cotiza', 'Cotización', 'fa-calculator'],
+    ['reserva', 'Acepta reservaciones', 'fa-calendar-check'],
+    ['envios', 'Envíos nacionales', 'fa-truck-fast'],
+    ['taller', 'Taller propio', 'fa-screwdriver-wrench'],
+    ['repuestos', 'Repuestos originales', 'fa-gears'],
+    ['certifica', 'Certificado', 'fa-certificate'],
+    ['promos', 'Promociones', 'fa-tags'],
+    ['creditos', 'Acepta crédito', 'fa-hand-holding-dollar'],
+    ['devolucion', 'Devoluciones', 'fa-rotate-left'],
+    ['acreditado', 'Profesional acreditado', 'fa-award']
 ];
 
 /* Botones-toggle: cada toque activa/desactiva un plus */
@@ -99,6 +112,14 @@ async function initEmprendimientos() {
     var vista, modal;
     try {
         var res = await fetch('parciales/emprendimiento.html');
+    var resM = await fetch('parciales/modales.html');
+    if (resM.ok) {
+        var tm = document.createElement('div');
+        tm.innerHTML = await resM.text();
+        while (tm.firstElementChild) {
+            document.body.appendChild(tm.firstElementChild);
+        }
+    }
         var tmp = document.createElement('div');
         tmp.innerHTML = await res.text();
         vista = tmp.querySelector('#view-registro-emp');
@@ -121,7 +142,19 @@ async function initEmprendimientos() {
     llenarDias();
     if (typeof initWizard === 'function') initWizard();
     var form = document.getElementById('form-emprendimiento');
-    if (form) form.addEventListener('submit', guardarEmprendimiento);
+    if (form) {
+        form.addEventListener('submit', guardarEmprendimiento);
+        /* Telefonos: solo digitos; correo: siempre en minusculas */
+        form.addEventListener('input', function (e) {
+            var t = e.target;
+            if (t.classList.contains('solo-digitos')) {
+                t.value = t.value.replace(/\D/g, '');
+            }
+            if (t.classList.contains('email-minus') || t.type === 'email') {
+                t.value = t.value.toLowerCase();
+            }
+        });
+    }
     var btnCerrar = document.getElementById('btn-cerrar-qr');
     if (btnCerrar) btnCerrar.addEventListener('click', cerrarQR);
     if (modal) {

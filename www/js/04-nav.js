@@ -72,6 +72,20 @@ function irAVista(viewId, titulo) {
     }
 
     App.vistaActual = viewId;
+    /* En el registro de emprendimiento el buscador no se muestra */
+    var tb = document.querySelector('.topbar-buscar');
+    if (tb) tb.hidden = (viewId === 'view-registro-emp' || viewId === 'view-emprendimiento' || viewId === 'view-contacto');
+    var res = document.getElementById('resultados-global');
+    if (res && (viewId === 'view-registro-emp' || viewId === 'view-emprendimiento' || viewId === 'view-contacto')) res.hidden = true;
+    /* El placeholder del buscador refleja el motor de cada vista */
+    var busc = document.getElementById('buscar-global');
+    if (busc) {
+        var ph = 'Busca negocio, categoría, contacto, teléfono o feria...';
+        if (viewId === 'view-emprendimientos') ph = 'Busca emprendimiento...';
+        if (viewId === 'view-directorio') ph = 'Busca contacto, emprendimiento o teléfono...';
+        if (viewId === 'view-notas') ph = 'Busca feria...';
+        busc.placeholder = ph;
+    }
     document.title = 'Emprende · ' + (titulo || '');
     if (typeof actualizarFab === 'function') actualizarFab(viewId);
     if (viewId === 'view-registro-emp' && typeof prepararFormEmp === 'function') {

@@ -1,0 +1,22 @@
+<!-- Modales del registro/detalle: categorias + QR -->
+<!-- Bottom-sheet de categorias con fondo blur -->
+<div class="modal-cat" id="modal-cat" hidden>
+    <div class="modal-cat-hoja">
+        <div class="modal-cat-encabezado">
+            <div class="modal-cat-titulo">Elegí una categoría</div>
+            <button type="button" class="modal-cat-x" id="modal-cat-x">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-cat-lista" id="modal-cat-lista"></div>
+    </div>
+</div>
+
+<div class="modal-qr" id="modal-qr" hidden>
+    <div class="modal-qr-caja" role="dialog" aria-modal="true">
+        <h3>Comparte tu código QR</h3>
+        <canvas id="qr-canvas" width="220" height="220"></canvas>
+        <p id="qr-nombre">—</p>
+        <button class="emp-btn-guardar" id="btn-cerrar-qr">Cerrar</button>
+    </div>
+</div>

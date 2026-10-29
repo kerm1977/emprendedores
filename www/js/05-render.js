@@ -179,6 +179,11 @@ function renderNotas() {
                     '</div>' +
                     '<div class="nota-feria">' +
                         (fecha ? '<span><i class="fas fa-calendar"></i> ' + fecha + '</span>' : '') +
+                        ((n.horaInicio || n.horaFin)
+                            ? '<span><i class="fas fa-clock"></i> ' +
+                              (n.horaInicio || '') +
+                              (n.horaFin ? ' - ' + n.horaFin : '') + '</span>'
+                            : '') +
                         (n.lugar ? '<span><i class="fas fa-location-dot"></i> ' +
                             escapeHtml(n.lugar) + '</span>' : '') +
                         (n.contacto ? '<span><i class="fas fa-user"></i> ' +

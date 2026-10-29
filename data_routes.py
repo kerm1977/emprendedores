@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime, timezone
 from flask import Blueprint, jsonify, request
-from db import get_db, ensure_db, DB_PATH
+from db import get_db, ensure_db, mirror_emprendimientos, DB_PATH
 
 data_bp = Blueprint("data", __name__)
 
@@ -28,6 +28,8 @@ def post_data():
         (json.dumps(payload), datetime.now(timezone.utc).isoformat()),
     )
     db.commit()
+    # Espejo indexado: emprendimientos sobreviven aparte del blob
+    mirror_emprendimientos(payload)
     return jsonify({"ok": True, "saved_at": datetime.now(timezone.utc).isoformat()})
 
 

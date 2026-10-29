@@ -19,15 +19,30 @@ function dicPorDefecto() {
     return out;
 }
 
+/* Diccionario fuera del blob sincronizado: vive en su propia
+   clave de localForage para no inflar el guardado/carga */
+var _dicc = null;
+
+async function guardarDiccionario() {
+    try { await localforage.setItem('diccionario', _dicc); } catch (e) {}
+}
+
 /* Reconstruye ALIAS_TABLA desde el diccionario persistido */
-function aplicarDiccionario() {
-    if (!App.data.diccionario) {
-        App.data.diccionario = dicPorDefecto();
+async function aplicarDiccionario() {
+    var d = null;
+    try { d = await localforage.getItem('diccionario'); } catch (e) {}
+    /* Migracion: si quedo dentro de App.data, se saca del blob */
+    if (!d && App.data.diccionario) {
+        d = App.data.diccionario;
+        delete App.data.diccionario;
+        try { await localforage.setItem('diccionario', d); } catch (e2) {}
+        saveData();
     }
+    _dicc = d || dicPorDefecto();
     if (typeof ALIAS_TABLA === 'undefined') return;
     ALIAS_TABLA.length = 0;
-    App.data.diccionario.forEach(function (d) {
-        ALIAS_TABLA.push([d.words.slice(), [[d.cat, d.grupo, d.icono]]]);
+    _dicc.forEach(function (x) {
+        ALIAS_TABLA.push([x.words.slice(), [[x.cat, x.grupo, x.icono]]]);
     });
 }
 
@@ -35,7 +50,7 @@ function renderDiccionario() {
     var lista = document.getElementById('dash-dic-lista');
     if (!lista) return;
     aplicarDiccionario();
-    lista.innerHTML = (App.data.diccionario || []).map(function (d) {
+    lista.innerHTML = (_dicc || []).map(function (d) {
         return '<div class="dic-cat">' +
             '<div class="dic-cat-titulo"><i class="fas ' + d.icono + '"></i> ' +
                 escapeHtml(d.cat) +
@@ -82,7 +97,7 @@ function dicModal(opc) {
 }
 
 async function dicEditarPalabra(cat, palabra) {
-    var d = (App.data.diccionario || []).find(function (x) {
+    var d = (_dicc || []).find(function (x) {
         return x.cat === cat;
     });
     if (!d) return;
@@ -95,7 +110,7 @@ async function dicEditarPalabra(cat, palabra) {
     var i = d.words.indexOf(palabra);
     if (i !== -1) d.words[i] = nuevo;
     aplicarDiccionario();
-    await saveData();
+    await guardarDiccionario();
     renderDiccionario();
     showToast('Palabra actualizada');
 }
@@ -115,19 +130,19 @@ async function dicEliminarPalabra(cat, palabra) {
         });
         if (ok !== true) return;
     }
-    var d = (App.data.diccionario || []).find(function (x) {
+    var d = (_dicc || []).find(function (x) {
         return x.cat === cat;
     });
     if (!d) return;
     d.words = d.words.filter(function (w) { return w !== palabra; });
     aplicarDiccionario();
-    await saveData();
+    await guardarDiccionario();
     renderDiccionario();
     showToast('Palabra eliminada');
 }
 
 async function dicAgregarPalabra(cat) {
-    var d = (App.data.diccionario || []).find(function (x) {
+    var d = (_dicc || []).find(function (x) {
         return x.cat === cat;
     });
     if (!d) return;
@@ -143,7 +158,7 @@ async function dicAgregarPalabra(cat) {
     }
     d.words.push(nueva);
     aplicarDiccionario();
-    await saveData();
+    await guardarDiccionario();
     renderDiccionario();
     showToast('Palabra agregada');
 }

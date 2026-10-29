@@ -2,7 +2,7 @@
    En desarrollo siempre se ven los cambios (red primero);
    sin conexión responde desde la caché. */
 
-var CACHE_NAME = 'emprende-v4';
+var CACHE_NAME = 'emprende-v8';
 
 var SHELL = [
     './',
@@ -11,6 +11,8 @@ var SHELL = [
     './parciales/login.html',
     './parciales/perfil.html',
     './parciales/ferias.html',
+    './parciales/editar.html',
+    './parciales/modales.html',
     './parciales/emprendimiento.html',
     './css/app.css',
     './css/componentes.css',
@@ -45,14 +47,21 @@ var SHELL = [
     './js/15-tarjeta.js',
     './js/16-mapas.js',
     './js/17-registro-wizard.js',
+    './js/17b-ubi.js',
     './js/18-qr.js',
     './js/19-ferias.js',
     './js/20-diccionario.js',
+    './js/21-socket.js',
+    './js/22-geo-cr.js',
+    './js/23-conexion.js',
+    './js/25-editar.js',
+    './js/26-google.js',
     './js/99-init.js',
     './vendor/css/bootstrap.min.css',
     './vendor/css/all.min.css',
     './vendor/js/bootstrap.bundle.min.js',
     './vendor/js/qrious.min.js',
+    './vendor/js/socket.io.min.js',
     './vendor/leaflet/leaflet.js',
     './vendor/leaflet/leaflet.css',
     './vendor/leaflet/images/marker-icon.png',

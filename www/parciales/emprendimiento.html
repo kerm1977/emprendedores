@@ -1,7 +1,7 @@
 <!-- Registro de emprendimiento: wizard por pasos + visor QR + vista contacto -->
 <section class="app-view" id="view-registro-emp">
-    <h3 class="section-title">Registrar mi emprendimiento</h3>
-    <div class="wizard-pasos" id="wizard-pasos">Paso 1 de 6</div>
+    <h3 class="section-title registro-titulo">Registrar mi emprendimiento</h3>
+    <div class="wizard-pasos" id="wizard-pasos">Paso 1 de 7</div>
     <form class="emp-form" id="form-emprendimiento">
 
         <div class="paso" data-paso="1">
@@ -19,30 +19,39 @@
         <div class="paso" data-paso="2" hidden>
             <label class="emp-campo">
                 <span>Nombre del emprendimiento *</span>
-                <input type="text" id="emp-nombre" placeholder="Ej: Soda La Esquina">
+                <input type="text" id="emp-nombre" placeholder="Coloca el nombre de tu emprendimiento">
             </label>
             <label class="emp-campo">
                 <span>Nombre del contacto</span>
                 <input type="text" id="emp-contacto" placeholder="Persona de contacto">
             </label>
+            <label class="emp-campo">
+                <span>Logo del emprendimiento</span>
+                <input type="file" id="emp-logo" accept="image/*">
+                <img id="emp-logo-prev" class="emp-logo-prev" hidden alt="">
+            </label>
         </div>
 
         <div class="paso" data-paso="3" hidden>
             <label class="emp-campo">
-                <span>Número de teléfono</span>
-                <input type="tel" id="emp-telefono" placeholder="Ej: 8888 1234">
+                <span>Número de WhatsApp</span>
+                <input type="tel" id="emp-whatsapp" class="solo-digitos"
+                       inputmode="numeric" placeholder="Ej: 8888 1234">
             </label>
             <label class="emp-campo">
-                <span>Número de WhatsApp</span>
-                <input type="tel" id="emp-whatsapp" placeholder="Ej: 8888 1234">
+                <span>Número de teléfono</span>
+                <input type="tel" id="emp-telefono" class="solo-digitos"
+                       inputmode="numeric" placeholder="Ej: 8888 1234">
             </label>
             <label class="emp-campo">
                 <span>Otro teléfono</span>
-                <input type="tel" id="emp-telefono2" placeholder="Opcional">
+                <input type="tel" id="emp-telefono2" class="solo-digitos"
+                       inputmode="numeric" placeholder="Opcional">
             </label>
             <label class="emp-campo">
                 <span>Correo electrónico</span>
-                <input type="email" id="emp-email" placeholder="correo@ejemplo.com">
+                <input type="email" id="emp-email" class="email-minus"
+                       autocapitalize="off" placeholder="correo@ejemplo.com">
             </label>
         </div>
 
@@ -55,19 +64,41 @@
                 </button>
             </div>
             <label class="emp-campo">
-                <span>Ubicación (texto)</span>
-                <input type="text" id="emp-lugar" placeholder="Cantón, distrito...">
+                <span>Provincia *</span>
+                <select id="emp-provincia" required>
+                    <option value="">Elegí la provincia...</option>
+                    <option>San José</option>
+                    <option>Alajuela</option>
+                    <option>Cartago</option>
+                    <option>Heredia</option>
+                    <option>Guanacaste</option>
+                    <option>Puntarenas</option>
+                    <option>Limón</option>
+                </select>
             </label>
-            <div class="mapa-mini" id="prev-maps" hidden>
-                <a id="prev-maps-a" href="#" target="_blank" rel="noopener">
-                    <i class="fas fa-location-dot"></i>
-                    <span>Google Maps · toca para abrir</span>
+            <label class="emp-campo">
+                <span>Cantón (opcional)</span>
+                <input type="text" id="emp-canton" placeholder="Ej: San Carlos">
+            </label>
+            <label class="emp-campo">
+                <span>Distrito (opcional)</span>
+                <input type="text" id="emp-distrito" placeholder="Ej: Santa Rosa">
+            </label>
+            <label class="emp-campo">
+                <span>Dirección exacta (opcional)</span>
+                <input type="text" id="emp-lugar"
+                       placeholder="Ej: 200m norte de la escuela...">
+            </label>
+            <p class="emp-geo-nota">Si marcás el mapa, provincia, cantón y
+               distrito se llenan solos.</p>
+            <div class="mapa-btns" id="prev-mapas" hidden>
+                <a id="prev-maps-a" class="mapa-btn" href="#"
+                   target="_blank" rel="noopener">
+                    <i class="fas fa-location-dot"></i> Google Maps
                 </a>
-            </div>
-            <div class="mapa-mini waze" id="prev-waze" hidden>
-                <a id="prev-waze-a" href="#" target="_blank" rel="noopener">
-                    <i class="fas fa-location-dot"></i>
-                    <span>Waze · toca para abrir</span>
+                <a id="prev-waze-a" class="mapa-btn waze" href="#"
+                   target="_blank" rel="noopener">
+                    <i class="fas fa-location-dot"></i> Waze
                 </a>
             </div>
             <input type="hidden" id="emp-maps">
@@ -100,6 +131,9 @@
                 <span>Pluses (tocá para activar)</span>
                 <div class="emp-pluses" id="emp-pluses"></div>
             </div>
+        </div>
+
+        <div class="paso" data-paso="7" hidden>
             <div class="emp-campo">
                 <span>Días y horario (marcá los días que trabajás)</span>
                 <div class="emp-agenda" id="emp-agenda"></div>
@@ -108,6 +142,27 @@
                 <span>Descripción breve</span>
                 <textarea id="emp-desc" rows="3" placeholder="¿Qué ofrecés?"></textarea>
             </label>
+        </div>
+
+        <div class="paso" data-paso="8" hidden>
+            <div class="emp-campo">
+                <span>Creá tu contraseña para ver y editar el estado de
+                tu emprendimiento después (opcional).</span>
+            </div>
+            <div class="emp-campo pass-wrap">
+                <span>Contraseña</span>
+                <input type="password" id="emp-pass"
+                       placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                <button type="button" class="pass-ojo" data-ojo="emp-pass"
+                        title="Ver contraseña"><i class="fas fa-eye"></i></button>
+            </div>
+            <div class="emp-campo pass-wrap">
+                <span>Confirmar contraseña</span>
+                <input type="password" id="emp-pass2"
+                       placeholder="Repetí la contraseña" autocomplete="new-password">
+                <button type="button" class="pass-ojo" data-ojo="emp-pass2"
+                        title="Ver contraseña"><i class="fas fa-eye"></i></button>
+            </div>
         </div>
 
         <div class="wizard-nav">
@@ -127,14 +182,25 @@
 <!-- Vista detalle de emprendimiento: toda la info registrada -->
 <section class="app-view" id="view-emprendimiento">
     <div class="perfil-card">
-        <div class="perfil-avatar"><i id="det-icono" class="fas fa-store"></i></div>
+        <div class="perfil-avatar">
+            <img id="det-logo" class="det-logo" hidden alt="Logo">
+            <i id="det-icono" class="fas fa-store"></i>
+        </div>
         <h3 id="det-nombre">—</h3>
         <p class="perfil-rol" id="det-categoria">—</p>
         <div class="perfil-datos" id="det-datos"></div>
         <div class="emp-extras det-extras" id="det-pluses"></div>
-        <div class="emp-extras det-extras" id="det-mapas"></div>
-        <div class="emp-extras det-extras" id="det-redes"></div>
-        <div class="con-acciones">
+        <button class="det-vermapa" id="det-vermapa" type="button" hidden>
+            <i class="fas fa-map"></i> Ver mapa
+        </button>
+        <div id="det-mapa-cont" hidden>
+            <div id="det-mapa" class="det-mapa"></div>
+        </div>
+        <div class="mapa-btns" id="det-mapas" hidden></div>
+        <button class="det-editar-btn" id="det-editar" type="button" hidden>
+            <i class="fas fa-pencil"></i> Editar
+        </button>
+        <div class="con-acciones det-acciones">
             <button class="btn-llamar" id="det-qr" type="button">
                 <i class="fas fa-qrcode"></i> QR
             </button>
@@ -172,25 +238,3 @@
         </div>
     </div>
 </section>
-
-<!-- Bottom-sheet de categorias con fondo blur -->
-<div class="modal-cat" id="modal-cat" hidden>
-    <div class="modal-cat-hoja">
-        <div class="modal-cat-encabezado">
-            <div class="modal-cat-titulo">Elegí una categoría</div>
-            <button type="button" class="modal-cat-x" id="modal-cat-x">
-                <i class="fas fa-xmark"></i>
-            </button>
-        </div>
-        <div class="modal-cat-lista" id="modal-cat-lista"></div>
-    </div>
-</div>
-
-<div class="modal-qr" id="modal-qr" hidden>
-    <div class="modal-qr-caja" role="dialog" aria-modal="true">
-        <h3>Comparte tu código QR</h3>
-        <canvas id="qr-canvas" width="220" height="220"></canvas>
-        <p id="qr-nombre">—</p>
-        <button class="emp-btn-guardar" id="btn-cerrar-qr">Cerrar</button>
-    </div>
-</div>

@@ -14,6 +14,7 @@ async function guardarEmprendimiento(e) {
         id: 'emp-' + Date.now(),
         nombre: document.getElementById('emp-nombre').value.trim(),
         categoria: document.getElementById('emp-categoria').value,
+        logo: await subirLogo(App._empLogoTmp, 'emp-' + Date.now()),
         telefono: document.getElementById('emp-telefono').value.trim(),
         telefono2: document.getElementById('emp-telefono2').value.trim(),
         email: document.getElementById('emp-email').value.trim(),
@@ -21,6 +22,9 @@ async function guardarEmprendimiento(e) {
         whatsapp: document.getElementById('emp-whatsapp').value.trim(),
         lat: document.getElementById('emp-lat').value,
         lng: document.getElementById('emp-lng').value,
+        provincia: document.getElementById('emp-provincia').value.trim(),
+        canton: document.getElementById('emp-canton').value.trim(),
+        distrito: document.getElementById('emp-distrito').value.trim(),
         lugar: document.getElementById('emp-lugar').value.trim(),
         horario: horarioTexto(),
         agenda: agendaSeleccionada(),
@@ -39,6 +43,10 @@ async function guardarEmprendimiento(e) {
     };
     if (!emp.nombre || !emp.categoria) {
         showToast('Completa nombre y categoría');
+        return;
+    }
+    if (!emp.provincia) {
+        showToast('Elegí la provincia del emprendimiento');
         return;
     }
     App.data.emprendimientos = App.data.emprendimientos || [];
@@ -64,42 +72,94 @@ async function guardarEmprendimiento(e) {
     if (typeof descargarTarjeta === 'function') {
         descargarTarjeta(emp.id);
     }
-    irAVista('view-emprendimientos', 'Negocios');
+    /* Abre el detalle del emprendimiento recien creado:
+       contacto, horario, pluses, mapa, QR y tarjeta */
+    if (typeof verEmprendimiento === 'function') {
+        verEmprendimiento(emp.id);
+    } else {
+        irAVista('view-emprendimientos', 'Negocios');
+    }
+    /* Paso 8: contrasena opcional -> intenta crear la cuenta en
+       segundo plano con timeout; NUNCA bloquea el registro */
+    var pass = (document.getElementById('emp-pass') || {}).value || '';
+    var pass2 = (document.getElementById('emp-pass2') || {}).value || '';
+    if (pass || pass2) {
+        if (pass !== pass2 || pass.length < 6) {
+            showToast(pass.length < 6
+                ? 'Contraseña mínimo 6 caracteres'
+                : 'Las contraseñas no coinciden');
+        } else {
+            crearCuentaFondo(emp, pass);
+        }
+    }
 }
 
-/* FAB: en Perfil con sesion (registrar emprendimiento) y en Ferias */
-function actualizarFab(viewId) {
-    var fab = document.getElementById('main-fab');
-    if (!fab) return;
-    var logueado = typeof usuarioActual === 'function' && !!usuarioActual();
-    fab.hidden = !((viewId === 'view-perfil' && logueado) ||
-                   viewId === 'view-notas');
+/* Crea la cuenta en segundo plano; si no hay servidor no pasa nada */
+async function crearCuentaFondo(emp, pass) {
+    if (!emp.email) return;
+    try {
+        var ctrl = new AbortController();
+        var t = setTimeout(function () { ctrl.abort(); }, 8000);
+        var res = await fetch(apiUrl('/api/auth/register'), {
+            method: 'POST', signal: ctrl.signal,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nombre: emp.contacto || emp.nombre,
+                email: emp.email, telefono: emp.telefono,
+                password: pass
+            })
+        });
+        clearTimeout(t);
+        var d = await res.json();
+        if (d.ok && typeof intentarLogin === 'function') {
+            var lr = await intentarLogin(emp.email, pass);
+            if (lr.ok) showToast('Cuenta creada: ya podés editar');
+        } else if (d.error) {
+            showToast(d.error);
+        }
+    } catch (e) {
+        /* sin servidor: el emprendimiento quedo guardado igual */
+    }
 }
 
-/* QR: se genera al registrar; el icono abre el visor para escanear */
-async function mostrarQR(id) {
+/* QR del emprendimiento: dibuja en el modal con QRious */
+function mostrarQR(id) {
     var emp = (App.data.emprendimientos || []).find(function (x) {
         return String(x.id) === String(id);
     });
     if (!emp) return;
-    if (!emp.qr) {
-        emp.qr = generarQRToken();
-        await saveData();
-    }
+    var modal = document.getElementById('modal-qr');
     var canvas = document.getElementById('qr-canvas');
-    if (canvas && typeof QRious === 'function') {
-        new QRious({
-            element: canvas, value: emp.qr,
-            size: 220, level: 'M', foreground: '#0f172a'
-        });
-    }
     var nombre = document.getElementById('qr-nombre');
-    if (nombre) nombre.textContent = emp.nombre;
-    var m = document.getElementById('modal-qr');
-    if (m) m.hidden = false;
+    if (!modal || !canvas) return;
+    var contenido = emp.qr ||
+        'EMPRENDEDORES|' + (emp.nombre || '') + '|' + (emp.telefono || '');
+    if (typeof QRious !== 'undefined') {
+        new QRious({ element: canvas, value: contenido, size: 220 });
+    }
+    if (nombre) nombre.textContent = emp.nombre || '';
+    modal.hidden = false;
 }
 
 function cerrarQR() {
-    var m = document.getElementById('modal-qr');
-    if (m) m.hidden = true;
+    var modal = document.getElementById('modal-qr');
+    if (modal) modal.hidden = true;
+}
+
+/* Sube el logo comprimido a uploads/ en el servidor; si no hay
+   red, queda el base64 local como respaldo */
+async function subirLogo(b64, empId) {
+    if (!b64) return '';
+    try {
+        var res = await fetch(apiUrl('/api/uploads'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: empId, data: b64 })
+        });
+        if (res.ok) {
+            var d = await res.json();
+            if (d && d.url) return d.url;
+        }
+    } catch (e) {}
+    return b64; /* respaldo local si el servidor no responde */
 }

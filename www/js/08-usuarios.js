@@ -37,7 +37,7 @@ var _usuariosCache = [];
 async function cargarUsuarios() {
     var box = document.getElementById('lista-usuarios');
     try {
-        var res = await fetch('/api/usuarios');
+        var res = await fetch(apiUrl('/api/usuarios'));
         var data = await res.json();
         _usuariosCache = data.usuarios || [];
         box.innerHTML = _usuariosCache.length
@@ -98,7 +98,7 @@ async function editarUsuario(id) {
 }
 
 async function borrarUsuario(id) {
-    var r = await fetch('/api/usuarios/' + id, { method: 'DELETE' });
+    var r = await fetch(apiUrl('/api/usuarios/' + id), { method: 'DELETE' });
     var data = await r.json();
     if (data.ok) {
         showToast('Usuario eliminado');
@@ -135,7 +135,8 @@ function wireUsuarios() {
             password: document.getElementById('u-pass').value
         };
         try {
-            var res = await fetch(id ? '/api/usuarios/' + id : '/api/auth/register', {
+            var res = await fetch(
+                apiUrl(id ? '/api/usuarios/' + id : '/api/auth/register'), {
                 method: id ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

@@ -22,6 +22,8 @@ async function guardarFeria(e) {
         id: 'fer-' + Date.now(),
         titulo: document.getElementById('fer-nombre').value.trim(),
         fecha: document.getElementById('fer-fecha').value,
+        horaInicio: document.getElementById('fer-hora-inicio').value,
+        horaFin: document.getElementById('fer-hora-fin').value,
         lugar: document.getElementById('fer-lugar').value.trim(),
         contacto: document.getElementById('fer-contacto').value.trim(),
         telefono: document.getElementById('fer-telefono').value.trim(),

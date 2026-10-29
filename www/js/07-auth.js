@@ -73,7 +73,7 @@ async function cerrarSesion() {
 
 async function intentarLogin(email, pass) {
     try {
-        var res = await fetch('/api/auth/login', {
+        var res = await fetch(apiUrl('/api/auth/login'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, password: pass })
@@ -187,7 +187,7 @@ async function registrarUsuario(e) {
         return;
     }
     try {
-        var res = await fetch('/api/auth/register', {
+        var res = await fetch(apiUrl('/api/auth/register'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -1,0 +1,67 @@
+<!-- Edicion del emprendimiento: formulario completo estilo registro -->
+<section class="app-view" id="view-editar-emp">
+    <h3 class="section-title">Editar emprendimiento</h3>
+    <form class="emp-form" id="form-editar">
+        <label class="emp-campo">
+            <span>Logo (tocá el actual para cambiarlo)</span>
+            <div class="ed-logo-fila">
+                <img id="ed-logo" class="ed-logo" alt="">
+                <input type="file" id="ed-logo-in" accept="image/*" hidden>
+            </div>
+        </label>
+        <label class="emp-campo"><span>Nombre *</span>
+            <input type="text" id="ed-nombre"></label>
+        <label class="emp-campo"><span>Categoría</span>
+            <input type="text" id="ed-categoria"></label>
+        <label class="emp-campo"><span>Contacto</span>
+            <input type="text" id="ed-contacto"></label>
+        <label class="emp-campo"><span>WhatsApp</span>
+            <input type="tel" id="ed-whatsapp" inputmode="numeric"></label>
+        <label class="emp-campo"><span>Teléfono</span>
+            <input type="tel" id="ed-telefono" inputmode="numeric"></label>
+        <label class="emp-campo"><span>Otro teléfono</span>
+            <input type="tel" id="ed-telefono2" inputmode="numeric"></label>
+        <label class="emp-campo"><span>Correo</span>
+            <input type="email" id="ed-email"></label>
+        <label class="emp-campo"><span>Provincia *</span>
+            <select id="ed-provincia">
+                <option value="">Elegí...</option>
+                <option>San José</option><option>Alajuela</option>
+                <option>Cartago</option><option>Heredia</option>
+                <option>Guanacaste</option><option>Puntarenas</option>
+                <option>Limón</option>
+            </select></label>
+        <label class="emp-campo"><span>Cantón</span>
+            <input type="text" id="ed-canton"></label>
+        <label class="emp-campo"><span>Distrito</span>
+            <input type="text" id="ed-distrito"></label>
+        <label class="emp-campo"><span>Dirección exacta</span>
+            <input type="text" id="ed-lugar"></label>
+        <div class="emp-campo">
+            <span>Ubicación en el mapa (tocá para mover)</span>
+            <div id="ed-mapa" class="emp-mapa-pick"></div>
+            <button type="button" class="emp-geo" id="ed-geo">
+                <i class="fas fa-location-crosshairs"></i> Usar mi ubicación actual
+            </button>
+        </div>
+        <input type="hidden" id="ed-lat"><input type="hidden" id="ed-lng">
+        <label class="emp-campo"><span>Facebook</span>
+            <input type="url" id="ed-facebook"></label>
+        <label class="emp-campo"><span>TikTok</span>
+            <input type="url" id="ed-tiktok"></label>
+        <label class="emp-campo"><span>Instagram</span>
+            <input type="url" id="ed-instagram"></label>
+        <label class="emp-campo"><span>Telegram</span>
+            <input type="url" id="ed-telegram"></label>
+        <div class="emp-campo">
+            <span>Pluses (tocá para activar)</span>
+            <div class="emp-pluses" id="ed-pluses"></div>
+        </div>
+        <label class="emp-campo"><span>Horario</span>
+            <input type="text" id="ed-horario"></label>
+        <label class="emp-campo"><span>Descripción</span>
+            <textarea id="ed-desc" rows="3"></textarea></label>
+        <button type="submit" class="emp-btn-guardar">
+            <i class="fas fa-check"></i> Guardar cambios</button>
+    </form>
+</section>

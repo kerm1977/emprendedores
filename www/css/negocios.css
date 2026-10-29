@@ -144,3 +144,106 @@
     font-weight: 700;
     color: var(--text-soft);
 }
+
+/* Feria: horarios inicio/fin en linea */
+.fer-horas {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.fer-horas input {
+    flex: 1;
+    min-width: 0;
+}
+.fer-horas i {
+    color: var(--text-soft);
+    font-size: 0.75rem;
+}
+.emp-geo-nota {
+    font-size: 0.74rem;
+    color: var(--text-soft);
+    text-align: center;
+    margin: 4px 0 0;
+}
+
+/* Detalle: logo en avatar, mapa colapsable, acciones separadas */
+.det-logo {
+    width: 100%; height: 100%;
+    object-fit: cover; border-radius: 50%;
+}
+.det-vermapa {
+    width: 100%; margin-top: 12px; padding: 11px;
+    border: none; border-radius: 12px;
+    background: var(--primary-color); color: #fff;
+    font-size: 0.85rem; font-weight: 700;
+}
+.det-mapa {
+    height: 210px; border-radius: 14px;
+    margin-top: 12px; overflow: hidden;
+    border: 1px solid var(--borde-suave);
+}
+#det-mapa-cont .mapa-btns { margin-top: 10px; }
+.det-acciones { margin-top: 18px !important; }
+
+/* Detalle: pluses en columna, una opcion por linea, alineadas
+   a la izquierda */
+#det-pluses {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    /* BLINDADO: linea vertical naranja que abraza las opciones,
+       igual que la de las subcategorias */
+    border-left: 3px solid var(--primary-color);
+    border-radius: 3px;
+    margin-left: 6px;
+    padding-left: 12px;
+}
+
+/* Sin barra de busqueda: la tarjeta del detalle sube */
+#view-emprendimiento .perfil-card {
+    margin-top: -26px;
+}
+
+/* Separacion entre "Ver mapa" y los botones Maps/Waze */
+#det-mapas {
+    margin-top: 10px;
+}
+
+/* Visor de tarjeta digital dentro de Capacitor (blob no descarga) */
+.tarjeta-visor {
+    position: fixed; inset: 0; z-index: 999;
+    background: var(--bg-main);
+}
+.tarjeta-visor-frame {
+    width: 100%; height: 100%; border: none;
+}
+.tarjeta-visor-x {
+    position: fixed; top: calc(14px + env(safe-area-inset-top));
+    right: 14px; z-index: 1000;
+    width: 40px; height: 40px; border-radius: 50%;
+    border: none; background: var(--primary-color); color: #fff;
+    font-size: 1rem;
+}
+
+/* Edicion en vivo: inputs inline + chips de pluses on/off */
+.det-edit, #det-nombre { cursor: pointer; }
+.det-input-vivo {
+    width: 100%; padding: 6px 10px; border-radius: 8px;
+    border: 2px solid var(--primary-color);
+    background: var(--bg-input); color: var(--text-dark);
+    font-size: 0.85rem;
+}
+.det-plus-edit { cursor: pointer; }
+.det-plus-edit.off { opacity: 0.35; filter: grayscale(1); }
+
+/* Modal de bienvenida post-registro 2 en 1 */
+.bienvenida { text-align: center; padding: 26px 18px; }
+.bien-icono {
+    font-size: 3rem; color: #16a34a; margin-bottom: 8px;
+}
+.bien-titulo { color: var(--primary-color); margin-bottom: 8px; }
+.bien-texto {
+    color: var(--text-soft); font-size: 0.9rem; line-height: 1.5;
+    margin-bottom: 14px;
+}

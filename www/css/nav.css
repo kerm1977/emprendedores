@@ -94,10 +94,17 @@
 }
 
 .magic-item.active .magic-icon {
+    /* BLINDADO: icono superpuesto a la geometria exacta del circulo */
     position: absolute;
-    top: -1px;
+    top: -30px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #ffffff;
     z-index: 2;
 }
@@ -174,7 +181,9 @@
         font-size: 1.1rem;
     }
     .magic-item.active .magic-icon {
-        top: 0px;
+        top: -26px;
+        width: 52px;
+        height: 52px;
     }
     .magic-indicator {
         width: 52px;

@@ -228,3 +228,14 @@
 .dic-chip:active { transform: scale(.95); }
 .dic-add { color: var(--primary); }
 .salir-si.peligro { background: #dc2626; }
+
+/* Probador de conexion con el servidor (Dashboard super) */
+.con-test {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    line-height: 1.5;
+}
+.con-test.ok { color: #16a34a; font-weight: 600; }
+.con-test.mal { color: #dc2626; font-weight: 600; }
+.con-test small { font-weight: 400; color: var(--text-soft); }

@@ -2,7 +2,7 @@
 import bcrypt
 from datetime import datetime, timezone
 from flask import Blueprint, jsonify, request
-from db import get_db, ensure_db, EMERGENCY_CODE
+from db import get_users_db, ensure_db, EMERGENCY_CODE
 
 emerg_bp = Blueprint("emerg", __name__)
 
@@ -16,7 +16,7 @@ def emergency_verify():
     body = request.get_json(force=True, silent=True) or {}
     if not _codigo_valido(body):
         return jsonify({"ok": False, "error": "Codigo incorrecto"}), 403
-    rows = get_db().execute(
+    rows = get_users_db().execute(
         "SELECT id, nombre, email FROM usuarios WHERE rol = 'super'"
     ).fetchall()
     return jsonify({"ok": True, "superusers": [dict(r) for r in rows]})
@@ -32,7 +32,7 @@ def emergency_reset():
     pwd = body.get("password") or ""
     if not pwd:
         return jsonify({"ok": False, "error": "Nueva contrasena requerida"}), 400
-    db = get_db()
+    db = get_users_db()
     row = db.execute(
         "SELECT id FROM usuarios WHERE email = ? AND rol = 'super'", (email,)
     ).fetchone()
@@ -54,7 +54,7 @@ def emergency_delete():
     if not _codigo_valido(body):
         return jsonify({"ok": False, "error": "Codigo incorrecto"}), 403
     email = (body.get("email") or "").strip().lower()
-    db = get_db()
+    db = get_users_db()
     row = db.execute(
         "SELECT id FROM usuarios WHERE email = ? AND rol = 'super'", (email,)
     ).fetchone()

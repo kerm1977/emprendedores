@@ -9,7 +9,7 @@ function wireEmergencia() {
         err.textContent = '';
         _codigoEmergencia = document.getElementById('emergencia-codigo').value.trim();
         try {
-            var res = await fetch('/api/emergency/verify', {
+            var res = await fetch(apiUrl('/api/emergency/verify'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: _codigoEmergencia })
@@ -64,7 +64,7 @@ function mostrarReset(email, row) {
 }
 
 async function emergenciaPost(ruta, extra) {
-    var res = await fetch('/api/emergency/' + ruta, {
+    var res = await fetch(apiUrl('/api/emergency/' + ruta), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(Object.assign({ code: _codigoEmergencia }, extra))

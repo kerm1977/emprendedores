@@ -4,7 +4,7 @@ import json
 import re
 from datetime import datetime, timezone
 from flask import Blueprint, jsonify, request
-from db import get_db, ensure_db, user_dict, EMERGENCY_CODE
+from db import get_db, get_users_db, ensure_db, user_dict, EMERGENCY_CODE
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -86,7 +86,7 @@ def auth_login():
     body = request.get_json(force=True, silent=True) or {}
     email = (body.get("email") or "").strip().lower()
     pwd = body.get("password") or ""
-    row = get_db().execute(
+    row = get_users_db().execute(
         "SELECT * FROM usuarios WHERE email = ?", (email,)
     ).fetchone()
     if row is None or not bcrypt.checkpw(pwd.encode("utf-8"), row["pass_hash"].encode("utf-8")):
@@ -103,7 +103,7 @@ def auth_register():
     pwd = body.get("password") or ""
     if not nombre or not email or not pwd:
         return jsonify({"ok": False, "error": "Nombre, correo y contrasena son obligatorios"}), 400
-    db = get_db()
+    db = get_users_db()
     cedula = (body.get("cedula") or "").strip()
     telefono = (body.get("telefono") or "").strip()
     tel = _tel_local(telefono)
@@ -158,7 +158,7 @@ def auth_register():
 @auth_bp.route("/api/usuarios", methods=["GET"])
 def list_usuarios():
     ensure_db()
-    rows = get_db().execute(
+    rows = get_users_db().execute(
         "SELECT * FROM usuarios ORDER BY rol = 'super' DESC, nombre"
     ).fetchall()
     return jsonify({"ok": True, "usuarios": [user_dict(r) for r in rows]})
@@ -168,7 +168,7 @@ def list_usuarios():
 def update_usuario(uid):
     ensure_db()
     body = request.get_json(force=True, silent=True) or {}
-    db = get_db()
+    db = get_users_db()
     row = db.execute("SELECT * FROM usuarios WHERE id = ?", (uid,)).fetchone()
     if row is None:
         return jsonify({"ok": False, "error": "Usuario no encontrado"}), 404
@@ -191,7 +191,7 @@ def update_usuario(uid):
 @auth_bp.route("/api/usuarios/<int:uid>", methods=["DELETE"])
 def delete_usuario(uid):
     ensure_db()
-    db = get_db()
+    db = get_users_db()
     row = db.execute("SELECT rol FROM usuarios WHERE id = ?", (uid,)).fetchone()
     if row is None:
         return jsonify({"ok": False, "error": "Usuario no encontrado"}), 404
@@ -200,3 +200,47 @@ def delete_usuario(uid):
     db.execute("DELETE FROM usuarios WHERE id = ?", (uid,))
     db.commit()
     return jsonify({"ok": True})
+
+
+@auth_bp.route("/api/auth/google", methods=["POST"])
+def google_auth():
+    """Login/registro con Google: verifica idToken contra Google y
+    luego aplica el sistema de antiduplicidad (merge por email)."""
+    ensure_db()
+    body = request.get_json(force=True, silent=True) or {}
+    token = str(body.get("idToken") or "")
+    if not token:
+        return jsonify({"error": "token faltante"}), 400
+    # Verificacion del idToken contra Google (tokeninfo)
+    try:
+        import urllib.request, json as j2
+        url = ("https://oauth2.googleapis.com/tokeninfo?id_token=" + token)
+        info = j2.loads(urllib.request.urlopen(url, timeout=8).read())
+    except Exception:
+        return jsonify({"error": "token Google invalido"}), 401
+    email = (info.get("email") or "").strip().lower()
+    if not email:
+        return jsonify({"error": "sin email de Google"}), 400
+    nombre = info.get("given_name") or info.get("name") or email.split("@")[0]
+    apellido = info.get("family_name") or ""
+    db = get_users_db()
+    dup = db.execute("SELECT * FROM usuarios WHERE email = ?",
+                     (email,)).fetchone()
+    ahora = datetime.now(timezone.utc).isoformat()
+    if dup:
+        # Antiduplicidad: misma cuenta, no duplicar
+        return jsonify({"ok": True, "linked": True,
+                        "user": user_dict(dup)})
+    h = bcrypt.hashpw(("google-" + token[:24]).encode("utf-8"),
+                      bcrypt.gensalt()).decode("utf-8")
+    cur = db.execute(
+        """INSERT INTO usuarios
+           (nombre, apellido, email, telefono, cedula, rol,
+            pass_hash, created_at, updated_at)
+           VALUES (?, ?, ?, '', '', 'user', ?, ?, ?)""",
+        (nombre, apellido, email, h, ahora, ahora),
+    )
+    db.commit()
+    row = db.execute("SELECT * FROM usuarios WHERE id = ?",
+                     (cur.lastrowid,)).fetchone()
+    return jsonify({"ok": True, "user": user_dict(row)})

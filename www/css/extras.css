@@ -87,7 +87,7 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s, transform 0.3s;
-    z-index: 1050;
+    z-index: 3000; /* por encima del login-overlay */
     white-space: nowrap;
 }
 
@@ -127,3 +127,13 @@
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 0 0 10px rgba(255, 255, 255, 0);
     }
 }
+
+/* Boton Continuar con Google en el login */
+.btn-google {
+    width: 100%; margin: 14px 0 10px; padding: 12px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; border-radius: 12px; border: 1px solid var(--borde-suave);
+    background: #fff; color: #444; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer;
+}
+.btn-google i { color: #ea4335; }

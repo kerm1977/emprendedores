@@ -94,6 +94,21 @@ async function descargarTarjeta(id) {
         return String(c.empId) === String(e.id);
     });
     var html = htmlTarjeta(e, contacto);
+    /* En Capacitor el blob no descarga -> visor interno */
+    if (window.Capacitor && window.Capacitor.isNativePlatform &&
+            window.Capacitor.isNativePlatform()) {
+        var ov = document.createElement('div');
+        ov.className = 'tarjeta-visor';
+        ov.innerHTML = '<button class="tarjeta-visor-x">' +
+            '<i class="fas fa-xmark"></i></button>' +
+            '<iframe class="tarjeta-visor-frame"></iframe>';
+        ov.querySelector('.tarjeta-visor-x').onclick =
+            function () { ov.remove(); };
+        document.body.appendChild(ov);
+        ov.querySelector('iframe').srcdoc = html;
+        showToast('Tarjeta digital');
+        return;
+    }
     var blob = new Blob([html], { type: 'text/html' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

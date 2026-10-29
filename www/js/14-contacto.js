@@ -47,16 +47,26 @@ function verEmprendimiento(id) {
     setTexto('det-nombre', e.nombre);
     setTexto('det-categoria', e.categoria + (e.lugar ? ' · ' + e.lugar : ''));
     var icono = document.getElementById('det-icono');
-    if (icono) icono.className = 'fas ' + iconoDeCategoria(e.categoria);
+    var logoImg = document.getElementById('det-logo');
+    if (e.logo && logoImg) {
+        logoImg.src = e.logo;
+        logoImg.hidden = false;
+        if (icono) icono.style.display = 'none';
+    } else {
+        if (logoImg) logoImg.hidden = true;
+        if (icono) {
+            icono.style.display = '';
+            icono.className = 'fas ' + iconoDeCategoria(e.categoria);
+        }
+    }
 
     var filas = [];
-    if (e.contacto) filas.push(['fas fa-user', 'Contacto', e.contacto]);
-    if (e.telefono) filas.push(['fas fa-phone', 'Teléfono', e.telefono]);
-    if (e.whatsapp) filas.push(['fab fa-whatsapp', 'WhatsApp', e.whatsapp]);
-    if (e.telefono2) filas.push(['fas fa-phone', 'Otro teléfono', e.telefono2]);
-    if (e.email) filas.push(['fas fa-envelope', 'Correo', e.email]);
-    if (e.horario) filas.push(['fas fa-clock', 'Horario', e.horario]);
-    if (e.desc) filas.push(['fas fa-circle-info', 'Ofrece', e.desc]);
+    if (e.contacto) filas.push(['fas fa-user', 'Contacto', e.contacto, 'contacto']);
+    if (e.telefono) filas.push(['fas fa-phone', 'Teléfono', e.telefono, 'telefono']);
+    if (e.telefono2) filas.push(['fas fa-phone', 'Otro teléfono', e.telefono2, 'telefono2']);
+    if (e.email) filas.push(['fas fa-envelope', 'Correo', e.email, 'email']);
+    if (e.horario) filas.push(['fas fa-clock', 'Horario', e.horario, 'horario']);
+    if (e.desc) filas.push(['fas fa-circle-info', 'Ofrece', e.desc, 'desc']);
     document.getElementById('det-datos').innerHTML = filas.map(function (f) {
         return '<div class="perfil-dato"><i class="' + f[0] + '"></i>' +
             '<span><b>' + f[1] + ':</b> ' + escapeHtml(f[2]) + '</span></div>';
@@ -70,38 +80,67 @@ function verEmprendimiento(id) {
             '"></i> ' + def[1] + '</span>' : '';
     }).join('');
 
+    /* Ver mapa colapsado: expande el mapa embebido + botones */
+    var vm = document.getElementById('det-vermapa');
+    var mc = document.getElementById('det-mapa-cont');
     var mapas = document.getElementById('det-mapas');
     var mh = '';
     if (e.maps) {
-        mh += '<a class="mapa-mini emp-mini" target="_blank" rel="noopener" href="' +
+        mh += '<a class="mapa-btn" target="_blank" rel="noopener" href="' +
             escapeHtml(typeof urlDireccion === 'function'
                 ? urlDireccion(e.maps, 'maps') : e.maps) +
-            '"><i class="fas fa-location-dot"></i><span>Google Maps</span></a>';
+            '"><i class="fas fa-location-dot"></i> Google Maps</a>';
     }
     if (e.waze) {
-        mh += '<a class="mapa-mini emp-mini waze" target="_blank" rel="noopener" href="' +
+        mh += '<a class="mapa-btn waze" target="_blank" rel="noopener" href="' +
             escapeHtml(typeof urlDireccion === 'function'
                 ? urlDireccion(e.waze, 'waze') : e.waze) +
-            '"><i class="fas fa-location-dot"></i><span>Waze</span></a>';
+            '"><i class="fas fa-location-dot"></i> Waze</a>';
     }
-    mapas.innerHTML = mh;
-
-    var redes = document.getElementById('det-redes');
-    var rh = '';
-    [['facebook', 'fa-facebook-f'], ['tiktok', 'fa-tiktok'],
-     ['instagram', 'fa-instagram'], ['telegram', 'fa-telegram']]
-        .forEach(function (r) {
-            if (e[r[0]]) {
-                rh += '<a class="emp-mapa emp-social" href="' + escapeHtml(e[r[0]]) +
-                    '" target="_blank" rel="noopener" title="' + r[0] + '">' +
-                    '<i class="fab ' + r[1] + '"></i></a>';
-            }
-        });
-    redes.innerHTML = rh;
-
+    if (mapas) {
+        mapas.innerHTML = mh;
+        mapas.hidden = !mh;
+    }
+    if (vm && mc) {
+        var conUbi = e.lat && e.lng;
+        vm.hidden = !conUbi;
+        mc.hidden = true;
+        vm.onclick = function () {
+            mc.hidden = !mc.hidden;
+            vm.innerHTML = mc.hidden
+                ? '<i class="fas fa-map"></i> Ver mapa'
+                : '<i class="fas fa-map"></i> Ocultar mapa';
+            if (!mc.hidden) _mapaDetalle(e);
+        };
+    }
     var bq = document.getElementById('det-qr');
     if (bq) bq.onclick = function () { mostrarQR(e.id); };
     var bt = document.getElementById('det-tarjeta');
     if (bt) bt.onclick = function () { descargarTarjeta(e.id); };
+    var be = document.getElementById('det-editar');
+    if (be) {
+        /* Editar solo si hay usuario registrado */
+        be.hidden = !(typeof usuarioActual === 'function' && usuarioActual());
+        be.onclick = function () {
+            if (typeof abrirEdicion === 'function') abrirEdicion(e); };
+    }
     irAVista('view-emprendimiento', e.nombre);
+}
+
+/* Mapa embebido del detalle (con logo como marcador) */
+var _detMapa = null;
+function _mapaDetalle(e) {
+    if (typeof L === 'undefined' || !e.lat || !e.lng) return;
+    var box = document.getElementById('det-mapa');
+    if (!box) return;
+    var ll = [Number(e.lat), Number(e.lng)];
+    var ic = e.logo ? L.divIcon({
+        className: '', iconSize: [46, 46], iconAnchor: [23, 46],
+        html: '<img class="marcador-logo" src="' + e.logo + '">'
+    }) : undefined;
+    if (_detMapa) { _detMapa.remove(); _detMapa = null; }
+    _detMapa = L.map('det-mapa', { zoomControl: false }).setView(ll, 15);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(_detMapa);
+    L.marker(ll, ic ? { icon: ic } : {}).addTo(_detMapa);
+    setTimeout(function () { _detMapa.invalidateSize(); }, 250);
 }
