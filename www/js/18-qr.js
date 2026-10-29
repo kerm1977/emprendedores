@@ -60,6 +60,10 @@ async function guardarEmprendimiento(e) {
     e.target.reset();
     renderTodo();
     showToast('Emprendimiento registrado');
+    /* Descarga automatica de la tarjeta digital al registrar */
+    if (typeof descargarTarjeta === 'function') {
+        descargarTarjeta(emp.id);
+    }
     irAVista('view-emprendimientos', 'Negocios');
 }
 

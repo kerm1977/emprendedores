@@ -94,8 +94,12 @@
 }
 
 .magic-item.active .magic-icon {
-    transform: translateY(-34px);
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translate(-50%, -50%);
     color: #ffffff;
+    z-index: 2;
 }
 
 .magic-item.active .magic-text {
@@ -110,6 +114,7 @@
    El borde del círculo es del color de la barra (--nav-bg), así la
    rueda parece parte de la barra que sobresale. */
 .magic-indicator {
+    /* BLINDADO: aprobado por el usuario - NO EDITAR */
     position: absolute;
     top: -30px;
     left: 0;
@@ -169,7 +174,7 @@
         font-size: 1.1rem;
     }
     .magic-item.active .magic-icon {
-        transform: translateY(-30px);
+        top: 0px;
     }
     .magic-indicator {
         width: 52px;

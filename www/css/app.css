@@ -60,7 +60,7 @@ body {
 .topbar-logo {
     display: block;
     margin: 6px auto 8px;
-    height: 56px;
+    height: 64px;
     width: auto;
     object-fit: contain;
 }
@@ -150,6 +150,8 @@ body {
 
 /* ============ Hero (vista Inicio) ============ */
 .hero-card {
+    /* BLINDADO: aprobado por el usuario - NO EDITAR */
+    margin-top: 14px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     border-radius: var(--radius);
     padding: 18px 20px;

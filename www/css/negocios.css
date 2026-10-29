@@ -109,3 +109,38 @@
     color: var(--text-soft);
     margin-top: 4px;
 }
+
+/* Paginacion de Negocios: 10 por pagina */
+.emp-pag {
+    /* BLINDADO: aprobado por el usuario - NO EDITAR */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 12px 0 6px;
+}
+
+.emp-pag-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-soft);
+    background: var(--surface);
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 0 rgba(17,27,33,.08);
+    transition: transform .12s;
+}
+
+.emp-pag-btn:active { transform: translateY(2px); box-shadow: none; }
+.emp-pag-btn:disabled { opacity: .35; pointer-events: none; }
+
+.emp-pag-info {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-soft);
+}

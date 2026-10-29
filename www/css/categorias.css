@@ -67,9 +67,9 @@
     border: 1px solid var(--border-soft);
     background: var(--surface);
     color: var(--text-dark);
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    padding: 7px 12px;
+    padding: 8px 13px;
     border-radius: 999px;
     transition: transform 0.15s, background-color 0.2s, border-color 0.2s;
     cursor: pointer;
@@ -77,7 +77,7 @@
 
 .cat-chip i {
     color: var(--logo-color);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
 }
 
 .cat-chip:hover {
@@ -106,4 +106,29 @@
 
 .filtro-chip i {
     font-size: 0.65rem;
+}
+
+/* BLINDADO por el usuario: SIN blur. Las subcategorias van
+   indentadas a la derecha con linea naranja que las abraza a
+   la izquierda, del color del cuadro de emprendedores */
+.cat-chips {
+    border-left: 3px solid var(--primary-color);
+    border-radius: 3px;
+    margin-left: 10px;
+    padding-left: 12px;
+}
+
+/* BLINDADO: enfoque del grupo abierto - su titulo crece a ~15px
+   y los grupos sin tocar bajan a ~12px para darle protagonismo */
+.cats-enfoque .cat-grupo-titulo {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    color: var(--text-soft);
+    transition: font-size 0.25s, opacity 0.25s, color 0.25s;
+}
+
+.cats-enfoque .cat-grupo-titulo.abierto {
+    font-size: 0.95rem;
+    opacity: 1;
+    color: var(--text-dark);
 }

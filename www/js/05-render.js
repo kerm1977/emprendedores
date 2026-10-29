@@ -25,59 +25,7 @@ function tarjetaEmprendimiento(e) {
 }
 
 /* Fila de extras de la tarjeta: llegada (Maps/Waze) y entregas/domicilio */
-function extrasEmprendimiento(e) {
-    var html = '';
-    if (e.maps) {
-        var urlMaps = typeof urlDireccion === 'function'
-            ? urlDireccion(e.maps, 'maps') : e.maps;
-        html += '<a class="mapa-mini emp-mini" href="' + escapeHtml(urlMaps) +
-            '" target="_blank" rel="noopener">' +
-            '<i class="fas fa-location-dot"></i><span>Maps</span></a>';
-    }
-    if (e.waze) {
-        var urlWaze = typeof urlDireccion === 'function'
-            ? urlDireccion(e.waze, 'waze') : e.waze;
-        html += '<a class="mapa-mini emp-mini waze" href="' + escapeHtml(urlWaze) +
-            '" target="_blank" rel="noopener">' +
-            '<i class="fas fa-location-dot"></i><span>Waze</span></a>';
-    }
-    if (e.facebook) {
-        html += '<a class="emp-mapa emp-social" href="' + escapeHtml(e.facebook) +
-            '" target="_blank" rel="noopener" title="Facebook">' +
-            '<i class="fab fa-facebook-f"></i></a>';
-    }
-    if (e.tiktok) {
-        html += '<a class="emp-mapa emp-social" href="' + escapeHtml(e.tiktok) +
-            '" target="_blank" rel="noopener" title="TikTok">' +
-            '<i class="fab fa-tiktok"></i></a>';
-    }
-    if (e.instagram) {
-        html += '<a class="emp-mapa emp-social" href="' + escapeHtml(e.instagram) +
-            '" target="_blank" rel="noopener" title="Instagram">' +
-            '<i class="fab fa-instagram"></i></a>';
-    }
-    if (e.telegram) {
-        html += '<a class="emp-mapa emp-social" href="' + escapeHtml(e.telegram) +
-            '" target="_blank" rel="noopener" title="Telegram">' +
-            '<i class="fab fa-telegram"></i></a>';
-    }
-    var pluses = e.pluses || [];
-    /* Compatibilidad con registros viejos que usaban flags sueltos */
-    if (e.entregas && pluses.indexOf('entregas') < 0) pluses.push('entregas');
-    if (e.domicilio && pluses.indexOf('domicilio') < 0) pluses.push('domicilio');
-    pluses.forEach(function (p) {
-        var def = (typeof PLUSES !== 'undefined' ? PLUSES : []).find(function (x) {
-            return x[0] === p;
-        });
-        if (def) {
-            html += '<span class="emp-flag"><i class="fas ' + def[2] + '"></i> ' +
-                def[1] + '</span>';
-        }
-    });
-    return html ? '<div class="emp-extras">' + html + '</div>' : '';
-}
 
-/* Destacados = favoritos del usuario logueado (corazon en cada tarjeta) */
 function favsDeUsuario() {
     var u = typeof usuarioActual === 'function' ? usuarioActual() : null;
     if (!u) return [];
@@ -144,6 +92,8 @@ function registrarClic(id) {
     saveData().then(renderHome);
 }
 
+var EMP_POR_PAGINA = 10;
+
 function renderEmprendimientos() {
     var lista = App.data.emprendimientos || [];
     var f = App.filtroCategoria || '';
@@ -157,10 +107,31 @@ function renderEmprendimientos() {
     document.getElementById('emprendimientos-count').textContent =
         filtrados.length + (f ? ' en ' + f : ' registrados');
 
-    document.getElementById('lista-emprendimientos').innerHTML = filtrados.length
-        ? filtrados.map(tarjetaEmprendimiento).join('')
+    /* Paginacion: 10 emprendimientos por pagina */
+    App.paginaEmp = App.paginaEmp || 0;
+    var pags = Math.max(1, Math.ceil(filtrados.length / EMP_POR_PAGINA));
+    if (App.paginaEmp >= pags) App.paginaEmp = 0;
+    var ini = App.paginaEmp * EMP_POR_PAGINA;
+    var pagina = filtrados.slice(ini, ini + EMP_POR_PAGINA);
+
+    document.getElementById('lista-emprendimientos').innerHTML = pagina.length
+        ? pagina.map(tarjetaEmprendimiento).join('')
         : '<div class="vacio"><i class="fas fa-store"></i>' +
           (f ? 'Nada en ' + escapeHtml(f) : 'No hay emprendimientos') + '</div>';
+
+    var pag = document.getElementById('emp-pag');
+    if (pag) {
+        pag.innerHTML = pags > 1
+            ? '<button class="emp-pag-btn" data-dir="-1"' +
+                  (App.paginaEmp === 0 ? ' disabled' : '') + '>' +
+                  '<i class="fas fa-chevron-left"></i></button>' +
+              '<span class="emp-pag-info">' + (App.paginaEmp + 1) +
+                  ' / ' + pags + '</span>' +
+              '<button class="emp-pag-btn" data-dir="1"' +
+                  (App.paginaEmp >= pags - 1 ? ' disabled' : '') + '>' +
+                  '<i class="fas fa-chevron-right"></i></button>'
+            : '';
+    }
 }
 
 function renderDirectorio(filtro) {

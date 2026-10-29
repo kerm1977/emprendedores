@@ -58,10 +58,19 @@ function irAResultado(item) {
     sincronizarBackdrop();
 
     if (item.dataset.tipo === 'categoria') {
-        irAVista('view-inicio', 'Inicio');
-        setTimeout(function () {
-            abrirGrupo(item.dataset.grupo, item.dataset.cat || null);
-        }, 60);
+        var cat = item.dataset.cat || null;
+        if (cat) {
+            /* Desde el buscador entra directo a la categoria en Negocios */
+            App.filtroCategoria = cat;
+            App.paginaEmp = 0;
+            renderEmprendimientos();
+            irAVista('view-emprendimientos', 'Negocios');
+        } else {
+            irAVista('view-inicio', 'Inicio');
+            setTimeout(function () {
+                abrirGrupo(item.dataset.grupo, null);
+            }, 60);
+        }
         return;
     }
 

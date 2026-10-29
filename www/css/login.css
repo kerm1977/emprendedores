@@ -73,8 +73,10 @@
 }
 
 .login-fila {
+    /* BLINDADO: aprobado por el usuario - NO EDITAR */
     display: flex;
-    gap: 12px;
+    flex-direction: column;
+    gap: 0;
 }
 
 .login-fila .login-label {

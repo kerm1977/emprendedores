@@ -205,7 +205,7 @@ a.mapa-mini.waze i {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 0.72rem;
+    font-size: 0.84rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -225,7 +225,7 @@ a.mapa-mini.waze i {
     border-radius: 10px;
     background: var(--bg-soft);
     color: var(--text-dark);
-    font-size: 0.9rem;
+    font-size: 1rem;
     text-align: left;
 }
 

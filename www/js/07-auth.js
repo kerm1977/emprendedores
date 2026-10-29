@@ -126,6 +126,20 @@ function wireLogin() {
 
     document.getElementById('login-cerrar').addEventListener('click', ocultarLogin);
 
+    /* X superior y toque fuera del cuadro: cierran y vuelven a Inicio */
+    var volverInicio = function () {
+        ocultarLogin();
+        irAVista('view-inicio', 'Inicio');
+    };
+    var bx = document.getElementById('login-x');
+    if (bx) bx.addEventListener('click', volverInicio);
+    var ov = document.getElementById('login-overlay');
+    if (ov) {
+        ov.addEventListener('click', function (e) {
+            if (e.target === ov) volverInicio();
+        });
+    }
+
     /* Ojitos para mostrar/ocultar contraseña */
     document.querySelectorAll('.pass-ojo').forEach(function (btn) {
         btn.addEventListener('click', function () {

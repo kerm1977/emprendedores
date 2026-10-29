@@ -186,6 +186,7 @@ var CATEGORIAS = [
         ['Lavandería', 'fa-soap'],
         ['Moda y accesorios', 'fa-shirt'],
         ['Artesanía', 'fa-palette'],
-        ['Funeraria', 'fa-dove']
+        ['Funeraria', 'fa-dove'],
+        ['Recarga y venta de extintores', 'fa-fire-extinguisher']
     ]}
 ];

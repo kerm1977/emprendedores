@@ -53,13 +53,22 @@ function irAVista(viewId, titulo) {
         v.classList.toggle('active', v.id === viewId);
     });
 
+    var indicator = document.querySelector('.magic-indicator');
     if (item) {
         document.querySelectorAll('.magic-item').forEach(function (el) {
             el.classList.remove('active');
         });
         item.classList.add('active');
         if (_moverIndicador) _moverIndicador(item);
+        if (indicator) indicator.style.opacity = '1';
         if (!titulo) titulo = item.getAttribute('data-title');
+    } else {
+        /* Vista sin item en la barra: nada activo y circulo oculto
+           (no queda un circulo varado sobre la barra) */
+        document.querySelectorAll('.magic-item').forEach(function (el) {
+            el.classList.remove('active');
+        });
+        if (indicator) indicator.style.opacity = '0';
     }
 
     App.vistaActual = viewId;

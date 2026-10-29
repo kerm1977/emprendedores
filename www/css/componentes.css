@@ -161,3 +161,23 @@
     font-size: 1.25rem;
     flex-shrink: 0;
 }
+
+/* X de cierre: vuelve a Inicio sin loguear */
+.login-x {
+    /* BLINDADO: aprobado por el usuario - NO EDITAR */
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 18px);
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-soft);
+    color: var(--text-soft);
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-x:active { transform: scale(0.92); }

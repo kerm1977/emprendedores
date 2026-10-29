@@ -46,11 +46,13 @@ function renderCategorias() {
                 chips.hidden = false;
                 titulo.classList.add('abierto');
             }
+            box.classList.toggle('cats-enfoque', abrir);
             return;
         }
         var chip = e.target.closest('.cat-chip');
         if (!chip) return;
         App.filtroCategoria = chip.dataset.cat;
+            App.paginaEmp = 0;
         renderEmprendimientos();
         irAVista('view-emprendimientos', 'Negocios');
     });
@@ -74,6 +76,8 @@ function abrirGrupo(nombreGrupo, nombreChip) {
     var chips = target.parentElement.querySelector('.cat-chips');
     chips.hidden = false;
     target.classList.add('abierto');
+    var box2 = document.getElementById('home-categorias');
+    if (box2) box2.classList.add('cats-enfoque');
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     if (nombreChip) {

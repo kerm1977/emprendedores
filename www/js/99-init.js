@@ -24,7 +24,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     /* Chip para limpiar el filtro de categoría en Negocios */
     document.getElementById('filtro-activo').addEventListener('click', function () {
+        App.paginaEmp = 0;
         App.filtroCategoria = '';
+        App.paginaEmp = 0;
         renderEmprendimientos();
     });
 

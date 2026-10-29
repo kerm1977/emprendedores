@@ -47,3 +47,30 @@
 - **Teléfonos CR**: se ignoran códigos de país (se toman los últimos 8 dígitos). WhatsApp solo habilitado si el número local empieza con 6, 7 u 8; el resto va deshabilitado visible.
 - **Mapas**: los links "cómo llegar" (Maps/Waze) se AUTO-GENERAN desde la ubicación marcada en el mapa Leaflet (vendored, tiles OSM online). `urlDireccion()` arma rutas `dir/?api=1&destination=` y `waze.com/ul?navigate=yes`.
 - **APK**: builds con nombre versionado en `Desktop\App\` (`Emprende-debug.apk`, `Emprende-debug-v2.apk`...) sin sobreescribir anteriores.
+
+## 8. Blindajes adicionales de layout (APROBADOS - prohibido tocar)
+
+- **Hero de Inicio (`.hero-card`)**: margen superior `14px` — queda simetrico
+  con los 14px de `.stats-row`. Prohibido modificar esos margenes o los
+  recuadros de stats.
+- **Indicador del navbar**: en vistas sin item de barra (Registrar,
+  formularios, detalle) el circulo se OCULTA (`opacity: 0`); no debe quedar
+  un circulo varado. El icono activo se centra con posicion absoluta
+  (`top: -1px` / `0px` en <=360px), nunca con translateY aproximado.
+- **Login**: la X de cierre respeta `env(safe-area-inset-top)`; tocar fuera
+  del cuadro cierra y vuelve a Inicio. Campos del registro en linea vertical
+  (`.login-fila` columna), sin columnas paralelas.
+- **Registro de emprendimiento**: al guardar se descarga automaticamente la
+  tarjeta digital del emprendimiento nuevo.
+- **Acordeon de categorias (BLINDADO TOTAL)**: PROHIBIDO blur/difuminado
+  sobre los grupos de abajo — todo queda siempre visible y tocable.
+  Las subcategorias van indentadas ~12px a la derecha con linea vertical
+  naranja de 3px a la izquierda (`border-left` en `.cat-chips`) que abraza
+  toda la lista, del color del cuadro Emprendedores.
+- **Enfoque de categoria abierta (`.cats-enfoque`)**: el titulo del grupo
+  abierto crece a 0.95rem con opacidad 100%; los grupos sin tocar bajan a
+  0.75rem con opacidad 50% y color suave (look "disabled" SOLO visual,
+  siguen tocables). Al cerrar todo vuelve a 0.82rem. Transicion 0.25s.
+- **Negocios**: paginacion de 10 por pagina con reinicio al cambiar filtro.
+- **Sistema de antiduplicidad**: registro hace merge por cedula/telefono/
+  email (nunca duplica) y vincula emprendimientos al mismo usuario.
