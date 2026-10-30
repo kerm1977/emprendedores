@@ -9,9 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 EXCLUIR_DIRS = {".git", "node_modules", "__pycache__", "vendor", "webfonts",
                 "build", ".gradle", ".idea"}  # build = artefactos generados
-EXCLUIR_FILES = {
-    os.path.join("templates", "base.html"),  # monolito congelado (ver AGENTS.md)
-}
+EXCLUIR_FILES = set()
 EXTENSIONES = {".js", ".css", ".html", ".py"}
 
 

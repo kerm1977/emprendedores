@@ -49,7 +49,7 @@ app.register_error_handler(HTTPException, error_seguridad)
 @app.route("/")
 def index():
     ensure_db()
-    return render_template("base.html")
+    return redirect("/app/")
 
 
 @app.route("/inicio", strict_slashes=False)

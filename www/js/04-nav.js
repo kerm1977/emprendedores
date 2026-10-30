@@ -103,8 +103,18 @@ function irAVista(viewId, titulo) {
 function actualizarFab(viewId) {
     var fab = document.getElementById('main-fab');
     if (!fab) return;
-    /* Al salir de Inicio la subcategoria ya no aplica: se limpia el flag */
-    if (viewId !== 'view-inicio') App.subcatActiva = null;
+    /* Al salir de Inicio se limpia la subcategoria y se cierra el
+       acordeon: al volver todas las categorias se ven normales,
+       sin enfoque gris ni grupo abierto. */
+    if (viewId !== 'view-inicio') {
+        App.subcatActiva = null;
+        var cats = document.getElementById('home-categorias');
+        if (cats) {
+            cats.classList.remove('cats-enfoque');
+            cats.querySelectorAll('.cat-chips').forEach(function (c) { c.hidden = true; });
+            cats.querySelectorAll('.cat-grupo-titulo').forEach(function (t) { t.classList.remove('abierto'); });
+        }
+    }
     fab.hidden = !(viewId === 'view-notas' ||
         (viewId === 'view-inicio' && !!App.subcatActiva));
 }
