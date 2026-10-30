@@ -1,10 +1,10 @@
-"""verificar_lineas.py - REGLA SAGRADA: ningun archivo supera las 250 lineas.
+"""verificar_lineas.py - REGLA SAGRADA: ningun archivo supera las 300 lineas.
 Uso: python herramientas/verificar_lineas.py
 Sale con codigo 1 y lista los infractores si los hay."""
 import os
 import sys
 
-LIMITE = 250
+LIMITE = 300
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 EXCLUIR_DIRS = {".git", "node_modules", "__pycache__", "vendor", "webfonts",

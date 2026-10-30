@@ -4,4 +4,5 @@
     <string name="title_activity_main">Emprende</string>
     <string name="package_name">com.emprende.directorio</string>
     <string name="custom_url_scheme">com.emprende.directorio</string>
+    <string name="server_client_id">68651650199-vd3tjnqsul6bofjml2vlhiu9ueisg211.apps.googleusercontent.com</string>
 </resources>

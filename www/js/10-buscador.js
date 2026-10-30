@@ -59,7 +59,9 @@ function campoCoincide(campo, q, qDigitos) {
 }
 
 function buscarEmprendimientos(q, qDigitos) {
-    return (App.data.emprendimientos || []).filter(function (e) {
+    return (App.data.emprendimientos || [])
+        .filter(function (e) { return !e.pausa; })
+        .filter(function (e) {
         return campoCoincide(e.nombre, q, qDigitos) ||
                campoCoincide(e.categoria, q, qDigitos) ||
                campoCoincide(e.lugar, q, qDigitos) ||
@@ -71,9 +73,57 @@ function buscarContactos(q, qDigitos) {
     return (App.data.emprendedores || []).filter(function (p) {
         return campoCoincide(p.nombre, q, qDigitos) ||
                campoCoincide(p.emprendimiento, q, qDigitos) ||
-               campoCoincide(p.telefono, q, qDigitos);
+               campoCoincide(p.telefono, q, qDigitos) ||
+               campoCoincide(p.provincia, q, qDigitos) ||
+               campoCoincide(p.canton, q, qDigitos) ||
+               campoCoincide(p.distrito, q, qDigitos);
     });
 }
+
+/* Dedup visual de negocios/contactos: mismo id, o mismo nombre con
+   igual telefono o igual dueno, se muestra una sola vez. No toca
+   App.data: se aplica solo al renderizar o buscar. */
+function dedupeNegocios(lista) {
+    var ids = {}, claves = {};
+    return (lista || []).filter(function (e) {
+        var id = e.id != null ? 'i' + e.id : '';
+        if (id && ids[id]) return false;
+        var nom = norm(e.nombre || e.emprendimiento || '');
+        var due = norm(e.owner || e.email || '');
+        var c1 = nom + '@' + soloDigitos(e.telefono || '');
+        var c2 = nom + '@' + due;
+        if (nom && (claves[c1] || (due && claves[c2]))) return false;
+        if (id) ids[id] = 1;
+        if (nom) { claves[c1] = 1; if (due) claves[c2] = 1; }
+        return true;
+    });
+}
+
+/* Se envuelve tras cargar todos los scripts (DOMContentLoaded) para
+   no depender del orden de definicion de cada funcion. */
+document.addEventListener('DOMContentLoaded', function () {
+    function conDedupe(nombreFn, campo) {
+        var orig = window[nombreFn];
+        if (typeof orig !== 'function') return;
+        window[nombreFn] = function () {
+            var lista = App.data[campo];
+            if (lista) App.data[campo] = dedupeNegocios(lista);
+            try { return orig.apply(this, arguments); }
+            finally { if (lista) App.data[campo] = lista; }
+        };
+    }
+    conDedupe('renderEmprendimientos', 'emprendimientos');
+    conDedupe('renderEspaciosPromocionados', 'emprendimientos');
+    conDedupe('renderDirectorio', 'emprendedores');
+    var origBuscar = window.buscarEmprendimientos;
+    if (typeof origBuscar === 'function') window.buscarEmprendimientos = function () {
+        return dedupeNegocios(origBuscar.apply(this, arguments));
+    };
+    var origDir = window.buscarContactos;
+    if (typeof origDir === 'function') window.buscarContactos = function () {
+        return dedupeNegocios(origDir.apply(this, arguments));
+    };
+});
 
 function resEmprend(e) {
     return '' +
@@ -106,12 +156,31 @@ function buscarCategorias(q) {
     /* Alias por rubro (ALIAS_TABLA en 00-alias.js) + caso aceite.
        Se desactivan desde el Dashboard del superusuario */
     var aliasOn = App.data.aliasActivo !== false;
+    /* score: 0 = nombre contiene la query (el criterio mas
+       identico, p.ej. "flor" -> "Floristeria"), 1 = grupo,
+       2 = recomendado por alias. El mas exacto sale primero. */
+    CATEGORIAS.forEach(function (g) {
+        if (coincideFuzzy(g.grupo, q)) {
+            res.push({ tipo: 'grupo', grupo: g.grupo, cat: '', icono: g.icono,
+                       detalle: 'Grupo · ' + g.items.length + ' categorías',
+                       _sc: 1 });
+        }
+        g.items.forEach(function (it) {
+            if (coincideFuzzy(it[0], q)) {
+                var exacta = norm(it[0]).indexOf(q) !== -1;
+                res.push({ tipo: 'catitem', grupo: g.grupo, cat: it[0], icono: it[1],
+                           detalle: 'Categoría · ' + g.grupo,
+                           _sc: exacta ? 0 : 1 });
+            }
+        });
+    });
     ALIAS_TABLA.forEach(function (t) {
         if (!aliasOn) return;
         if (t[0].some(function (a) { return aliasCoincide(a, q); })) {
             t[1].forEach(function (c) {
                 res.push({ tipo: 'catitem', grupo: c[1], cat: c[0],
-                           icono: c[2], detalle: 'Recomendado · ' + c[1] });
+                           icono: c[2], detalle: 'Recomendado · ' + c[1],
+                           _sc: 2 });
             });
         }
     });
@@ -120,44 +189,30 @@ function buscarCategorias(q) {
          ['Mecánico automotriz', 'Mecánica', 'fa-car'],
          ['Autorrepuestos', 'Mecánica', 'fa-gears']].forEach(function (c) {
             res.push({ tipo: 'catitem', grupo: c[1], cat: c[0],
-                       icono: c[2], detalle: 'Recomendado · ' + c[1] });
+                       icono: c[2], detalle: 'Recomendado · ' + c[1],
+                       _sc: 2 });
         });
     }
-    CATEGORIAS.forEach(function (g) {
-        if (coincideFuzzy(g.grupo, q)) {
-            res.push({ tipo: 'grupo', grupo: g.grupo, cat: '', icono: g.icono,
-                       detalle: 'Grupo · ' + g.items.length + ' categorías' });
-        }
-        g.items.forEach(function (it) {
-            if (coincideFuzzy(it[0], q)) {
-                res.push({ tipo: 'catitem', grupo: g.grupo, cat: it[0], icono: it[1],
-                           detalle: 'Categoría · ' + g.grupo });
-            }
-        });
-    });
-    /* Sin duplicados: si la recomendacion ya salio por nombre directo */
+    /* Sin duplicados + el criterio mas exacto primero */
     var vistos = {};
     return res.filter(function (r) {
         var k = r.grupo + '|' + r.cat;
         if (vistos[k]) return false;
         vistos[k] = true;
         return true;
+    }).sort(function (a, b) {
+        var d = (a._sc || 0) - (b._sc || 0);
+        return d !== 0 ? d : (a.cat || '').localeCompare(b.cat || '');
     });
 }
 
 function buscarNotas(q, qDigitos) {
-    return (App.data.ferias || App.data.notas || []).filter(function (n) {
-        return campoCoincide(n.titulo, q, qDigitos) ||
-            campoCoincide(n.texto, q, qDigitos) ||
-            campoCoincide(n.lugar, q, qDigitos) ||
-            campoCoincide(n.contacto, q, qDigitos) ||
-            campoCoincide(n.telefono, q, qDigitos);
-    });
+    return typeof buscarEventos === 'function' ? buscarEventos(q, qDigitos) : [];
 }
 
 function resNota(n) {
     return '' +
-        '<div class="res-item" data-tipo="nota" data-id="' + n.id + '">' +
+        '<div class="res-item" data-tipo="evento" data-id="' + escapeHtml(n.id) + '">' +
             '<div class="res-icono"><i class="fas fa-note-sticky"></i></div>' +
             '<div class="res-info">' +
                 '<div class="res-nombre">' + escapeHtml(n.titulo) + '</div>' +

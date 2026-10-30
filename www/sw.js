@@ -1,8 +1,10 @@
+/* BLINDADO (orden del usuario): prohibido modificar/eliminar
+   sin orden explicita. Pedir permiso antes de tocar. */
 /* sw.js - Offline-first: network-first con fallback a caché.
    En desarrollo siempre se ven los cambios (red primero);
    sin conexión responde desde la caché. */
 
-var CACHE_NAME = 'emprende-v8';
+var CACHE_NAME = 'emprende-v21';
 
 var SHELL = [
     './',
@@ -13,6 +15,7 @@ var SHELL = [
     './parciales/ferias.html',
     './parciales/editar.html',
     './parciales/modales.html',
+    './parciales/ajustes.html',
     './parciales/emprendimiento.html',
     './css/app.css',
     './css/componentes.css',
@@ -56,6 +59,14 @@ var SHELL = [
     './js/23-conexion.js',
     './js/25-editar.js',
     './js/26-google.js',
+    './js/27-huella.js',
+    './js/28-reportes.js',
+    './js/29-prohibidas.js',
+    './js/30-notificaciones.js',
+    './js/31-roles.js',
+    './js/32-estadisticas.js',
+    './js/33-est-graficos.js',
+    './js/34-est-acciones.js',
     './js/99-init.js',
     './vendor/css/bootstrap.min.css',
     './vendor/css/all.min.css',
@@ -96,17 +107,25 @@ self.addEventListener('activate', function (e) {
 
 self.addEventListener('fetch', function (e) {
     if (e.request.method !== 'GET') return;
-    if (e.request.url.indexOf('/api/') !== -1) return;
+    var url = new URL(e.request.url);
+    if (url.origin !== location.origin) return;
+    if (url.pathname.indexOf('/api/') !== -1) return;
 
     e.respondWith(
         fetch(e.request).then(function (res) {
-            var copia = res.clone();
-            caches.open(CACHE_NAME).then(function (c) {
-                c.put(e.request, copia);
-            });
+            if (res.ok) {
+                var copia = res.clone();
+                caches.open(CACHE_NAME).then(function (c) {
+                    c.put(e.request, copia);
+                });
+            }
             return res;
         }).catch(function () {
-            return caches.match(e.request);
+            return caches.match(e.request).then(function (hit) {
+                return hit || new Response('Sin conexion', {
+                    status: 503, statusText: 'Offline'
+                });
+            });
         })
     );
 });

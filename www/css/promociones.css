@@ -1,0 +1,22 @@
+.imagen-ampliada { position: fixed; inset: 0; z-index: 5000; background: #000d; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; }
+.imagen-ampliada img { max-width: 92vw; max-height: 80vh; object-fit: contain; border-radius: 12px; }
+.imagen-ampliada button, .promo-boton { padding: 12px 18px; border: 0; border-radius: 12px; background: var(--primary-color); color: #fff; font: inherit; cursor: pointer; }
+.topbar-logo, .perfil-avatar img, .emprend-logo img { cursor: pointer; }
+.promo-hoja { max-height: 88vh; overflow-y: auto; padding: 22px; }
+.promo-hoja label { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; text-align: left; }
+.promo-hoja input, .promo-hoja textarea, .promo-hoja select { width: 100%; padding: 10px; border: 1px solid var(--primary-color); border-radius: 9px; background: var(--surface); color: var(--text-dark); font: inherit; }
+.promo-hoja button { margin: 6px 4px 6px 0; min-height: 44px; }
+.promo-fila { padding: 14px 0; border-bottom: 1px solid var(--border-soft); overflow-wrap: anywhere; }
+.promo-nota { padding: 12px; background: var(--bg-soft); border-radius: 10px; line-height: 1.5; white-space: pre-wrap; }
+.promo-carrusel { display: flex; gap: 14px; overflow-x: auto; touch-action: pan-x pan-y; padding: 12px 0 20px; scrollbar-width: thin; }
+.promo-carrusel > .emprend-card { flex: 0 0 min(34vw, 123px); aspect-ratio: 9 / 16; flex-direction: column; justify-content: center; gap: 8px; text-align: center; }
+.promo-carrusel .emprend-logo { width: 53px; height: 53px; }
+.promo-carrusel .emprend-info { flex: 0; }
+.promo-carrusel .emprend-nombre, .promo-carrusel .emprend-detalle { white-space: normal; overflow-wrap: anywhere; }
+#promo-gratuitos { margin-top: 28px; }
+#promo-perfil, #det-promocionar { width: 100%; margin-top: 12px; }
+.promo-error { color: #dc2626; white-space: pre-wrap; }
+.promo-hoja [hidden] { display: none !important; }
+#view-emprendimientos .vista-encabezado { flex-wrap: wrap; gap: 10px; }
+#view-emprendimientos .vista-encabezado h3 { flex-basis: 100%; text-align: center; }
+@media (prefers-reduced-motion: reduce) { .promo-carrusel { scroll-behavior: auto; } }

@@ -9,7 +9,7 @@ uploads_bp = Blueprint("uploads", __name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 MIMES = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
-MAX_BYTES = 600 * 1024
+MAX_BYTES = 800 * 1024
 
 
 @uploads_bp.route("/api/uploads", methods=["POST"])
@@ -20,7 +20,10 @@ def subir():
     m = re.match(r"data:(image/\w+);base64,(.+)", data)
     if not m or m.group(1) not in MIMES:
         return jsonify({"error": "imagen invalida"}), 400
-    raw = base64.b64decode(m.group(2))
+    try:
+        raw = base64.b64decode(m.group(2), validate=True)
+    except ValueError:
+        return jsonify({"error": "imagen invalida"}), 400
     if len(raw) > MAX_BYTES:
         return jsonify({"error": "imagen muy pesada"}), 413
     os.makedirs(UPLOAD_DIR, exist_ok=True)

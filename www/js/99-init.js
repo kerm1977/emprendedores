@@ -1,6 +1,11 @@
+/* BLINDADO (orden del usuario): prohibido modificar/eliminar
+   sin orden explicita. Pedir permiso antes de tocar. */
 /* 99-init.js - Arranque de la app */
 
 document.addEventListener('DOMContentLoaded', async function () {
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('portrait').catch(function () {});
+    }
     initNav();
     initTema();
 
@@ -35,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById(id).addEventListener('click', function (e) {
             var card = e.target.closest('.emprend-card');
             if (card) {
+                if (e.target.closest('.emp-like, .rep-btn')) return;
                 if (e.target.closest('.emp-fav')) {
                     if (typeof toggleDestacado === 'function') {
                         toggleDestacado(card.dataset.id);
@@ -72,18 +78,20 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (item && typeof verContacto === 'function') verContacto(item.dataset.id);
     });
 
-    /* Botones de sincronización */
-    document.getElementById('btn-sync-ahora').addEventListener('click', syncAhora);
-
-    /* Ajustes: usuarios y sesión */
-    document.getElementById('btn-usuarios').addEventListener('click', function () {
-        renderVistaUsuarios();
-        irAVista('view-usuarios', 'Usuarios');
-        cargarUsuarios();
-    });
-    document.getElementById('btn-logout').addEventListener('click', function () {
-        if (sesion) cerrarSesion();
-        else mostrarLogin();
+    /* Ajustes carga async (parcial): delegar en document */
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('#btn-sync-ahora, #btn-usuarios, #btn-logout');
+        if (!btn) return;
+        if (btn.id === 'btn-sync-ahora' && typeof syncAhora === 'function') {
+            syncAhora();
+        } else if (btn.id === 'btn-usuarios') {
+            renderVistaUsuarios();
+            irAVista('view-usuarios', 'Usuarios');
+            cargarUsuarios();
+        } else if (btn.id === 'btn-logout') {
+            if (sesion) cerrarSesion();
+            else mostrarLogin();
+        }
     });
 
     /* FAB: registrar emprendimiento requiere cuenta */
@@ -97,8 +105,15 @@ document.addEventListener('DOMContentLoaded', async function () {
     /* El FAB: en Ferias agrega feria, en Perfil registra emprendimiento */
     document.getElementById('main-fab').addEventListener('click', function () {
         if (App.vistaActual === 'view-notas') {
-            irAVista('view-feria', 'Nueva feria');
+            prepararNuevoEvento().catch(function (error) { showToast(error.message); });
         } else if (requiereLogin()) {
+            if (App.vistaActual === 'view-inicio' && App.subcatActiva) {
+                App._regCategoria = App.subcatActiva;
+                setTimeout(function () {
+                    var cat = document.querySelector('[data-cat="' + App._regCategoria + '"], [data-categoria="' + App._regCategoria + '"]');
+                    if (cat) cat.click();
+                }, 400);
+            }
             irAVista('view-registro-emp', 'Registrar');
         }
     });
@@ -111,11 +126,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     /* Sesión opcional: la app es pública, solo restaura la sesión */
-    if (typeof initPerfil === 'function') await initPerfil();
-    if (typeof initEmprendimientos === 'function') await initEmprendimientos();
-    if (typeof initFerias === 'function') await initFerias();
-    if (typeof initEditar === 'function') await initEditar();
-    await initAuth();
+    /* Inits en paralelo: cada parcial carga al mismo tiempo,
+       y si uno falla los demas siguen vivos */
+    var parciales = [
+        typeof initPerfil === 'function' ? initPerfil : null,
+        typeof initEmprendimientos === 'function' ? initEmprendimientos : null,
+        typeof initFerias === 'function' ? initFerias : null,
+        typeof initEditar === 'function' ? initEditar : null
+    ].filter(Boolean).map(function (f) {
+        return f().catch(function () { /* init aislado */ });
+    });
+    await Promise.all(parciales);
+    try { await initAuth(); } catch (e) { /* auth aislado */ }
     /* Socket.io desactivado hasta que el servidor lo soporte */
     /* if (typeof initSocket === 'function') initSocket(); */
 

@@ -71,6 +71,11 @@ function irAVista(viewId, titulo) {
         if (indicator) indicator.style.opacity = '0';
     }
 
+    if (viewId === 'view-emprendimientos' && App.vistaActual !== viewId) {
+        mezclarOrdenNegocios();
+        App.paginaEmp = 0;
+        renderEmprendimientos();
+    }
     App.vistaActual = viewId;
     /* En el registro de emprendimiento el buscador no se muestra */
     var tb = document.querySelector('.topbar-buscar');
@@ -80,10 +85,10 @@ function irAVista(viewId, titulo) {
     /* El placeholder del buscador refleja el motor de cada vista */
     var busc = document.getElementById('buscar-global');
     if (busc) {
-        var ph = 'Busca negocio, categoría, contacto, teléfono o feria...';
+        var ph = 'Busca negocio, categoría, contacto, teléfono o evento...';
         if (viewId === 'view-emprendimientos') ph = 'Busca emprendimiento...';
-        if (viewId === 'view-directorio') ph = 'Busca contacto, emprendimiento o teléfono...';
-        if (viewId === 'view-notas') ph = 'Busca feria...';
+        if (viewId === 'view-directorio') ph = 'Busca contacto, negocio, teléfono o provincia...';
+        if (viewId === 'view-notas') ph = 'Busca evento, etiqueta, lugar o contacto...';
         busc.placeholder = ph;
     }
     document.title = 'Emprende · ' + (titulo || '');
@@ -92,3 +97,28 @@ function irAVista(viewId, titulo) {
         prepararFormEmp();
     }
 }
+
+/* FAB "+": solo en Ferias (nuevo evento) o dentro de una
+   subcategoria de Inicio (registrar emprendimiento con esa categoria) */
+function actualizarFab(viewId) {
+    var fab = document.getElementById('main-fab');
+    if (!fab) return;
+    /* Al salir de Inicio la subcategoria ya no aplica: se limpia el flag */
+    if (viewId !== 'view-inicio') App.subcatActiva = null;
+    fab.hidden = !(viewId === 'view-notas' ||
+        (viewId === 'view-inicio' && !!App.subcatActiva));
+}
+
+document.addEventListener('click', function (e) {
+    var chip = e.target.closest('#view-inicio [data-cat], #view-inicio .cat-chip');
+    if (chip) {
+        App.subcatActiva = chip.dataset.cat || chip.textContent.trim();
+        actualizarFab(App.vistaActual);
+        return;
+    }
+    /* Tocar un grupo/titulo del acordeon vuelve a la raiz: se oculta el + */
+    if (e.target.closest('#view-inicio .cat-titulo, #view-inicio .cat-grupo, #view-inicio [data-grupo]')) {
+        App.subcatActiva = null;
+        actualizarFab(App.vistaActual);
+    }
+});

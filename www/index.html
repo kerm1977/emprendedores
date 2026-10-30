@@ -31,12 +31,13 @@
     <link rel="stylesheet" href="css/emprendimiento.css">
     <link rel="stylesheet" href="css/mapas.css">
     <link rel="stylesheet" href="css/negocios.css">
+    <link rel="stylesheet" href="css/promociones.css">
+    <link rel="stylesheet" href="css/eventos.css">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
     <link rel="stylesheet" href="css/tema.css">
     <link rel="stylesheet" href="css/nav.css">
 </head>
 <body>
-
     <!-- Barra superior de la app -->
     <header class="app-topbar">
         <img src="img/logo-emprendedores.png" alt="Emprendedores" class="topbar-logo">
@@ -45,17 +46,12 @@
         </button>
         <div class="topbar-buscar">
             <i class="fas fa-magnifying-glass"></i>
-            <input type="search" id="buscar-global" placeholder="Busca negocio, categoría, contacto, teléfono o nota...">
+            <input type="search" id="buscar-global" placeholder="Busca negocio, categoría, contacto, teléfono o evento...">
         </div>
         <div class="resultados-global" id="resultados-global" hidden></div>
     </header>
-
-    <!-- Fondo difuminado mientras el buscador muestra resultados -->
     <div class="buscador-backdrop" id="buscador-backdrop" hidden></div>
-
     <main class="app-main">
-
-        <!-- VISTA: Inicio -->
         <section class="app-view active" id="view-inicio">
             <div class="hero-card">
                 <div class="hero-izq">
@@ -74,10 +70,9 @@
             <div id="home-destacados" class="cards-grid" hidden></div>
         </section>
 
-        <!-- VISTA: Emprendimientos -->
         <section class="app-view" id="view-emprendimientos">
             <div class="vista-encabezado">
-                <h3 class="section-title mb-0">Emprendimientos</h3>
+                <h3 class="section-title mb-0">Emprendimientos · Espacio pagado</h3>
                 <button class="filtro-chip" id="filtro-activo" hidden>
                     <span id="filtro-nombre"></span><i class="fas fa-xmark"></i>
                 </button>
@@ -87,78 +82,28 @@
             <div id="emp-pag" class="emp-pag"></div>
         </section>
 
-        <!-- VISTA: Directorio de emprendedores -->
         <section class="app-view" id="view-directorio">
-            <div class="buscador">
+            <h3 class="section-title">Directorio de Emprendedores y Negocios</h3>
+            <div class="buscador" hidden>
                 <i class="fas fa-magnifying-glass"></i>
                 <input type="search" id="buscar-contacto" placeholder="Buscar emprendedor o negocio...">
             </div>
             <div id="lista-directorio" class="cards-grid mt-3"></div>
         </section>
 
-        <!-- VISTA: Ferias -->
         <section class="app-view" id="view-notas">
-            <h3 class="section-title">Ferias de emprendimientos</h3>
+            <h3 class="section-title">Eventos de emprendedores</h3>
             <div id="lista-notas" class="notas-grid"></div>
         </section>
 
         <!-- VISTA: Ajustes -->
-        <section class="app-view" id="view-ajustes">
-            <h3 class="section-title">Ajustes</h3>
-            <div class="list-group ajustes-lista">
-                <button class="list-group-item list-group-item-action" id="btn-sync-ahora">
-                    <i class="fas fa-cloud-arrow-up ajuste-icono" id="sync-icon"></i>
-                    <div>
-                        <div class="ajuste-titulo">Sincronizar ahora</div>
-                        <div class="ajuste-sub" id="sync-detalle">Copia local lista</div>
-                    </div>
-                    <i class="fas fa-chevron-right ajuste-flecha"></i>
-                </button>
-                <button class="list-group-item list-group-item-action">
-                    <i class="fas fa-database ajuste-icono"></i>
-                    <div>
-                        <div class="ajuste-titulo">Base de datos</div>
-                        <div class="ajuste-sub">SQLite local / PythonAnywhere</div>
-                    </div>
-                    <i class="fas fa-chevron-right ajuste-flecha"></i>
-                </button>
-                <button class="list-group-item list-group-item-action">
-                    <i class="fas fa-cloud ajuste-icono"></i>
-                    <div>
-                        <div class="ajuste-titulo">Servidor Flask</div>
-                        <div class="ajuste-sub" id="server-url">Solo conectividad API</div>
-                    </div>
-                    <i class="fas fa-chevron-right ajuste-flecha"></i>
-                </button>
-                <button class="list-group-item list-group-item-action" id="btn-usuarios">
-                    <i class="fas fa-users-gear ajuste-icono"></i>
-                    <div>
-                        <div class="ajuste-titulo">Usuarios</div>
-                        <div class="ajuste-sub">Gestionar usuarios registrados</div>
-                    </div>
-                    <i class="fas fa-chevron-right ajuste-flecha"></i>
-                </button>
-                <button class="list-group-item list-group-item-action">
-                    <i class="fas fa-circle-info ajuste-icono"></i>
-                    <div>
-                        <div class="ajuste-titulo">Acerca de</div>
-                        <div class="ajuste-sub">Emprende · offline-first</div>
-                    </div>
-                    <i class="fas fa-chevron-right ajuste-flecha"></i>
-                </button>
-                <button class="list-group-item list-group-item-action" id="btn-logout">
-                    <i class="fas fa-right-from-bracket ajuste-icono"></i>
-                    <div>
-                        <div class="ajuste-titulo">Cerrar sesión</div>
-                        <div class="ajuste-sub" id="sesion-usuario">Invitado</div>
-                    </div>
-                    <i class="fas fa-chevron-right ajuste-flecha"></i>
-                </button>
-            </div>
-        </section>
+        
 
         <!-- VISTA: Usuarios (se construye por JS) -->
         <section class="app-view" id="view-usuarios"></section>
+
+        <!-- VISTA: Bloqueos administrativos (se construye por JS) -->
+        <section class="app-view" id="view-bloqueos"></section>
 
     </main>
 
@@ -188,10 +133,10 @@
                     <span class="magic-text">Directorio</span>
                 </a>
             </li>
-            <li class="magic-item" data-view="view-notas" data-title="Ferias">
+            <li class="magic-item" data-view="view-notas" data-title="Eventos">
                 <a href="#" class="magic-link">
-                    <span class="magic-icon"><i class="fas fa-tents"></i></span>
-                    <span class="magic-text">Ferias</span>
+                    <span class="magic-icon"><i class="fas fa-calendar-days"></i></span>
+                    <span class="magic-text">Eventos</span>
                 </a>
             </li>
             <li class="magic-item" data-view="view-ajustes" data-title="Perfil" data-perfil>
@@ -222,6 +167,8 @@
     <script src="js/05-render.js"></script>
     <script src="js/06-tema.js"></script>
     <script src="js/07-auth.js"></script>
+    <script src="js/07b-foto-perfil.js"></script>
+    <script src="js/07c-sesion-servidor.js"></script>
     <script src="js/08-usuarios.js"></script>
     <script src="js/09-emergencia.js"></script>
     <script src="js/10-buscador.js"></script>
@@ -229,7 +176,10 @@
     <script src="js/12-perfil.js"></script>
     <script src="js/13-emprendimientos.js"></script>
     <script src="js/14-contacto.js"></script>
+    <script src="js/14b-detalle-mapa.js"></script>
     <script src="js/15-tarjeta.js"></script>
+    <script src="js/15a-tarjeta-plantilla.js"></script>
+    <script src="js/15b-tarjeta-descarga.js"></script>
     <script src="js/16-mapas.js"></script>
     <script src="vendor/leaflet/leaflet.js"></script>
     <script src="js/17-registro-wizard.js"></script>
@@ -242,6 +192,34 @@
     <script src="js/23-conexion.js"></script>
     <script src="js/25-editar.js"></script>
     <script src="js/26-google.js"></script>
+    <script src="js/27-huella.js"></script>
+    <script src="js/28-reportes.js"></script>
+    <script src="js/29-prohibidas.js"></script>
+    <script src="js/30-notificaciones.js"></script>
+    <script src="js/31-roles.js"></script>
+    <script src="js/32-estadisticas.js"></script>
+    <script src="js/33-est-graficos.js"></script>
+    <script src="js/34-est-acciones.js"></script>
+    <script src="js/35-interacciones.js"></script>
+    <script src="js/36-promociones-api.js"></script>
+    <script src="js/37-promociones-tarifas.js"></script>
+    <script src="js/38-promociones-manual.js"></script>
+    <script src="js/39-carrusel-gratuitos.js"></script>
+    <script src="js/40-promociones-avisos.js"></script>
+    <script src="js/41-promociones-cobro.js"></script>
+    <script src="js/42-eventos-api.js"></script>
+    <script src="js/43-eventos-formulario.js"></script>
+    <script src="js/44-eventos-vistas.js"></script>
+    <script src="js/45-eventos-administracion.js"></script>
+    <script src="js/46-actualizador.js"></script>
+    <script src="js/47-guia-ota.js"></script>
+    <script src="js/48-wysiwyg.js"></script>
+    <script src="js/49-foto-editor.js"></script>
+    <script src="js/50-super-tarjeta.js"></script>
+    <script src="js/51-bloqueo.js"></script>
+    <script src="js/52-ficticios.js"></script>
+    <script src="js/53-mis-empresas.js"></script>
+    <script src="js/54-bloqueos-admin.js"></script>
     <script src="vendor/js/qrious.min.js"></script>
     <script src="vendor/js/socket.io.min.js"></script>
     <script src="js/99-init.js"></script>

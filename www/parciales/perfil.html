@@ -4,11 +4,8 @@
         <div class="perfil-avatar"><i class="fas fa-user"></i></div>
         <h3 id="perfil-nombre">—</h3>
         <p class="perfil-rol" id="perfil-rol">—</p>
+        <div id="perfil-stats" hidden></div>
         <div class="perfil-datos">
-            <div class="perfil-dato">
-                <i class="fas fa-envelope"></i>
-                <span id="perfil-email">—</span>
-            </div>
             <div class="perfil-dato">
                 <i class="fas fa-phone"></i>
                 <span id="perfil-telefono">—</span>
@@ -18,6 +15,11 @@
                 <span id="perfil-cedula">—</span>
             </div>
         </div>
+        <button class="perfil-btn-ajustes" id="perfil-notif"
+                type="button" onclick="abrirNotificaciones()" hidden>
+            <i class="fas fa-bell"></i> Notificaciones
+            (<b id="perfil-notif-count">0</b>)
+        </button>
         <button class="perfil-btn-ajustes" id="btn-dashboard" hidden>
             <i class="fas fa-gauge-high"></i> Dashboard
         </button>
@@ -27,36 +29,6 @@
         <button class="perfil-btn-salir" id="btn-salir-perfil">
             <i class="fas fa-right-from-bracket"></i> Cerrar sesión
         </button>
-    </div>
-</section>
-
-<!-- Dashboard del superusuario: activa/desactiva criterios de busqueda -->
-<section class="app-view" id="view-dashboard">
-    <div class="perfil-card">
-        <div class="perfil-avatar"><i class="fas fa-gauge-high"></i></div>
-        <h3>Dashboard</h3>
-        <p class="perfil-rol">Superusuario</p>
-        <div class="perfil-datos">
-            <label class="perfil-dato dash-fila">
-                <span>
-                    <i class="fas fa-magnifying-glass"></i>
-                    <b>Búsqueda inteligente</b><br>
-                    <small>Sinónimos y criterios por categoría</small>
-                </span>
-                <input type="checkbox" id="dash-alias" checked>
-            </label>
-        </div>
-        <p class="dash-nota">Desactivado, el buscador solo encuentra
-           categorías por su nombre exacto.</p>
-        <button class="perfil-btn-ajustes" id="dash-dic-ver" type="button">
-            <i class="fas fa-book-open"></i> Ver diccionario de palabras
-        </button>
-        <div id="dash-dic-lista" hidden></div>
-        <button class="perfil-btn-ajustes" type="button"
-                onclick="probarConexion()">
-            <i class="fas fa-satellite-dish"></i> Probar conexión servidor
-        </button>
-        <div id="con-test" class="con-test"></div>
     </div>
 </section>
 
@@ -107,3 +79,55 @@
         </div>
     </div>
 </div>
+
+<!-- Estadisticas del sitio: solo superusuario -->
+<section class="app-view" id="view-dashboard">
+    <div class="perfil-card" style="max-width:none;text-align:left">
+        <div class="perfil-avatar"><i class="fas fa-chart-pie"></i></div>
+        <h3>Estadísticas</h3>
+        <p class="perfil-rol">Superusuario</p>
+        <button class="est-acc-btn" type="button" data-acc="est-graf-cont">
+            <i class="fas fa-chart-pie"></i> Gráficos de las métricas
+            <i class="fas fa-chevron-down acc-flecha"></i>
+        </button>
+        <div class="est-acc-cont" id="est-graf-cont" hidden>
+            <canvas id="pie-cat" class="est-pie"></canvas>
+            <canvas id="pie-dias" class="est-pie"></canvas>
+            <canvas id="pie-rep" class="est-pie"></canvas>
+        </div>
+        <button class="est-acc-btn" type="button" data-acc="est-resumen">
+            <i class="fas fa-chart-line"></i> Estadísticas
+            <i class="fas fa-chevron-down acc-flecha"></i>
+        </button>
+        <div class="est-acc-cont" id="est-resumen" hidden></div>
+        <button class="est-acc-btn" type="button" data-acc="est-reportes">
+            <i class="fas fa-flag"></i> Reportes
+            <i class="fas fa-chevron-down acc-flecha"></i>
+        </button>
+        <div class="est-acc-cont" id="est-reportes" hidden></div>
+        <button class="est-acc-btn" type="button" data-acc="est-likes">
+            <i class="fas fa-heart"></i> Likes
+            <i class="fas fa-chevron-down acc-flecha"></i>
+        </button>
+        <div class="est-acc-cont" id="est-likes" hidden></div>
+        <button class="est-acc-btn" type="button" data-acc="est-alertas">
+            <i class="fas fa-bell"></i> Alertas
+            <i class="fas fa-chevron-down acc-flecha"></i>
+        </button>
+        <div class="est-acc-cont" id="est-alertas" hidden></div>
+        <button class="est-acc-btn" type="button" data-acc="est-actividad">
+            <i class="fas fa-bolt"></i> Actividad del sitio
+            <i class="fas fa-chevron-down acc-flecha"></i>
+        </button>
+        <div class="est-acc-cont" id="est-actividad" hidden></div>
+        <button class="perfil-btn-ajustes" type="button"
+                onclick="descargarEstadisticas()">
+            <i class="fas fa-file-arrow-down"></i> Descargar
+            estadísticas (.txt)
+        </button>
+        <button class="perfil-btn-ajustes" type="button"
+                onclick="irAVista('view-perfil','Perfil')">
+            <i class="fas fa-user-circle"></i> Volver a mi perfil
+        </button>
+    </div>
+</section>

@@ -50,7 +50,11 @@ var CATEGORIAS = [
         ['Distribuidor de gas', 'fa-fire'],
         ['Lotería / Chances / Tiempos', 'fa-ticket'],
         ['Joyería', 'fa-gem'],
-        ['Reciclaje de metales', 'fa-recycle']
+        ['Community Manager', 'fa-bullhorn'],
+        ['Mercadeo', 'fa-chart-line'],
+        ['Reciclaje de metales', 'fa-recycle'],
+        ['Librería', 'fa-book'],
+        ['Bazar y Pasamanería', 'fa-store']
     ]},
     { grupo: 'Electrónica', icono: 'fa-plug', items: [
         ['Técnico en electrónica', 'fa-microchip'],
@@ -179,7 +183,8 @@ var CATEGORIAS = [
         ['Ministerio musical', 'fa-music'],
         ['Coros', 'fa-people-group'],
         ['Profesor de música', 'fa-person-chalkboard'],
-        ['Banda o grupo musical', 'fa-drum']
+        ['Banda o grupo musical', 'fa-drum'],
+        ['DJ y venta instrumentos musicales', 'fa-compact-disc']
     ]},
     { grupo: 'Otros servicios', icono: 'fa-briefcase', items: [
         ['Fotografía', 'fa-camera'],

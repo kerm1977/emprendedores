@@ -1,3 +1,5 @@
+/* BLINDADO (orden del usuario): prohibido modificar/eliminar
+   sin orden explicita. Pedir permiso antes de tocar. */
 /* 13-emprendimientos.js - Registro de emprendimiento en pagina completa,
    FAB visible solo dentro de Perfil con sesion, y QR por emprendimiento
    (el codigo no se muestra en la tarjeta, solo el icono). */
@@ -24,6 +26,11 @@ var PLUSES = [
     ['certifica', 'Certificado', 'fa-certificate'],
     ['promos', 'Promociones', 'fa-tags'],
     ['creditos', 'Acepta crédito', 'fa-hand-holding-dollar'],
+    ['paypal', 'Acepta PayPal', 'fa-dollar-sign'],
+    ['wallet', 'Acepta wallet', 'fa-wallet'],
+    ['cripto', 'Acepta criptomonedas', 'fa-coins'],
+    ['transferencia', 'Acepta transferencia', 'fa-money-bill-transfer'],
+    ['pagonline', 'Pagos en línea', 'fa-cash-register'],
     ['devolucion', 'Devoluciones', 'fa-rotate-left'],
     ['acreditado', 'Profesional acreditado', 'fa-award']
 ];
@@ -59,7 +66,10 @@ var DIAS = [
 function llenarDias() {
     var cont = document.getElementById('emp-agenda');
     if (!cont) return;
-    cont.innerHTML = DIAS.map(function (d) {
+    cont.innerHTML =
+        '<button type="button" class="ubi-btn emp-24-365" id="emp-24-365">' +
+            '<i class="fas fa-infinity"></i> 24 horas · 365 días' +
+        '</button>' + DIAS.map(function (d) {
         return '<div class="emp-fila-dia" data-dia="' + d[0] + '">' +
             '<button type="button" class="emp-dia-toggle">' + d[1] + '</button>' +
             '<div class="emp-dia-horas">' +
@@ -70,6 +80,19 @@ function llenarDias() {
         '</div>';
     }).join('');
     cont.addEventListener('click', function (e) {
+        if (e.target.closest('#emp-24-365')) {
+            var on = e.target.closest('#emp-24-365')
+                .classList.toggle('activo');
+            cont.querySelectorAll('.emp-fila-dia').forEach(function (f) {
+                f.classList.toggle('activo', on);
+                f.querySelector('.h-abre').value = '00:00';
+                f.querySelector('.h-cierra').value = '23:59';
+                f.querySelectorAll('input').forEach(function (i) {
+                    i.disabled = !on;
+                });
+            });
+            return;
+        }
         var btn = e.target.closest('.emp-dia-toggle');
         if (!btn) return;
         var fila = btn.closest('.emp-fila-dia');
@@ -96,6 +119,12 @@ function agendaSeleccionada() {
 function horarioTexto() {
     var ag = agendaSeleccionada();
     if (!ag.length) return '';
+    /* 24/365: los 7 dias a 00:00-23:59 */
+    if (ag.length === 7 && ag.every(function (a) {
+        return a.abre === '00:00' && a.cierra === '23:59';
+    })) {
+        return '24 horas · 365 días';
+    }
     var grupos = {};
     ag.forEach(function (a) {
         var k = a.abre + '-' + a.cierra;

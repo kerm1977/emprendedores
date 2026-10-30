@@ -119,6 +119,10 @@ def init_db():
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL
             )""")
+        try:
+            db.execute("ALTER TABLE usuarios ADD COLUMN foto TEXT DEFAULT ''")
+        except Exception:
+            pass
         db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_u_email ON usuarios(email)")
         db.execute("CREATE INDEX IF NOT EXISTS idx_u_cedula ON usuarios(cedula)")
         db.execute("CREATE INDEX IF NOT EXISTS idx_u_telefono ON usuarios(telefono)")
@@ -229,4 +233,5 @@ def user_dict(row):
         "telefono": row["telefono"],
         "cedula": row["cedula"],
         "rol": row["rol"],
+        "foto": row["foto"] if "foto" in row.keys() else "",
     }

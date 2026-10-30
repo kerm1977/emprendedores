@@ -57,6 +57,13 @@
 
         <div class="paso" data-paso="4" hidden>
             <div class="emp-campo">
+                <div class="ubi-toggle">
+                    <button type="button" id="emp-dir-si" class="ubi-btn activo">Cuento con dirección física</button>
+                    <button type="button" id="emp-dir-no" class="ubi-btn">No cuento con dirección física</button>
+                </div>
+            </div>
+            <div id="ubi-bloque">
+            <div class="emp-campo">
                 <span>Tocá el mapa para marcar tu ubicación</span>
                 <div id="emp-mapa" class="emp-mapa-pick"></div>
                 <button type="button" class="emp-geo" id="emp-geo">
@@ -76,21 +83,15 @@
                     <option>Limón</option>
                 </select>
             </label>
-            <label class="emp-campo">
-                <span>Cantón (opcional)</span>
-                <input type="text" id="emp-canton" placeholder="Ej: San Carlos">
-            </label>
-            <label class="emp-campo">
-                <span>Distrito (opcional)</span>
-                <input type="text" id="emp-distrito" placeholder="Ej: Santa Rosa">
-            </label>
-            <label class="emp-campo">
-                <span>Dirección exacta (opcional)</span>
-                <input type="text" id="emp-lugar"
-                       placeholder="Ej: 200m norte de la escuela...">
-            </label>
+            <label class="emp-campo"><span>Cantón (opcional)</span><input type="text" id="emp-canton" placeholder="Ej: San Carlos"></label>
+            <label class="emp-campo"><span>Distrito (opcional)</span><input type="text" id="emp-distrito" placeholder="Ej: Santa Rosa"></label>
+            <label class="emp-campo"><span>Dirección exacta (opcional)</span><input type="text" id="emp-lugar" placeholder="Ej: 200m norte de la escuela..."></label>
             <p class="emp-geo-nota">Si marcás el mapa, provincia, cantón y
                distrito se llenan solos.</p>
+            </div>
+            <p class="emp-geo-nota" id="ubi-sin" hidden>
+                Tu emprendimiento se publica como <b>servicio a
+                domicilio</b>: no aparece mapa ni dirección.</p>
             <div class="mapa-btns" id="prev-mapas" hidden>
                 <a id="prev-maps-a" class="mapa-btn" href="#"
                    target="_blank" rel="noopener">
@@ -124,6 +125,10 @@
                 <span>Telegram</span>
                 <input type="url" id="emp-telegram" placeholder="https://t.me/...">
             </label>
+            <label class="emp-campo">
+                <span>Página web</span>
+                <input type="url" id="emp-web" placeholder="https://tusitio.com">
+            </label>
         </div>
 
         <div class="paso" data-paso="6" hidden>
@@ -138,10 +143,9 @@
                 <span>Días y horario (marcá los días que trabajás)</span>
                 <div class="emp-agenda" id="emp-agenda"></div>
             </div>
-            <label class="emp-campo">
-                <span>Descripción breve</span>
-                <textarea id="emp-desc" rows="3" placeholder="¿Qué ofrecés?"></textarea>
-            </label>
+            <label class="perfil-dato dash-fila"><span><i class="fas fa-clock"></i> <b>Atención 24 horas</b></span><input type="checkbox" id="emp-24h"></label>
+            <label class="perfil-dato dash-fila"><span><i class="fas fa-calendar-star"></i> <b>Abro días feriados</b></span><input type="checkbox" id="emp-feriados"></label>
+            <label class="emp-campo"><span>Descripción breve</span><textarea id="emp-desc" rows="3" placeholder="¿Qué ofrecés?"></textarea></label>
         </div>
 
         <div class="paso" data-paso="8" hidden>
@@ -182,24 +186,42 @@
 <!-- Vista detalle de emprendimiento: toda la info registrada -->
 <section class="app-view" id="view-emprendimiento">
     <div class="perfil-card">
-        <div class="perfil-avatar">
-            <img id="det-logo" class="det-logo" hidden alt="Logo">
-            <i id="det-icono" class="fas fa-store"></i>
+        <div class="det-cabecera-logo">
+            <div class="perfil-avatar">
+                <img id="det-logo" class="det-logo" hidden alt="Logo">
+                <i id="det-icono" class="fas fa-store"></i>
+            </div>
+            <div class="det-corazon-zona">
+                <button class="det-acc-btn like" id="det-like-arriba" type="button" aria-label="Me gusta" hidden>
+                    <i class="fas fa-heart"></i>
+                </button>
+            </div>
         </div>
-        <h3 id="det-nombre">—</h3>
+        <div class="det-nombre-fila">
+            <h3 id="det-nombre">—</h3>
+            <button class="det-edit-icono" id="det-editar" type="button"
+                    hidden title="Editar emprendimiento">
+                <i class="fas fa-pen"></i>
+            </button>
+        </div>
         <p class="perfil-rol" id="det-categoria">—</p>
         <div class="perfil-datos" id="det-datos"></div>
         <div class="emp-extras det-extras" id="det-pluses"></div>
-        <button class="det-vermapa" id="det-vermapa" type="button" hidden>
+        <button class="det-vermapa" id="det-vermapa" type="button" aria-controls="det-mapa-cont" aria-expanded="false" hidden>
             <i class="fas fa-map"></i> Ver mapa
         </button>
         <div id="det-mapa-cont" hidden>
-            <div id="det-mapa" class="det-mapa"></div>
+            <div class="det-mapa-marco">
+                <div id="det-mapa" class="det-mapa"></div>
+                <button id="det-mapa-activar" type="button" aria-controls="det-mapa"><span>Tocá para activar el mapa</span></button>
+            </div>
+            <div class="det-mapa-controles">
+                <button id="det-mapa-centrar" type="button">Centrar ubicación</button>
+                <button id="det-mapa-bloquear" type="button" hidden>Bloquear mapa</button>
+            </div>
         </div>
+        <hr class="det-sep" id="det-rutas-sep" hidden>
         <div class="mapa-btns" id="det-mapas" hidden></div>
-        <button class="det-editar-btn" id="det-editar" type="button" hidden>
-            <i class="fas fa-pencil"></i> Editar
-        </button>
         <div class="con-acciones det-acciones">
             <button class="btn-llamar" id="det-qr" type="button">
                 <i class="fas fa-qrcode"></i> QR
@@ -208,6 +230,22 @@
                 <i class="fas fa-address-card"></i> Tarjeta digital
             </button>
         </div>
+        <hr class="det-sep" id="det-stats-sep" hidden>
+        <button class="det-acc-btn" id="det-stats-btn" type="button" hidden>
+            <i class="fas fa-chart-line"></i> Estadísticas
+        </button>
+        <div id="det-stats" hidden></div>
+        <button class="promo-boton" id="det-promocionar" type="button" hidden>Promocionar mi negocio</button>
+        <hr class="det-sep" id="det-social-sep">
+        <div class="det-acciones-pie" id="det-pie-social">
+            <button class="det-acc-btn rep" id="det-reportar" type="button">
+                <i class="fas fa-flag"></i> Reportar
+            </button>
+            <button class="det-acc-btn like" id="det-like" type="button">
+                <i class="fas fa-heart"></i>
+            </button>
+        </div>
+
     </div>
 </section>
 

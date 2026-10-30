@@ -27,10 +27,15 @@ async function guardarEmprendimiento(e) {
         distrito: document.getElementById('emp-distrito').value.trim(),
         lugar: document.getElementById('emp-lugar').value.trim(),
         horario: horarioTexto(),
+        h24: document.getElementById('emp-24h').checked,
+        sinUbicacion: document.getElementById('emp-dir-no')
+            .classList.contains('activo'),
+        feriados: document.getElementById('emp-feriados').checked,
         agenda: agendaSeleccionada(),
         facebook: document.getElementById('emp-facebook').value.trim(),
         tiktok: document.getElementById('emp-tiktok').value.trim(),
         instagram: document.getElementById('emp-instagram').value.trim(),
+        web: document.getElementById('emp-web').value.trim(),
         telegram: document.getElementById('emp-telegram').value.trim(),
         maps: document.getElementById('emp-maps').value.trim(),
         waze: document.getElementById('emp-waze').value.trim(),
@@ -39,18 +44,32 @@ async function guardarEmprendimiento(e) {
         estado: 'nuevo',
         clics: 0,
         qr: generarQRToken(),
-        owner: u ? u.email : ''
+        owner: u ? u.email :
+               (document.getElementById('emp-email').value.trim()
+                .toLowerCase())
     };
     if (!emp.nombre || !emp.categoria) {
         showToast('Completa nombre y categoría');
         return;
     }
-    if (!emp.provincia) {
+    if (!emp.sinUbicacion && !emp.provincia) {
         showToast('Elegí la provincia del emprendimiento');
         return;
     }
     App.data.emprendimientos = App.data.emprendimientos || [];
     App.data.emprendimientos.push(emp);
+    if (typeof logActividad === 'function') {
+        var _u = typeof usuarioActual === 'function' ?
+                 usuarioActual() : null;
+        logActividad('emp',
+            (_u ? _u.email : 'Invitado') +
+            ' publicó el negocio "' + emp.nombre + '"');
+        if (emp.logo) {
+            logActividad('foto',
+                (_u ? _u.email : 'Invitado') +
+                ' subió logo de "' + emp.nombre + '"');
+        }
+    }
 
     /* El directorio guarda: emprendimiento, contacto y WhatsApp */
     var nombreContacto = emp.contacto ||

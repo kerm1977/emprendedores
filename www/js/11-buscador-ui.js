@@ -23,6 +23,7 @@ function renderResultados(q, box) {
         emprends = buscarEmprendimientos(ql, qd);
     } else if (vista === 'view-directorio') {
         contactos = buscarContactos(ql, qd);
+        if (typeof renderDirectorio === 'function') renderDirectorio(q);
     } else if (vista === 'view-notas') {
         notas = buscarNotas(ql, qd);
     } else {
@@ -46,7 +47,7 @@ function renderResultados(q, box) {
                 contactos.slice(0, 8).map(resContacto).join('');
     }
     if (notas.length) {
-        html += '<div class="res-grupo">Ferias</div>' +
+        html += '<div class="res-grupo">Eventos</div>' +
                 notas.slice(0, 6).map(resNota).join('');
     }
     box.innerHTML = html || '<div class="res-vacio">Sin resultados para "' +
@@ -82,6 +83,11 @@ function irAResultado(item) {
                 abrirGrupo(item.dataset.grupo, null);
             }, 60);
         }
+        return;
+    }
+
+    if (item.dataset.tipo === 'evento') {
+        abrirEvento(item.dataset.id).catch(function (error) { showToast(error.message); });
         return;
     }
 

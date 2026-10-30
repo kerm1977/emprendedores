@@ -1,3 +1,5 @@
+/* BLINDADO (orden del usuario): prohibido modificar/eliminar
+   sin orden explicita. Pedir permiso antes de tocar. */
 /* 17b-ubi.js - Motor de ubicacion del wizard (BLINDADO TOTAL).
    Extraido de 17-registro-wizard.js por la regla de 250 lineas.
 

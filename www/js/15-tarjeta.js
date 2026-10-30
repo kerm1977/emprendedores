@@ -3,119 +3,114 @@
    emprendimiento; todos los enlaces son tocables. */
 
 function soloDigitos(t) {
-    return (t || '').replace(/\D/g, '');
+    return String(t || '').replace(/\D/g, '');
+}
+
+function textoTarjeta(valor) {
+    return String(valor == null ? '' : valor).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+}
+
+function urlTarjeta(valor) {
+    try {
+        var url = new URL(String(valor || '').trim());
+        return /^(https?:|tel:|mailto:)$/.test(url.protocol) ? url.href : '';
+    } catch (error) { return ''; }
 }
 
 function enlaceTarjeta(href, clase, texto) {
-    return href
-        ? '<a class="' + clase + '" href="' + href +
-          '" target="_blank" rel="noopener">' + texto + '</a>'
-        : '';
+    var url = urlTarjeta(href);
+    var icono = clase === 'boton google-maps' ?
+        '<svg class="icono-maps" viewBox="0 0 48 48" aria-hidden="true" focusable="false">' +
+        '<path fill="#4285f4" d="M43.6 20.5H24v8h11.3C33.7 33 29.6 36 24 36a12 12 0 1 1 0-24c3 0 5.7 1.1 7.8 3l6-6A20.5 20.5 0 1 0 24 44.5c12 0 20-8.4 20-20.3 0-1.3-.1-2.5-.4-3.7"/>' +
+        '<path fill="#34a853" d="M24 44.5c5.5 0 10.1-1.8 13.5-5l-6.6-5.1A12 12 0 0 1 13 28l-6.9 5.3A20.5 20.5 0 0 0 24 44.5"/>' +
+        '<path fill="#fbbc05" d="M13 28a12 12 0 0 1 0-8l-6.9-5.3a20.5 20.5 0 0 0 0 18.6z"/>' +
+        '<path fill="#ea4335" d="M24 12c3 0 5.7 1.1 7.8 3l6-6A20.5 20.5 0 0 0 6.1 14.7L13 20A12 12 0 0 1 24 12"/></svg>' : '';
+    return url ? '<a class="' + textoTarjeta(clase) + '" href="' + textoTarjeta(url) +
+        '" target="_blank" rel="noopener noreferrer">' + icono + textoTarjeta(texto) + '</a>' : '';
+}
+
+function marcaTarjeta() {
+    var src = typeof API_BASE !== 'undefined' ? API_BASE + '/app/img/logo-emprendedores.png' : '';
+    try {
+        var img = document.querySelector('.topbar-logo');
+        if (img && img.complete && img.naturalWidth) {
+            var canvas = document.createElement('canvas');
+            canvas.width = 480;
+            canvas.height = Math.round(img.naturalHeight * canvas.width / img.naturalWidth);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            src = canvas.toDataURL('image/png');
+        }
+    } catch (error) {}
+    return src ? '<img class="marca-logo" src="' + textoTarjeta(src) + '" alt="Emprendedores">' : '';
+}
+
+function telefonoTarjeta(valor) {
+    var numero = soloDigitos(valor);
+    return numero.length === 8 ? '506' + numero : numero;
+}
+
+function filaTarjeta(titulo, valor) {
+    return valor ? '<div class="fila"><dt>' + textoTarjeta(titulo) + '</dt><dd>' +
+        textoTarjeta(valor) + '</dd></div>' : '';
+}
+
+function logoTarjeta(valor) {
+    if (/^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=\s]+$/i.test(valor || '')) return valor;
+    if (/^\/uploads\//.test(valor || '') && typeof API_BASE !== 'undefined') {
+        return urlTarjeta(API_BASE + valor);
+    }
+    var url = urlTarjeta(valor);
+    return /^https?:/.test(url) ? url : '';
 }
 
 function htmlTarjeta(e, contacto) {
-    var wa = soloDigitos((contacto && contacto.telefono) || e.whatsapp || e.telefono);
-    var tel = soloDigitos(e.telefono) || wa;
-    var pluses = (e.pluses || []).map(function (p) {
-        var def = (typeof PLUSES !== 'undefined' ? PLUSES : []).find(function (x) {
-            return x[0] === p;
-        });
-        return def ? '<span class="plus">' + def[1] + '</span>' : '';
-    }).join('');
-
-    return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">' +
-'<meta name="viewport" content="width=device-width, initial-scale=1">' +
-'<title>' + e.nombre + ' · Emprendedores</title><style>' +
-'*{margin:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}' +
-'body{background:#f1f5f9;min-height:100vh;display:flex;align-items:center;' +
-'justify-content:center;padding:18px}' +
-'.card{background:#fff;border-radius:22px;max-width:380px;width:100%;overflow:hidden;' +
-'box-shadow:0 12px 40px rgba(15,23,42,.15)}' +
-'.hero{background:linear-gradient(135deg,#ea580c,#c2410c);color:#fff;' +
-'padding:26px 20px;text-align:center}' +
-'.hero .logo{width:64px;height:64px;margin:0 auto 10px;border-radius:50%;' +
-'background:rgba(255,255,255,.18);display:flex;align-items:center;' +
-'justify-content:center;font-size:26px;font-weight:800}' +
-'.hero h1{font-size:1.3rem}' +
-'.hero p{font-size:.8rem;opacity:.9;margin-top:4px}' +
-'.cuerpo{padding:18px 20px}' +
-'.fila{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid #f1f5f9;' +
-'font-size:.88rem;color:#334155;word-break:break-all}' +
-'.fila b{color:#ea580c;min-width:74px;font-size:.78rem;text-transform:uppercase}' +
-'.acciones{display:flex;gap:10px;margin:14px 0}' +
-'.acciones a{flex:1;text-align:center;padding:12px;border-radius:12px;' +
-'font-weight:700;font-size:.9rem;text-decoration:none}' +
-'.llamar{background:#f1f5f9;color:#0f172a;border:1.5px solid #e2e8f0}' +
-'.wa{background:#25d366;color:#fff}' +
-'.enlaces{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}' +
-'.enlaces a{padding:7px 13px;border-radius:999px;font-size:.78rem;font-weight:700;' +
-'text-decoration:none}' +
-'.maps{background:rgba(26,115,232,.12);color:#1a73e8}' +
-'.waze{background:rgba(51,204,255,.14);color:#0097a7}' +
-'.fb{background:rgba(24,119,242,.12);color:#1877f2}' +
-'.tk{background:#0f172a;color:#fff}' +
-'.plus{display:inline-block;margin:0 6px 6px 0;padding:5px 11px;border-radius:999px;' +
-'background:rgba(234,88,12,.1);color:#ea580c;font-size:.75rem;font-weight:600}' +
-'.pie{text-align:center;font-size:.7rem;color:#94a3b8;padding:0 0 14px}' +
-'</style></head><body><div class="card">' +
-'<div class="hero"><div class="logo">' +
-    (e.nombre || 'E').charAt(0).toUpperCase() + '</div>' +
-'<h1>' + e.nombre + '</h1>' +
-'<p>' + (e.categoria || '') + (e.lugar ? ' · ' + e.lugar : '') + '</p></div>' +
-'<div class="cuerpo">' +
-(contacto && contacto.nombre ? '<div class="fila"><b>Responsable</b><span>' +
-    contacto.nombre + '</span></div>' : '') +
-(tel ? '<div class="fila"><b>Teléfono</b><span>' + (e.telefono || '') +
-    '</span></div>' : '') +
-(wa ? '<div class="fila"><b>WhatsApp</b><span>' + wa + '</span></div>' : '') +
-(e.horario ? '<div class="fila"><b>Horario</b><span>' + e.horario +
-    '</span></div>' : '') +
-(e.desc ? '<div class="fila"><b>Ofrece</b><span>' + e.desc + '</span></div>' : '') +
-'<div class="acciones">' +
-enlaceTarjeta(tel ? 'tel:' + tel : '', 'llamar', 'Llamar') +
-enlaceTarjeta(wa ? 'https://wa.me/' + wa : '', 'wa', 'WhatsApp') +
-'</div>' +
-'<div class="enlaces">' +
-enlaceTarjeta(e.maps, 'maps', 'Cómo llegar · Maps') +
-enlaceTarjeta(e.waze, 'waze', 'Cómo llegar · Waze') +
-enlaceTarjeta(e.facebook, 'fb', 'Facebook') +
-enlaceTarjeta(e.tiktok, 'tk', 'TikTok') +
-'</div>' +
-(pluses ? '<div>' + pluses + '</div>' : '') +
-'</div><div class="pie">Emprendedores · Tarjeta digital</div></div></body></html>';
-}
-
-async function descargarTarjeta(id) {
-    var e = (App.data.emprendimientos || []).find(function (x) {
-        return String(x.id) === String(id);
-    });
-    if (!e) return;
-    var contacto = (App.data.emprendedores || []).find(function (c) {
-        return String(c.empId) === String(e.id);
-    });
-    var html = htmlTarjeta(e, contacto);
-    /* En Capacitor el blob no descarga -> visor interno */
-    if (window.Capacitor && window.Capacitor.isNativePlatform &&
-            window.Capacitor.isNativePlatform()) {
-        var ov = document.createElement('div');
-        ov.className = 'tarjeta-visor';
-        ov.innerHTML = '<button class="tarjeta-visor-x">' +
-            '<i class="fas fa-xmark"></i></button>' +
-            '<iframe class="tarjeta-visor-frame"></iframe>';
-        ov.querySelector('.tarjeta-visor-x').onclick =
-            function () { ov.remove(); };
-        document.body.appendChild(ov);
-        ov.querySelector('iframe').srcdoc = html;
-        showToast('Tarjeta digital');
-        return;
+    var tel = telefonoTarjeta(e.telefono);
+    var tel2 = telefonoTarjeta(e.telefono2);
+    var wa = telefonoTarjeta(e.whatsapp || (contacto && contacto.whatsapp && contacto.telefono));
+    if (!wa && /^[678]/.test(soloDigitos(e.telefono).slice(-8))) wa = tel;
+    var nombre = textoTarjeta(e.nombre || 'Emprendimiento');
+    var direccion = e.sinUbicacion ? 'Servicio a domicilio · Sin dirección física' :
+        [e.provincia, e.canton, e.distrito, e.lugar].filter(Boolean).join(' · ');
+    var lat = Number(e.lat), lng = Number(e.lng);
+    var ubicacion = !e.sinUbicacion && String(e.lat == null ? '' : e.lat).trim() !== '' &&
+        String(e.lng == null ? '' : e.lng).trim() !== '' &&
+        Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+    var punto = ubicacion ? lat + ',' + lng : '';
+    var maps = ubicacion ? 'https://www.google.com/maps/dir/?api=1&destination=' + punto : e.maps;
+    var waze = ubicacion ? 'https://www.waze.com/ul?ll=' + punto + '&navigate=yes' : e.waze;
+    var mapa = '';
+    if (ubicacion) {
+        var bbox = [Math.max(-180, lng - .01), Math.max(-90, lat - .01),
+            Math.min(180, lng + .01), Math.min(90, lat + .01)].join(',');
+        var origenMapa = 'https://www.openstreetmap.org/export/embed.html?bbox=' + encodeURIComponent(bbox) +
+            '&layer=mapnik&marker=' + encodeURIComponent(punto);
+        mapa = mapaTarjetaHtml(nombre, origenMapa);
     }
-    var blob = new Blob([html], { type: 'text/html' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'tarjeta-' +
-        (e.nombre || 'emprendimiento').toLowerCase()
-            .replace(/[^a-z0-9]+/gi, '-') + '.html';
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
-    showToast('Tarjeta digital descargada');
+    var logo = logoTarjeta(e.logo);
+    var redes = [['facebook', 'Facebook'], ['instagram', 'Instagram'], ['tiktok', 'TikTok'],
+        ['telegram', 'Telegram'], ['web', 'Sitio web']].map(function (red) {
+        var valor = String(e[red[0]] || '').trim();
+        if (valor && !/^[a-z][a-z0-9+.-]*:/i.test(valor)) valor = 'https://' + valor;
+        return enlaceTarjeta(valor, 'red', red[1]);
+    }).join('');
+    var pluses = (e.pluses || []).map(function (p) {
+        var def = (typeof PLUSES !== 'undefined' ? PLUSES : []).find(function (x) { return x[0] === p; });
+        return '<li>' + textoTarjeta(def ? def[1] : p) + '</li>';
+    }).join('');
+    var dias = { L: 'Lunes', M: 'Martes', X: 'Miércoles', J: 'Jueves', V: 'Viernes', S: 'Sábado', D: 'Domingo' };
+    var agenda = (e.agenda || []).map(function (a) {
+        return filaTarjeta(dias[a.dia] || a.dia, a.abre + ' – ' + a.cierra);
+    }).join('');
+    var acciones = enlaceTarjeta(tel ? 'tel:+' + tel : '', 'boton', 'Llamar') +
+        enlaceTarjeta(wa ? 'https://wa.me/' + wa : '', 'boton wa', 'WhatsApp') +
+        enlaceTarjeta(e.email ? 'mailto:' + e.email : '', 'boton', 'Enviar correo');
+    var navegacion = e.sinUbicacion ? '' : enlaceTarjeta(maps, 'boton google-maps', 'Google Maps') +
+        enlaceTarjeta(waze, 'boton waze', 'Waze');
+    var fechaDescarga = new Date().toLocaleString('es-CR', {
+        dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Costa_Rica'
+    });
+    return plantillaTarjeta({ e, contacto, tel2, wa, nombre, direccion, mapa, logo, redes,
+        pluses, agenda, acciones, navegacion, fechaDescarga });
 }

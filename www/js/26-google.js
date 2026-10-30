@@ -1,18 +1,41 @@
+/* BLINDADO (orden del usuario): prohibido modificar/eliminar
+   sin orden explicita. Pedir permiso antes de tocar. */
+/* ==========================================================
+   BLINDADO TOTAL (orden del usuario): login con Google YA
+   FUNCIONA. Prohibido tocar este modulo, el plugin
+   @capgo/capacitor-social-login, el webClientId,
+   android/app/google-services.json (ambos clientes
+   web+android), ni MainActivity (interfaz marcador).
+   Solo cambiar si hay una orden explicita del usuario.
+   ========================================================== */
 /* 26-google.js - Login/registro con Google OAuth nativo.
-   El plugin Capacitor usa Play Services en la app instalada;
-   en navegador avisa que solo funciona en la APK. */
+   Plugin: @capgo/capacitor-social-login (Capgo, mantenido).
+   Requiere google-services.json con AMBOS clientes (web + android)
+   y la app OAuth publicada. */
 
 async function loginGoogle() {
-    var ok = window.Capacitor && Capacitor.Plugins &&
-             Capacitor.Plugins.GoogleAuth;
-    if (!ok) {
+    var SL = window.Capacitor && Capacitor.Plugins &&
+             Capacitor.Plugins.SocialLogin;
+    if (!SL) {
         showToast('Google login disponible en la app instalada');
         return;
     }
     try {
-        var g = await Capacitor.Plugins.GoogleAuth.signIn();
-        var token = g.idToken ||
-            (g.authentication && g.authentication.idToken) || '';
+        await SL.initialize({
+            google: {
+                webClientId:
+ '68651650199-vd3tjnqsul6bofjml2vlhiu9ueisg211.apps.googleusercontent.com'
+            }
+        });
+        var resp = await SL.login({
+            provider: 'google',
+            options: {
+                /* muestra todas las cuentas, sin filtro */
+                filterByAuthorizedAccounts: false,
+                scopes: ['profile', 'email']
+            }
+        });
+        var token = (resp.result && resp.result.idToken) || '';
         var res = await fetch(apiUrl('/api/auth/google'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -30,7 +53,6 @@ async function loginGoogle() {
     } catch (e) {
         var msg = (e && e.message) || String(e);
         if (msg.indexOf('cancel') === -1 && msg.indexOf('Cancel') === -1) {
-            /* Muestra el error real: falta serverClientId, SHA-1, etc. */
             showToast('Google: ' + (msg || 'no pudo iniciar'));
             console.warn('loginGoogle error:', e);
         }

@@ -1,0 +1,110 @@
+<!-- BLINDADO: ajustes centralizado, no tocar sin orden -->
+<section class="app-view" id="view-ajustes">
+            <h3 class="section-title">Ajustes</h3>
+            <div class="list-group ajustes-lista">
+                <button class="list-group-item list-group-item-action"
+                        onclick="irAVista('view-perfil','Perfil')">
+                    <i class="fas fa-user-circle ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Volver a mi perfil</div>
+                        <div class="ajuste-sub" id="ajuste-usuario-sub">Ver mi cuenta</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action" id="btn-sync-ahora">
+                    <i class="fas fa-cloud-arrow-up ajuste-icono" id="sync-icon"></i>
+                    <div>
+                        <div class="ajuste-titulo">Sincronizar ahora</div>
+                        <div class="ajuste-sub" id="sync-detalle">Copia local lista</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action">
+                    <i class="fas fa-database ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Base de datos</div>
+                        <div class="ajuste-sub">SQLite local / PythonAnywhere</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action">
+                    <i class="fas fa-cloud ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Servidor Flask</div>
+                        <div class="ajuste-sub" id="server-url">Solo conectividad API</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action" id="btn-usuarios">
+                    <i class="fas fa-users-gear ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Usuarios</div>
+                        <div class="ajuste-sub">Gestionar usuarios registrados</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action"
+                        onclick="gestionarProhibidas()" type="button">
+                    <i class="fas fa-ban ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Palabras restringidas</div>
+                        <div class="ajuste-sub">Contenido prohibido</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action"
+                        onclick="verTerminos()" type="button">
+                    <i class="fas fa-file-contract ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Términos de uso</div>
+                        <div class="ajuste-sub">Condiciones del servicio</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action">
+                    <i class="fas fa-circle-info ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Acerca de</div>
+                        <div class="ajuste-sub">Emprende · offline-first</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <button class="list-group-item list-group-item-action" id="btn-logout">
+                    <i class="fas fa-right-from-bracket ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Cerrar sesión</div>
+                        <div class="ajuste-sub" id="sesion-usuario">Invitado</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <div class="ajuste-sep">Configuración avanzada</div>
+                <button class="list-group-item list-group-item-action" type="button">
+                    <i class="fas fa-magnifying-glass ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Búsqueda inteligente</div>
+                        <div class="ajuste-sub">Sinónimos por categoría</div>
+                    </div>
+                    <input type="checkbox" id="dash-alias" checked>
+                </button>
+                <button class="list-group-item list-group-item-action"
+                        id="dash-dic-ver" type="button">
+                    <i class="fas fa-book-open ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Ver diccionario</div>
+                        <div class="ajuste-sub">Palabras y sinónimos</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+                <div id="dash-dic-lista" hidden></div>
+                <button class="list-group-item list-group-item-action"
+                        onclick="probarConexion()" type="button">
+                    <i class="fas fa-satellite-dish ajuste-icono"></i>
+                    <div>
+                        <div class="ajuste-titulo">Probar conexión</div>
+                        <div class="ajuste-sub" id="con-test">
+                            Latencia con PythonAnywhere</div>
+                    </div>
+                    <i class="fas fa-chevron-right ajuste-flecha"></i>
+                </button>
+            </div>
+        </section>

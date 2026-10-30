@@ -246,3 +246,20 @@
     font-size: 0.8rem;
     padding: 8px 12px;
 }
+
+/* Foto de perfil en registro */
+.reg-foto-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; margin-bottom: 12px;
+}
+.reg-foto-prev {
+    width: 72px; height: 72px; border-radius: 50%;
+    border: 2px dashed var(--primary-color);
+    background: var(--bg-soft); color: var(--primary-color);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; overflow: hidden; cursor: pointer;
+}
+.reg-foto-prev img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+.reg-foto-wrap span { font-size: .72rem; color: var(--text-soft); }

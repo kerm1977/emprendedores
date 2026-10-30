@@ -1,25 +1,49 @@
 /* 05-render.js - Renderizado de las vistas con los datos de App.data */
 
+function esCreadorNegocio(e, u) {
+    var correo = String(u && u.email || '').trim().toLowerCase();
+    return !!(correo && e && String(e.owner || '').trim().toLowerCase() === correo);
+}
+
+function puedeVerEstadisticasNegocio(e, u) {
+    return !!(u && (u.rol === 'super' || esCreadorNegocio(e, u)));
+}
+
+function urlLogoNegocio(valor) {
+    var src = String(valor || '').trim();
+    if (/^data:image\/(png|jpeg|webp);base64,[a-z0-9+/=\s]+$/i.test(src)) return src;
+    if (/^\/?uploads\/[a-z0-9_.-]+$/i.test(src)) return apiUrl('/' + src.replace(/^\//, ''));
+    try {
+        var url = new URL(src);
+        return /^https?:$/.test(url.protocol) ? url.href : '';
+    } catch (error) { return ''; }
+}
+
+document.addEventListener('error', function (ev) {
+    var img = ev.target;
+    if (!img.matches || !img.matches('img[data-logo-negocio]')) return;
+    img.hidden = true;
+    var icono = img.parentElement.querySelector('i');
+    if (icono) icono.hidden = false;
+}, true);
+
 function tarjetaEmprendimiento(e) {
+    var logo = urlLogoNegocio(e.logo);
     return '' +
-        '<div class="emprend-card" data-id="' + e.id + '">' +
+        '<div class="emprend-card" data-id="' + escapeHtml(String(e.id)) + '">' +
             '<div class="emprend-logo">' +
-                '<i class="fas ' + iconoDeCategoria(e.categoria) + '"></i>' +
+                (logo ? '<img data-logo-negocio src="' + escapeHtml(logo) + '" alt="Logo de ' + escapeHtml(e.nombre) + '">' : '') +
+                '<i' + (logo ? ' hidden' : '') + ' class="fas ' + iconoDeCategoria(e.categoria) + '"></i>' +
             '</div>' +
             '<div class="emprend-info">' +
                 '<div class="emprend-nombre">' + escapeHtml(e.nombre) + '</div>' +
                 '<div class="emprend-detalle">' +
                     escapeHtml(e.categoria) +
                 '</div>' +
-            '</div>' +
-            '<div class="emp-acc">' +
-                '<button class="emp-fav' + esDestacado(e.id) +
-                    '" title="Destacar">' +
-                    '<i class="fas fa-heart"></i>' +
-                '</button>' +
-                '<button class="emp-dl" title="Descargar tarjeta digital">' +
-                    '<i class="fas fa-address-card"></i>' +
-                '</button>' +
+                '<div class="emprend-ubicacion">' +
+                    '<span>Provincia: ' + escapeHtml(e.provincia || 'No indicada') + '</span>' +
+                    '<span>Distrito: ' + escapeHtml(e.distrito || 'No indicado') + '</span>' +
+                '</div>' +
             '</div>' +
         '</div>';
 }
@@ -68,10 +92,16 @@ function renderHome() {
         '<div class="stat-card"><div class="stat-numero">' + (App.data.emprendedores || []).length + '</div>' +
             '<div class="stat-label">Contactos</div></div>';
 
-    /* Destacados = solo los que el usuario marco con corazon */
-    var favs = favsDeUsuario();
+    /* Destacados de Inicio = solo emprendimientos del espacio pagado
+       con promocion vigente (orden del usuario) */
+    var ahora = typeof promoAhora === 'function' ? promoAhora() : 0;
+    var ids = new Set((typeof Promociones !== 'undefined' && Promociones.publico ? Promociones.publico.activos : [])
+        .filter(function (a) { return a.starts <= ahora && a.ends > ahora; })
+        .map(function (a) { return String(a.emp); }));
     var muestra = lista.filter(function (e) {
-        return favs.indexOf(String(e.id)) !== -1;
+        return !e.pausa;
+    }).filter(function (e) {
+        return ids.has(String(e.id));
     });
     var titulo = document.getElementById('titulo-destacados');
     var grid = document.getElementById('home-destacados');
@@ -94,8 +124,25 @@ function registrarClic(id) {
 
 var EMP_POR_PAGINA = 10;
 
+function mezclarOrdenNegocios() {
+    App.ordenNegocios = (App.data.emprendimientos || []).map(function (e) { return String(e.id); });
+    for (var i = App.ordenNegocios.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var valor = App.ordenNegocios[i];
+        App.ordenNegocios[i] = App.ordenNegocios[j];
+        App.ordenNegocios[j] = valor;
+    }
+}
+
 function renderEmprendimientos() {
-    var lista = App.data.emprendimientos || [];
+    if (!App.ordenNegocios) mezclarOrdenNegocios();
+    if (typeof renderEspaciosPromocionados === 'function') return renderEspaciosPromocionados();
+    var orden = new Map(App.ordenNegocios.map(function (id, i) { return [id, i]; }));
+    var lista = (App.data.emprendimientos || []).slice().sort(function (a, b) {
+        var ia = orden.has(String(a.id)) ? orden.get(String(a.id)) : orden.size;
+        var ib = orden.has(String(b.id)) ? orden.get(String(b.id)) : orden.size;
+        return ia - ib;
+    });
     var f = App.filtroCategoria || '';
     var filtrados = f
         ? lista.filter(function (e) { return e.categoria === f; })
@@ -137,9 +184,14 @@ function renderEmprendimientos() {
 function renderDirectorio(filtro) {
     var lista = App.data.emprendedores || [];
     var q = (filtro || '').toLowerCase();
+    var qd = (filtro || '').replace(/\D/g, '');
     var filtrados = lista.filter(function (p) {
-        return p.nombre.toLowerCase().indexOf(q) !== -1 ||
-               (p.emprendimiento || '').toLowerCase().indexOf(q) !== -1;
+        return ['nombre', 'emprendimiento', 'provincia', 'canton', 'distrito'].some(function (k) {
+            return String(p[k] || '').toLowerCase().indexOf(q) !== -1;
+        }) || (qd && String(p.telefono || '').replace(/\D/g, '').indexOf(qd) !== -1);
+    });
+    filtrados.sort(function (a, b) {
+        return (a.emprendimiento || a.nombre || '').localeCompare(b.emprendimiento || b.nombre || '', 'es');
     });
 
     document.getElementById('lista-directorio').innerHTML = filtrados.length
@@ -165,36 +217,8 @@ function renderDirectorio(filtro) {
 }
 
 function renderNotas() {
-    var ferias = App.data.ferias || App.data.notas || [];
-    document.getElementById('lista-notas').innerHTML = ferias.length
-        ? ferias.map(function (n) {
-            var fecha = n.fecha
-                ? new Date(n.fecha + 'T00:00').toLocaleDateString('es-CR',
-                    { day: 'numeric', month: 'short', year: 'numeric' })
-                : '';
-            return '' +
-                '<div class="nota-card" data-id="' + n.id + '">' +
-                    '<div class="nota-titulo">' +
-                        '<i class="fas fa-tents"></i> ' + escapeHtml(n.titulo) +
-                    '</div>' +
-                    '<div class="nota-feria">' +
-                        (fecha ? '<span><i class="fas fa-calendar"></i> ' + fecha + '</span>' : '') +
-                        ((n.horaInicio || n.horaFin)
-                            ? '<span><i class="fas fa-clock"></i> ' +
-                              (n.horaInicio || '') +
-                              (n.horaFin ? ' - ' + n.horaFin : '') + '</span>'
-                            : '') +
-                        (n.lugar ? '<span><i class="fas fa-location-dot"></i> ' +
-                            escapeHtml(n.lugar) + '</span>' : '') +
-                        (n.contacto ? '<span><i class="fas fa-user"></i> ' +
-                            escapeHtml(n.contacto) + '</span>' : '') +
-                        (n.telefono ? '<span><i class="fas fa-phone"></i> ' +
-                            escapeHtml(n.telefono) + '</span>' : '') +
-                    '</div>' +
-                    (n.texto ? '<p class="nota-texto">' + escapeHtml(n.texto) + '</p>' : '') +
-                '</div>';
-        }).join('')
-        : '<div class="vacio"><i class="fas fa-tents"></i>No hay ferias registradas</div>';
+    if (typeof renderEventos === 'function') return renderEventos();
+    document.getElementById('lista-notas').textContent = 'Actualizá la aplicación para consultar eventos.';
 }
 
 function renderTodo() {

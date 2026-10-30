@@ -38,8 +38,15 @@
         <label class="emp-campo"><span>Dirección exacta</span>
             <input type="text" id="ed-lugar"></label>
         <div class="emp-campo">
-            <span>Ubicación en el mapa (tocá para mover)</span>
-            <div id="ed-mapa" class="emp-mapa-pick"></div>
+            <span>Ubicación en el mapa (activá para mover o cambiar la ubicación)</span>
+            <div class="ed-mapa-marco" id="ed-mapa-marco">
+                <div id="ed-mapa" class="emp-mapa-pick"></div>
+                <button type="button" id="ed-mapa-activar"><span>Tocá para activar el mapa</span></button>
+            </div>
+            <div class="det-mapa-controles">
+                <button type="button" id="ed-mapa-centrar">Centrar ubicación</button>
+                <button type="button" id="ed-mapa-bloquear" hidden>Bloquear mapa</button>
+            </div>
             <button type="button" class="emp-geo" id="ed-geo">
                 <i class="fas fa-location-crosshairs"></i> Usar mi ubicación actual
             </button>
@@ -61,6 +68,12 @@
             <input type="text" id="ed-horario"></label>
         <label class="emp-campo"><span>Descripción</span>
             <textarea id="ed-desc" rows="3"></textarea></label>
+        <button type="button" class="ed-pausar" id="ed-pausar">
+            <i class="fas fa-pause"></i> Pausar emprendimiento
+        </button>
+        <button type="button" class="ed-eliminar" id="ed-eliminar">
+            <i class="fas fa-trash"></i> Eliminar emprendimiento
+        </button>
         <button type="submit" class="emp-btn-guardar">
             <i class="fas fa-check"></i> Guardar cambios</button>
     </form>

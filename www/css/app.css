@@ -38,9 +38,7 @@ body {
 /* ============ Barra superior ============ */
 .app-topbar {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     height: calc(118px + env(safe-area-inset-top, 0px));
     padding: env(safe-area-inset-top, 0px) 16px 10px;
     padding-left: max(16px, env(safe-area-inset-left, 0px));

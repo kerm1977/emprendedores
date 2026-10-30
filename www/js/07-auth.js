@@ -18,6 +18,10 @@ async function initAuth() {
 /* Refleja el estado de sesion en Ajustes */
 function actualizarSesionUI() {
     var u = usuarioActual();
+    if (typeof refrescarSesionPromociones === 'function') refrescarSesionPromociones();
+    if (typeof reflejarNotificaciones === 'function') {
+        reflejarNotificaciones();
+    }
     var sub = document.getElementById('sesion-usuario');
     if (sub) sub.textContent = u ? u.email : 'Invitado';
     var btn = document.getElementById('btn-logout');
@@ -63,6 +67,9 @@ function ocultarLogin() {
 }
 
 async function cerrarSesion() {
+    if (sesion && sesion.user && sesion.user.promo_token) {
+        try { await fetch(apiUrl('/api/promociones/sesion'), { method: 'DELETE' }); } catch (error) {}
+    }
     sesion = null;
     await localforage.removeItem(SESION_KEY);
     actualizarSesionUI();
@@ -81,6 +88,7 @@ async function intentarLogin(email, pass) {
         var data = await res.json();
         if (!res.ok) return { ok: false, error: data.error || 'Error de acceso' };
         await guardarSesion(data.user, data.pass_hash);
+        if (typeof verTerminos === 'function') verTerminos();
         return { ok: true };
     } catch (e) {
         return loginOffline(email, pass);
@@ -169,6 +177,21 @@ function wireLogin() {
     });
 
     document.getElementById('form-registro').addEventListener('submit', registrarUsuario);
+    var rfPrev = document.getElementById('reg-foto-prev');
+    var rfFile = document.getElementById('reg-foto');
+    if (rfPrev && rfFile) {
+        rfPrev.onclick = function () { rfFile.click(); };
+        rfFile.onchange = async function () {
+            if (!rfFile.files[0]) return;
+            App._regFoto = '';
+            App._regFotoTarea = comprimirFotoUsuario(rfFile.files[0]).then(function (foto) {
+                App._regFoto = foto;
+                rfPrev.innerHTML = '<img src="' + foto + '" alt="foto">';
+                return foto;
+            }).catch(function (error) { showToast(error.message); return ''; });
+            await App._regFotoTarea;
+        };
+    }
     document.getElementById('emergencia-toggle').addEventListener('click', function () {
         var p = document.getElementById('emergencia-panel');
         p.hidden = !p.hidden;
@@ -179,6 +202,7 @@ function wireLogin() {
 async function registrarUsuario(e) {
     e.preventDefault();
     var err = document.getElementById('reg-error');
+    var avisoFoto = '';
     err.textContent = '';
     var pass = document.getElementById('reg-pass').value;
     var pass2 = document.getElementById('reg-pass2').value;
@@ -187,6 +211,7 @@ async function registrarUsuario(e) {
         return;
     }
     try {
+        if (App._regFotoTarea) await App._regFotoTarea;
         var res = await fetch(apiUrl('/api/auth/register'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -201,12 +226,43 @@ async function registrarUsuario(e) {
         });
         var data = await res.json();
         if (!res.ok) { err.textContent = data.error; return; }
-        showToast(data.merged
+        /* Foto de perfil: sube comprimida a uploads/ y queda en
+           la columna foto del usuario */
+        if (App._regFoto && data.user && data.user.id) {
+            try {
+                var url = await subirFotoPerfil(App._regFoto, data.user.id);
+                if (typeof logActividad === 'function') {
+                    logActividad('foto',
+                        data.user.email + ' subió foto de perfil');
+                }
+                var guardada = await fetch(apiUrl('/api/usuarios/' + data.user.id), {
+                    method: 'PUT',
+                    body: JSON.stringify({ foto: url }),
+                    credentials: 'omit',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (data.user.promo_token || '') }
+                });
+                if (!guardada.ok) throw new Error('No se pudo guardar la foto del perfil');
+                var perfilGuardado = await guardada.json();
+                if (!perfilGuardado.user || perfilGuardado.user.foto !== url) throw new Error('El servidor no confirmó la foto');
+                data.user.foto = url;
+                App._regFoto = '';
+                App._regFotoTarea = null;
+            } catch (e3) { /* la foto no bloquea el registro */
+                avisoFoto = ' La foto no quedó guardada en el servidor; necesitás reintentar su subida.';
+            }
+        }
+        if (typeof logActividad === 'function') {
+            logActividad('usuario',
+                'Nuevo perfil: ' + (data.user.email || ''));
+        }
+        showToast((data.merged
             ? 'Cuenta vinculada: tus registros quedaron unidos'
-            : 'Cuenta creada, ya puedes ingresar');
+            : 'Cuenta creada, ya puedes ingresar') + avisoFoto);
         document.querySelector('.login-tab[data-tab="ingresar"]').click();
         document.getElementById('login-email').value = data.user.email;
     } catch (e2) {
         err.textContent = 'Sin conexión con el servidor';
     }
 }
+
+

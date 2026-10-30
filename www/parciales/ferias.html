@@ -1,43 +1,49 @@
 <!-- Registro de feria de emprendimientos (pagina completa) -->
 <section class="app-view" id="view-feria">
-    <h3 class="section-title">Nueva feria</h3>
+    <h3 class="section-title" id="fer-titulo-form">Nuevo evento</h3>
     <form class="emp-form" id="form-feria">
+        <p class="evt-nota" id="fer-info">El anuncio requiere aprobación del superusuario.</p>
         <label class="emp-campo">
-            <span>Nombre de la feria *</span>
-            <input type="text" id="fer-nombre" required
-                   placeholder="Ej: Feria del Emprendedor">
+            <span>Etiqueta del evento *</span>
+            <select id="fer-etiqueta" required></select>
         </label>
         <label class="emp-campo">
-            <span>Fecha de la feria</span>
-            <input type="date" id="fer-fecha">
+            <span>Nombre del evento *</span>
+            <input type="text" id="fer-nombre" required maxlength="160"
+                   placeholder="Ej: Feria, curso, charla o anuncio">
+        </label>
+        <label class="emp-campo">
+            <span>Fecha del evento *</span>
+            <input type="date" id="fer-fecha" required>
         </label>
         <div class="emp-campo">
-            <span>Horario de la feria</span>
+            <span>Horario del evento *</span>
             <div class="fer-horas">
-                <input type="time" id="fer-hora-inicio" title="Hora de inicio">
+                <input type="time" id="fer-hora-inicio" title="Hora de inicio" required>
                 <i class="fas fa-arrow-right"></i>
-                <input type="time" id="fer-hora-fin" title="Hora final">
+                <input type="time" id="fer-hora-fin" title="Hora final" required>
             </div>
+            <small>Si finaliza antes de la hora inicial, se entiende que termina al día siguiente.</small>
         </div>
         <label class="emp-campo">
-            <span>Lugar</span>
-            <input type="text" id="fer-lugar" placeholder="Cantón, distrito, local...">
+            <span>Lugar *</span>
+            <input type="text" id="fer-lugar" placeholder="Cantón, distrito, local..." maxlength="240" required>
         </label>
         <label class="emp-campo">
-            <span>Contacto del organizador</span>
-            <input type="text" id="fer-contacto" placeholder="Organizador">
+            <span>Contacto del evento *</span>
+            <input type="text" id="fer-contacto" placeholder="Organizador" maxlength="160" required>
         </label>
         <label class="emp-campo">
-            <span>Teléfono de la feria</span>
-            <input type="tel" id="fer-telefono" placeholder="Ej: 8888 1234">
+            <span>Teléfono del evento *</span>
+            <input type="tel" id="fer-telefono" placeholder="Ej: 8888 1234" maxlength="64" required>
         </label>
         <label class="emp-campo">
-            <span>Descripción</span>
-            <textarea id="fer-desc" rows="3"
-                      placeholder="Detalles, horario, costo de espacio..."></textarea>
+            <span>Descripción *</span>
+            <textarea id="fer-desc" rows="3" maxlength="5000" required
+                      placeholder="Información completa del evento"></textarea>
         </label>
-        <button type="submit" class="emp-btn-guardar">
-            <i class="fas fa-tents"></i> Guardar feria
+        <button type="submit" class="emp-btn-guardar" id="fer-guardar">
+            <i class="fas fa-calendar-days"></i> Guardar evento
         </button>
     </form>
 </section>

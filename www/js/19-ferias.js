@@ -18,26 +18,6 @@ async function initFerias() {
 
 async function guardarFeria(e) {
     e.preventDefault();
-    var feria = {
-        id: 'fer-' + Date.now(),
-        titulo: document.getElementById('fer-nombre').value.trim(),
-        fecha: document.getElementById('fer-fecha').value,
-        horaInicio: document.getElementById('fer-hora-inicio').value,
-        horaFin: document.getElementById('fer-hora-fin').value,
-        lugar: document.getElementById('fer-lugar').value.trim(),
-        contacto: document.getElementById('fer-contacto').value.trim(),
-        telefono: document.getElementById('fer-telefono').value.trim(),
-        texto: document.getElementById('fer-desc').value.trim()
-    };
-    if (!feria.titulo) {
-        showToast('Escribí el nombre de la feria');
-        return;
-    }
-    App.data.ferias = App.data.ferias || [];
-    App.data.ferias.push(feria);
-    await saveData();
-    e.target.reset();
-    renderNotas();
-    showToast('Feria registrada');
-    irAVista('view-notas', 'Ferias');
+    if (typeof guardarEvento === 'function') return guardarEvento(e);
+    showToast('Actualizá la aplicación para registrar eventos');
 }

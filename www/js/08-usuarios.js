@@ -56,11 +56,22 @@ function filaUsuario(u) {
             '<div class="contacto-avatar">' + inicial(u.nombre) + '</div>' +
             '<div class="contacto-info">' +
                 '<div class="contacto-nombre">' + escapeHtml(u.nombre) + ' ' + escapeHtml(u.apellido || '') +
-                    (esSuper ? ' <span class="emprend-badge estado-destacado">Super</span>' : '') +
+                    (u.rol !== 'user' ? ' <span class="emprend-badge estado-destacado">' + rolLabel(u.rol) + '</span>' : '') +
                 '</div>' +
                 '<div class="contacto-tel">' + escapeHtml(u.email) +
                     (u.telefono ? ' · ' + escapeHtml(u.telefono) : '') + '</div>' +
             '</div>' +
+            (puedeAsignarRol(usuarioActual(), 'admin2')
+                ? '<select class="u-rol" data-uid="' + u.id + '">' +
+                  ROLES.map(function (r) {
+                      if (r[0] === 'super' &&
+                          (!usuarioActual() ||
+                           usuarioActual().rol !== 'super')) return '';
+                      return '<option value="' + r[0] + '"' +
+                             (u.rol === r[0] ? ' selected' : '') +
+                             '>' + r[1] + '</option>';
+                  }).join('') + '</select>'
+                : '') +
             (esSuper ? '' :
                 '<button type="button" class="super-btn u-editar" title="Editar"><i class="fas fa-pen"></i></button>' +
                 '<button type="button" class="super-btn peligro u-borrar" title="Eliminar"><i class="fas fa-trash"></i></button>') +
@@ -72,6 +83,11 @@ function wireUsuariosItems(box) {
         btn.addEventListener('click', function () {
             var id = btn.closest('.contacto-item').dataset.id;
             editarUsuario(id);
+        });
+    });
+    box.querySelectorAll('.u-rol').forEach(function (sel) {
+        sel.addEventListener('change', function () {
+            cambiarRol(sel.dataset.uid, sel.value);
         });
     });
     box.querySelectorAll('.u-borrar').forEach(function (btn) {
@@ -101,6 +117,10 @@ async function borrarUsuario(id) {
     var r = await fetch(apiUrl('/api/usuarios/' + id), { method: 'DELETE' });
     var data = await r.json();
     if (data.ok) {
+        if (typeof logActividad === 'function') {
+            logActividad('eliminar',
+                'Perfil eliminado: ' + (obj.email || obj.nombre || id));
+        }
         showToast('Usuario eliminado');
         cargarUsuarios();
     } else {

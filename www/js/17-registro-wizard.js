@@ -1,3 +1,5 @@
+/* BLINDADO (orden del usuario): prohibido modificar/eliminar
+   sin orden explicita. Pedir permiso antes de tocar. */
 /* 17-registro-wizard.js - Wizard por pasos del registro de emprendimiento
    y selector de ubicacion con mapa (Leaflet + OpenStreetMap). */
 
@@ -23,6 +25,24 @@ function _moverMarcador(ll) {
     if (App._empLogoTmp && _marcador.setIcon) _marcador.setIcon(_iconoEmp());
 }
 var PASO_TOTAL = 8;
+
+/* Paso 4: toggle "direccion fisica" vs "servicio a domicilio" */
+function wireToggleUbi() {
+    var si = document.getElementById('emp-dir-si');
+    var no = document.getElementById('emp-dir-no');
+    var bloque = document.getElementById('ubi-bloque');
+    var sin = document.getElementById('ubi-sin');
+    if (!si || !no || !bloque) return;
+    function pon(fisica) {
+        si.classList.toggle('activo', fisica);
+        no.classList.toggle('activo', !fisica);
+        bloque.hidden = !fisica;
+        if (sin) sin.hidden = fisica;
+        document.getElementById('emp-provincia').required = fisica;
+    }
+    si.onclick = function () { pon(true); };
+    no.onclick = function () { pon(false); };
+}
 var pasoActual = 1;
 
 function mostrarPaso(n) {
@@ -54,6 +74,7 @@ function validarPaso(n) {
 }
 
 function initWizard() {
+    wireToggleUbi();
     var sig = document.getElementById('w-sig');
     var atras = document.getElementById('w-atras');
     if (sig) {

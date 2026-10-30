@@ -1,0 +1,20 @@
+name: Publicar en PythonAnywhere
+on:
+  push:
+    paths:
+      - '*.py'
+      - 'www/**'
+  workflow_dispatch:
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Publicar backend y bundle OTA
+        env:
+          PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
+        run: python herramientas/publicar.py

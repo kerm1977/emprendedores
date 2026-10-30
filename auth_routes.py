@@ -40,7 +40,7 @@ def _vincular_emprendimientos(db, email, cedula, tel):
             match = True
         if not match and cedula and emp.get("cedula") == cedula:
             match = True
-        if match and emp.get("owner") != email:
+        if match and not emp.get("owner"):
             emp["owner"] = email
             cambio = True
     if cambio:
@@ -136,6 +136,8 @@ def auth_register():
                 dup = cand
                 break
     if dup:
+        if not bcrypt.checkpw(pwd.encode('utf-8'), dup['pass_hash'].encode('utf-8')):
+            return jsonify(ok=False, error='La cuenta ya existe. Ingresá con su contraseña actual o utilizá recuperación; el registro no puede reemplazarla.'), 409
         row = _merge_usuario(db, dup, body, pwd)
         _vincular_emprendimientos(db, dup["email"], cedula, tel)
         return jsonify({"ok": True, "user": user_dict(row), "merged": True})
@@ -169,16 +171,21 @@ def update_usuario(uid):
     ensure_db()
     body = request.get_json(force=True, silent=True) or {}
     db = get_users_db()
+    try:
+        db.execute("ALTER TABLE usuarios ADD COLUMN foto TEXT DEFAULT ''")
+        db.commit()
+    except Exception:
+        pass
     row = db.execute("SELECT * FROM usuarios WHERE id = ?", (uid,)).fetchone()
     if row is None:
         return jsonify({"ok": False, "error": "Usuario no encontrado"}), 404
     ahora = datetime.now(timezone.utc).isoformat()
     db.execute(
-        """UPDATE usuarios SET nombre=?, apellido=?, telefono=?, cedula=?, updated_at=?
+        """UPDATE usuarios SET nombre=?, apellido=?, telefono=?, cedula=?, foto=?, updated_at=?
            WHERE id=?""",
         (body.get("nombre", row["nombre"]), body.get("apellido", row["apellido"]),
          body.get("telefono", row["telefono"]), body.get("cedula", row["cedula"]),
-         ahora, uid),
+         body.get("foto", row["foto"]), ahora, uid),
     )
     if body.get("password"):
         h = bcrypt.hashpw(body["password"].encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -200,47 +207,3 @@ def delete_usuario(uid):
     db.execute("DELETE FROM usuarios WHERE id = ?", (uid,))
     db.commit()
     return jsonify({"ok": True})
-
-
-@auth_bp.route("/api/auth/google", methods=["POST"])
-def google_auth():
-    """Login/registro con Google: verifica idToken contra Google y
-    luego aplica el sistema de antiduplicidad (merge por email)."""
-    ensure_db()
-    body = request.get_json(force=True, silent=True) or {}
-    token = str(body.get("idToken") or "")
-    if not token:
-        return jsonify({"error": "token faltante"}), 400
-    # Verificacion del idToken contra Google (tokeninfo)
-    try:
-        import urllib.request, json as j2
-        url = ("https://oauth2.googleapis.com/tokeninfo?id_token=" + token)
-        info = j2.loads(urllib.request.urlopen(url, timeout=8).read())
-    except Exception:
-        return jsonify({"error": "token Google invalido"}), 401
-    email = (info.get("email") or "").strip().lower()
-    if not email:
-        return jsonify({"error": "sin email de Google"}), 400
-    nombre = info.get("given_name") or info.get("name") or email.split("@")[0]
-    apellido = info.get("family_name") or ""
-    db = get_users_db()
-    dup = db.execute("SELECT * FROM usuarios WHERE email = ?",
-                     (email,)).fetchone()
-    ahora = datetime.now(timezone.utc).isoformat()
-    if dup:
-        # Antiduplicidad: misma cuenta, no duplicar
-        return jsonify({"ok": True, "linked": True,
-                        "user": user_dict(dup)})
-    h = bcrypt.hashpw(("google-" + token[:24]).encode("utf-8"),
-                      bcrypt.gensalt()).decode("utf-8")
-    cur = db.execute(
-        """INSERT INTO usuarios
-           (nombre, apellido, email, telefono, cedula, rol,
-            pass_hash, created_at, updated_at)
-           VALUES (?, ?, ?, '', '', 'user', ?, ?, ?)""",
-        (nombre, apellido, email, h, ahora, ahora),
-    )
-    db.commit()
-    row = db.execute("SELECT * FROM usuarios WHERE id = ?",
-                     (cur.lastrowid,)).fetchone()
-    return jsonify({"ok": True, "user": user_dict(row)})

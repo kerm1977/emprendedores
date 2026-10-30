@@ -1,0 +1,41 @@
+{
+  "project_info": {
+    "project_number": "68651650199",
+    "project_id": "crud-457015"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68651650199:android:emprende",
+        "android_client_info": {
+          "package_name": "com.emprende.directorio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68651650199-dkecvnvcqa99ejpuhivblgubql91uv19.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.emprende.directorio",
+            "certificate_hash": "f61f8ab966cefed21ee4da5208ee52737c019d21"
+          }
+        },
+        {
+          "client_id": "68651650199-vd3tjnqsul6bofjml2vlhiu9ueisg211.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-emprende-placeholder"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

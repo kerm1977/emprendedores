@@ -1,0 +1,1 @@
+Reinicio de versionado publico: esta es la 1.0.0. Incluye todo lo entregado hasta la fecha; el comparador de versiones ahora entiende numeracion semantica.
