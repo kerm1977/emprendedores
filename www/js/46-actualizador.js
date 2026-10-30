@@ -47,7 +47,7 @@ function otaRegistrar(man) {
     var h = otaHistorial();
     if (h.some(function (r) { return String(r.version) === String(man.version); })) return;
     h.push({ version: String(man.version), ts: Date.now(), beta: !!man.beta, cambios: Array.isArray(man.cambios) ? man.cambios : [] });
-    try { localStorage.setItem('ota-historial', JSON.stringify(h.slice(-100))); } catch (e) {}
+    try { localStorage.setItem('ota-historial', JSON.stringify(h.slice(-1000))); } catch (e) {}
 }
 
 async function revisarActualizacion(manual) {
@@ -164,8 +164,8 @@ var otaPagina = 0;
 
 function abrirDetalleActualizacion(r) {
     var ov = otaModal('ota-detalle',
-        '<div class="ota-head"><i class="fas fa-scroll"></i><div><h3>Registro de la versión ' + escapeHtml(r.version) + '</h3>' +
-        '<span class="ota-version">' + new Date(r.ts).toLocaleString('es-CR') + (r.beta ? ' · prueba' : '') + (r.publicada ? ' · publicada' : '') + '</span></div></div>' +
+        '<div class="ota-head"><i class="fas fa-scroll"></i><div><h3>' + escapeHtml(typeof otaTituloRegistro === 'function' ? otaTituloRegistro(r) : 'Registro de la versión ' + r.version) + '</h3>' +
+        '<span class="ota-version">' + (r.ts ? new Date(r.ts).toLocaleString('es-CR') : 'sin fecha') + (r.beta ? ' · prueba' : '') + (r.publicada ? ' · publicada' : '') + '</span></div></div>' +
         '<h4>Mejoras de esta actualización</h4>' +
         ((r.cambios && r.cambios.length) ? '<ul class="ota-cambios">' + r.cambios.map(function (c) { return '<li>' + escapeHtml(String(c)) + '</li>'; }).join('') + '</ul>' : '<p class="rep-sub">Sin detalle registrado.</p>') +
         '<button class="rep-cancelar" id="ota-det-cerrar">Cerrar</button>');
@@ -179,17 +179,19 @@ function otaBytes(n) {
 function renderRegistroActualizaciones() {
     var box = document.getElementById('ota-registro');
     if (!box) return;
-    var h = otaHistorial().slice().reverse();
+    var h = typeof otaHistorialCompleto === 'function' ? otaHistorialCompleto() : otaHistorial().slice().reverse();
+    var lista = box.querySelector('.ota-registro-lista'), abierto = !!(lista && lista.open);
     var u = typeof usuarioActual === 'function' ? usuarioActual() : null;
     var pendiente = (u && u.rol === 'super') ? h.filter(function (r) { return r.beta && !r.publicada; })[0] : null;
     var porPagina = 20, paginas = Math.max(1, Math.ceil(h.length / porPagina));
     if (otaPagina >= paginas) otaPagina = paginas - 1;
     var pagina = h.slice(otaPagina * porPagina, otaPagina * porPagina + porPagina);
     box.innerHTML = (pendiente ? '<details class="evt-acordeon" open><summary><i class="fas fa-flask"></i> Publicación al público</summary><p>La versión ' + escapeHtml(pendiente.version) + ' está instalada en modo prueba. Probala; si todo funciona, liberála:</p><button class="emp-btn-guardar" id="ota-publicar"><i class="fas fa-globe"></i> Publicar v' + escapeHtml(pendiente.version) + ' al mundo</button></details>' : '') +
-        '<details class="evt-acordeon"><summary>Registro de actualizaciones (' + h.length + ')</summary>' +
+        '<details class="evt-acordeon ota-registro-lista"' + (abierto ? ' open' : '') + '><summary>Registro de actualizaciones (' + h.length + ')</summary>' +
+        (h.length ? '<button class="rep-cancelar" id="ota-exportar" style="margin:6px 0"><i class="fas fa-file-export"></i> Exportar todo a TXT</button>' : '') +
         (pagina.length ? pagina.map(function (r, i) {
             var fecha = new Date(r.ts).toLocaleString('es-CR');
-            return '<details class="evt-acordeon ota-item"><summary>Versión ' + escapeHtml(r.version) + ' · ' + fecha + (r.beta ? ' · prueba' : '') + '</summary>' +
+            return '<details class="evt-acordeon ota-item"><summary>' + escapeHtml(typeof otaTituloRegistro === 'function' ? otaTituloRegistro(r) : 'Versión ' + r.version) + ' · ' + fecha + (r.beta ? ' · prueba' : '') + '</summary>' +
                 '<button class="rep-cancelar" data-ver-ota="' + (otaPagina * porPagina + i) + '" style="margin:6px 0"><i class="fas fa-scroll"></i> Ver registro completo</button></details>';
         }).join('') : '<p class="rep-sub">Todavía no hay actualizaciones aplicadas.</p>') +
         (paginas > 1 ? '<div class="evt-acciones" style="justify-content:center;margin:8px 0"><button class="rep-cancelar" id="ota-prev"' + (otaPagina ? '' : ' disabled') + '>«</button><span style="align-self:center">Página ' + (otaPagina + 1) + ' de ' + paginas + '</span><button class="rep-cancelar" id="ota-next"' + (otaPagina + 1 < paginas ? '' : ' disabled') + '>»</button></div>' : '') + '</details>';
@@ -198,6 +200,8 @@ function renderRegistroActualizaciones() {
     box.querySelectorAll('[data-ver-ota]').forEach(function (b) {
         b.onclick = function () { abrirDetalleActualizacion(h[Number(b.dataset.verOta)]); };
     });
+    var exp = box.querySelector('#ota-exportar');
+    if (exp && typeof exportarHistorialTxt === 'function') exp.onclick = exportarHistorialTxt;
     var prev = box.querySelector('#ota-prev'), next = box.querySelector('#ota-next');
     if (prev) prev.onclick = function () { otaPagina--; renderRegistroActualizaciones(); };
     if (next) next.onclick = function () { otaPagina++; renderRegistroActualizaciones(); };

@@ -77,6 +77,11 @@ Motor con `@capgo/capacitor-updater` (no cambiar sin orden explícita):
 5. `notifyAppReady` protege el arranque (rollback si falla).
 6. Cambios nativos (permisos, plugins) requieren APK nuevo — el OTA solo
    actualiza la capa web.
+7. **Registro de actualizaciones** (Ajustes): une el registro local con
+   `descargas/historial.json` (lo actualiza `publicar.py` con TODAS las líneas
+   de `notas-version.txt`; la primera vez se siembra con los commits de `www/`).
+   Al superar 20 registros aparece paginación de 20 en 20, y el botón
+   **«Exportar todo a TXT»** descarga/comparte el historial completo.
 
 ## 6. Capacidades del superusuario
 
