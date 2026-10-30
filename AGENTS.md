@@ -205,3 +205,9 @@ puede pisar App.data antes del POST y el reporte se pierde.
 - SQLite del servidor es oficial; caché secundaria únicamente para eventos públicos vigentes. No cachear datos de pago privados ni fingir guardado remoto. Las tablas de eventos no se reemplazan importando el JSON del catálogo. Respaldo integral requiere preservar SQLite del servidor.
 - Verificar con `python herramientas/verificar_eventos.py`, `node herramientas/verificar_eventos.js` y las pruebas previas de promociones. Los tests usan bases temporales, nunca producción. Comprobar límite menor de 250 en cada archivo nuevo, ejecutar verificador global y compilar APK versionada sin sobreescribir.
 - Desplegar `app.py` y los tres módulos Python de eventos junto al backend de sesión autorizado; recargar PythonAnywhere sin reemplazar SQLite. No afirmar despliegue ni comportamiento físico de Android sin probarlos.
+
+## 13. Registro de actualizaciones e instrucciones (orden del usuario)
+
+- Ajustes > Registro de actualizaciones: paginación de 20 en 20 en cuanto hay más de 20 solicitudes/instrucciones; cambiar de página no cierra el acordeón.
+- Botón «Exportar todo a TXT» (`www/js/55-historial-ota.js`): exporta TODAS las páginas (versión, fecha, estado e instrucciones). Android: Filesystem CACHE + Share; navegador: Blob. No reutiliza ni toca `15b-tarjeta-descarga.js`.
+- Fuente: registro local + `descargas/historial.json`, que `herramientas/publicar.py` actualiza en cada bundle con todas las líneas de `notas-version.txt` (sin el tope de 20 del manifiesto) y que nunca se sobreescribe si el remoto está corrupto. Escribir en `notas-version.txt` las instrucciones del usuario de cada versión.

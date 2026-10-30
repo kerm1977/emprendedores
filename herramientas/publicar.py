@@ -13,7 +13,9 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
+import time
 import urllib.request
 import urllib.error
 import uuid
@@ -58,6 +60,49 @@ def api_post(ruta, contenido=None, json_body=None):
         raise RuntimeError(f'API {e.code} en {ruta}: {e.read()[:300]}')
 
 
+def leer_remoto(remoto):
+    url = f'https://{HOST}/api/v0/user/{USUARIO}/files/path{RAIZ_REMOTA}/{remoto}'
+    req = urllib.request.Request(url, headers={'Authorization': 'Token ' + token()})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return r.read()
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return None
+        raise RuntimeError(f'API {e.code} leyendo {remoto}: {e.read()[:300]}')
+
+
+def historial_git(root):
+    """Semilla inicial: cada commit que toco www/ es una instruccion aplicada."""
+    try:
+        salida = subprocess.run(['git', 'log', '--format=%h%x1f%ct%x1f%B%x1e', '--', 'www'], cwd=root,
+                                capture_output=True, text=True, encoding='utf-8', check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return []
+    registros = []
+    for bloque in filter(None, (b.strip() for b in salida.split('\x1e'))):
+        sha, ts, cuerpo = bloque.split('\x1f', 2)
+        lineas = [l.strip().lstrip('-* ').strip() for l in cuerpo.splitlines() if l.strip()]
+        lineas = [l for l in lineas if not l.startswith(('Generated with', 'Co-Authored-By'))]
+        registros.append({'version': 'git-' + sha, 'etiqueta': lineas[0] if lineas else sha,
+                          'ts': int(ts) * 1000, 'cambios': lineas[1:] or lineas[:1]})
+    return registros
+
+
+def actualizar_historial(root, version, nombre, cambios):
+    previo = leer_remoto('descargas/historial.json')
+    try:
+        historial = json.loads(previo) if previo else historial_git(root)
+    except ValueError:
+        raise RuntimeError('descargas/historial.json remoto no es JSON valido; no se sobreescribe')
+    actual = next((r for r in historial if str(r.get('version')) == str(version)), None)
+    registro = {'version': str(version), 'nombre': nombre, 'ts': actual['ts'] if actual else int(time.time() * 1000), 'cambios': cambios}
+    historial = [r for r in historial if str(r.get('version')) != str(version)] + [registro]
+    historial.sort(key=lambda r: r.get('ts', 0))
+    subir_archivo('descargas/historial.json', json.dumps(historial, ensure_ascii=False).encode('utf-8'))
+    print(f'  historial: {len(historial)} registros')
+
+
 def subir_archivo(remoto, contenido):
     status, _ = api_post(f'/files/path{RAIZ_REMOTA}/{remoto}', contenido=contenido)
     if status not in (200, 201):
@@ -83,7 +128,8 @@ def publicar_bundle(root, version, apk, publico):
     sha = hashlib.sha256(datos).hexdigest()
     subir_archivo(f'descargas/www-v{version}.zip', datos)
     notas = root / 'notas-version.txt'
-    cambios = [l.strip() for l in notas.read_text(encoding='utf-8').splitlines() if l.strip()][:20] if notas.is_file() else []
+    todos = [l.strip() for l in notas.read_text(encoding='utf-8').splitlines() if l.strip()] if notas.is_file() else []
+    cambios = todos[:20]
     nombre = str(json.loads((root / 'www' / 'version.json').read_text(encoding='utf-8')).get('nombre', version))
     manifiesto = {'version': str(version), 'nombre': nombre, 'url': f'https://{DOMINIO_APP}/descargas/www-v{version}.zip', 'checksum': sha, 'cambios': cambios, 'bytes': len(datos)}
     if apk:
@@ -93,6 +139,7 @@ def publicar_bundle(root, version, apk, publico):
     else:
         manifiesto['apk'] = ''
     subir_archivo('descargas/beta.json', json.dumps(manifiesto).encode())
+    actualizar_historial(root, version, nombre, todos)
     if publico:
         subir_archivo('descargas/version.json', json.dumps(manifiesto).encode())
         print('  promovida AL PÚBLICO de inmediato')

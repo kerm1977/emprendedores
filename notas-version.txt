@@ -1,1 +1,3 @@
-Limpieza: se elimina el monolito base.html (queda solo en historial GitHub); la raiz ahora redirige directo a /app/.
+Registro de actualizaciones: paginación automática de 20 en 20 al superar las 20 solicitudes/instrucciones, y la página abierta se conserva al cambiar de página.
+Registro completo desde el servidor (descargas/historial.json): todas las versiones e instrucciones aplicadas a la app, no solo las instaladas en este teléfono.
+Nuevo botón «Exportar todo a TXT»: descarga (navegador) o comparte (Android) un .txt con todas las versiones, fechas e instrucciones de todas las páginas.
