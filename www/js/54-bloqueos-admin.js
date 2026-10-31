@@ -21,7 +21,7 @@ function estaBloqueadoAdmin(email, id) {
 function prepararBloqueosAdmin() {
     var u = usuarioActual();
     if (!u || u.rol !== 'super' || document.getElementById('btn-bloqueos-admin')) return;
-    var salir = document.getElementById('btn-salir-perfil');
+    var salir = document.getElementById('btn-info-dev') || document.getElementById('btn-salir-perfil');
     if (!salir) return;
     var btn = document.createElement('button');
     btn.type = 'button';

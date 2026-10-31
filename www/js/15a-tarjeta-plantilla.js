@@ -38,7 +38,7 @@ function eventosMapaTarjeta() {
 
 function plantillaTarjeta(datos) {
     var { e, contacto, tel2, wa, nombre, direccion, mapa, logo, redes, pluses, agenda,
-        acciones, navegacion, fechaDescarga } = datos;
+        acciones, navegacion, fechaDescarga, embebidos } = datos;
     return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer"><title>${nombre} · Emprendedores</title>
@@ -85,6 +85,7 @@ ${e.horario ? '<p class="descripcion">' + textoTarjeta(e.horario) + '</p>' : ''}
 ${agenda ? '<dl>' + agenda + '</dl>' : (!e.horario && !e.h24 ? '<p>Consultá nuestros horarios por los medios de contacto.</p>' : '')}
 ${e.feriados ? '<p>También atendemos días feriados.</p>' : ''}</section>
 ${redes ? '<section><h2>Redes sociales y sitio web</h2><nav class="acciones" aria-label="Redes sociales">' + redes + '</nav></section>' : ''}
+${embebidos ? '<section><h2>Publicaciones</h2>' + embebidos + '<p class="nota">Los videos y publicaciones requieren conexión a internet.</p></section>' : ''}
 ${pluses ? '<section><h2>Servicios y facilidades</h2><ul>' + pluses + '</ul></section>' : ''}
 <section class="ancho"><h2>${e.sinUbicacion ? 'Servicio a domicilio' : 'Dónde encontrarnos'}</h2><p>${textoTarjeta(direccion)}</p>
 ${mapa}${navegacion ? '<nav class="acciones" aria-label="Cómo llegar">' + navegacion + '</nav>' : ''}

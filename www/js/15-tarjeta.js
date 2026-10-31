@@ -89,12 +89,11 @@ function htmlTarjeta(e, contacto) {
         mapa = mapaTarjetaHtml(nombre, origenMapa);
     }
     var logo = logoTarjeta(e.logo);
-    var redes = [['facebook', 'Facebook'], ['instagram', 'Instagram'], ['tiktok', 'TikTok'],
-        ['telegram', 'Telegram'], ['web', 'Sitio web']].map(function (red) {
-        var valor = String(e[red[0]] || '').trim();
-        if (valor && !/^[a-z][a-z0-9+.-]*:/i.test(valor)) valor = 'https://' + valor;
-        return enlaceTarjeta(valor, 'red', red[1]);
-    }).join('');
+    /* Iconos SVG de marca + video Shorts: mismos que en la tarjeta en
+       pantalla y en el QR (video arriba centrado, iconos 2 por fila) */
+    var redes = typeof iconosRedesDe === 'function'
+        ? '<div style="display:flex;flex-wrap:wrap;gap:10px">' + iconosRedesDe(e) + '</div>' : '';
+    var embebidos = '';
     var pluses = (e.pluses || []).map(function (p) {
         var def = (typeof PLUSES !== 'undefined' ? PLUSES : []).find(function (x) { return x[0] === p; });
         return '<li>' + textoTarjeta(def ? def[1] : p) + '</li>';
@@ -112,5 +111,5 @@ function htmlTarjeta(e, contacto) {
         dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Costa_Rica'
     });
     return plantillaTarjeta({ e, contacto, tel2, wa, nombre, direccion, mapa, logo, redes,
-        pluses, agenda, acciones, navegacion, fechaDescarga });
+        pluses, agenda, acciones, navegacion, fechaDescarga, embebidos });
 }

@@ -32,7 +32,11 @@ var PLUSES = [
     ['transferencia', 'Acepta transferencia', 'fa-money-bill-transfer'],
     ['pagonline', 'Pagos en línea', 'fa-cash-register'],
     ['devolucion', 'Devoluciones', 'fa-rotate-left'],
-    ['acreditado', 'Profesional acreditado', 'fa-award']
+    ['acreditado', 'Profesional acreditado', 'fa-award'],
+    ['diabetes', 'Para personas con diabetes', 'fa-hand-holding-droplet'],
+    ['celiaco', 'Para celíacos', 'fa-wheat-awn-circle-exclamation'],
+    ['vegano', 'Opciones veganas', 'fa-leaf'],
+    ['vegetariano', 'Opciones vegetarianas', 'fa-carrot']
 ];
 
 /* Botones-toggle: cada toque activa/desactiva un plus */

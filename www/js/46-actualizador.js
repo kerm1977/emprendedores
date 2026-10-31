@@ -46,7 +46,7 @@ function otaHistorial() {
 function otaRegistrar(man) {
     var h = otaHistorial();
     if (h.some(function (r) { return String(r.version) === String(man.version); })) return;
-    h.push({ version: String(man.version), ts: Date.now(), beta: !!man.beta, cambios: Array.isArray(man.cambios) ? man.cambios : [] });
+    h.push({ version: String(man.version), nombre: String(man.nombre || man.version), ts: Date.now(), beta: !!man.beta, cambios: Array.isArray(man.cambios) ? man.cambios : [] });
     try { localStorage.setItem('ota-historial', JSON.stringify(h.slice(-100))); } catch (e) {}
 }
 
@@ -145,6 +145,53 @@ function mostrarModalApk(man) {
 }
 
 async function publicarAlMundo(btn, version) {
+    /* Doble confirmacion (orden del usuario): publicar al mundo manda
+       la version a TODOS los celulares, hay que estar totalmente
+       seguro antes de tocar el sistema de todos */
+    var ov = otaModal('ota-confirm-pub',
+        '<div class="ota-head"><i class="fas fa-triangle-exclamation"></i><div>' +
+        '<h3>¿Publicar al mundo?</h3>' +
+        '<p class="rep-sub">La versión <b>' + escapeHtml(String(version)) + '</b> llegará a <b>TODOS</b> los celulares de la aplicación.</p></div></div>' +
+        '<p class="rep-sub">Confirmá que ya probaste todo en esta versión. Si algo falla, todos recibirán una versión con errores.</p>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button class="rep-cancelar" id="ota-pub-no">Cancelar</button>' +
+        '<button class="emp-btn-guardar" id="ota-pub-si">Sí, publicar al mundo</button></div>');
+    ov.querySelector('#ota-pub-no').onclick = function () { ov.remove(); };
+    ov.querySelector('#ota-pub-si').onclick = function () {
+        ov.remove();
+        _publicarAlMundoConfirmado(btn, version);
+    };
+}
+
+/* Revocar: detiene la publicacion al publico; las pruebas quedan
+   solo para superusuarios por el canal beta (orden del usuario) */
+function revocarDelMundo(btn) {
+    var ov = otaModal('ota-confirm-rev',
+        '<div class="ota-head"><i class="fas fa-ban"></i><div>' +
+        '<h3>¿Revocar la publicación?</h3>' +
+        '<p class="rep-sub">Se detiene la entrega al público. Las versiones de prueba seguirán llegando solo a superusuarios.</p></div></div>' +
+        '<p class="rep-sub">Podés volver a republicar al mundo cuando estés seguro. El registro queda archivado en la base de datos.</p>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button class="rep-cancelar" id="ota-rev-no">Cancelar</button>' +
+        '<button class="emp-btn-guardar" id="ota-rev-si">Sí, revocar</button></div>');
+    ov.querySelector('#ota-rev-no').onclick = function () { ov.remove(); };
+    ov.querySelector('#ota-rev-si').onclick = async function () {
+        ov.remove();
+        btn.disabled = true;
+        try {
+            var res = await fetch(apiUrl('/api/version/revocar'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+            var json = await res.json().catch(function () { return {}; });
+            if (!res.ok) throw new Error(json.error || 'El servidor no autorizó la revocación');
+            showToast('Publicación revocada: las pruebas quedan solo para superusuarios');
+            renderRegistroActualizaciones();
+        } catch (e) {
+            showToast(e.message || 'No se pudo revocar');
+            btn.disabled = false;
+        }
+    };
+}
+
+async function _publicarAlMundoConfirmado(btn, version) {
     btn.disabled = true;
     try {
         var res = await fetch(apiUrl('/api/version/publicar'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
@@ -185,46 +232,121 @@ function renderRegistroActualizaciones() {
     var porPagina = 20, paginas = Math.max(1, Math.ceil(h.length / porPagina));
     if (otaPagina >= paginas) otaPagina = paginas - 1;
     var pagina = h.slice(otaPagina * porPagina, otaPagina * porPagina + porPagina);
-    box.innerHTML = (pendiente ? '<details class="evt-acordeon" open><summary><i class="fas fa-flask"></i> Publicación al público</summary><p>La versión ' + escapeHtml(pendiente.version) + ' está instalada en modo prueba. Probala; si todo funciona, liberála:</p><button class="emp-btn-guardar" id="ota-publicar"><i class="fas fa-globe"></i> Publicar v' + escapeHtml(pendiente.version) + ' al mundo</button></details>' : '') +
+    var bloquePub = '';
+    if (u && u.rol === 'super') {
+        bloquePub = '<details class="evt-acordeon" open><summary><i class="fas fa-flask"></i> Publicación al público</summary>' +
+            (pendiente ? '<p>La versión ' + escapeHtml(pendiente.nombre || pendiente.version) + ' está instalada en modo prueba. Probala; si todo funciona, liberála:</p>' +
+                '<button class="emp-btn-guardar" id="ota-publicar"><i class="fas fa-globe"></i> Publicar v' + escapeHtml(pendiente.nombre || pendiente.version) + ' al mundo</button>' : '') +
+            '<button class="rep-cancelar" id="ota-revocar"' + (pendiente ? ' style="margin-left:8px"' : '') + '><i class="fas fa-ban"></i> Revocar publicación</button></details>';
+    }
+    box.innerHTML = bloquePub +
         '<details class="evt-acordeon"><summary>Registro de actualizaciones (' + h.length + ')</summary>' +
         (pagina.length ? pagina.map(function (r, i) {
             var fecha = new Date(r.ts).toLocaleString('es-CR');
             return '<details class="evt-acordeon ota-item"><summary>Versión ' + escapeHtml(r.version) + ' · ' + fecha + (r.beta ? ' · prueba' : '') + '</summary>' +
-                '<button class="rep-cancelar" data-ver-ota="' + (otaPagina * porPagina + i) + '" style="margin:6px 0"><i class="fas fa-scroll"></i> Ver registro completo</button></details>';
+                '<button class="rep-cancelar" data-ver-ota="' + (otaPagina * porPagina + i) + '" style="margin:6px 0"><i class="fas fa-scroll"></i> Ver registro completo</button>' +
+                '<button class="rep-cancelar" data-del-ota="' + (otaPagina * porPagina + i) + '" style="margin:6px 0 6px 8px"><i class="fas fa-trash"></i> Eliminar</button></details>';
         }).join('') : '<p class="rep-sub">Todavía no hay actualizaciones aplicadas.</p>') +
         (paginas > 1 ? '<div class="evt-acciones" style="justify-content:center;margin:8px 0"><button class="rep-cancelar" id="ota-prev"' + (otaPagina ? '' : ' disabled') + '>«</button><span style="align-self:center">Página ' + (otaPagina + 1) + ' de ' + paginas + '</span><button class="rep-cancelar" id="ota-next"' + (otaPagina + 1 < paginas ? '' : ' disabled') + '>»</button></div>' : '') + '</details>';
     var pub = box.querySelector('#ota-publicar');
     if (pub && pendiente) pub.onclick = function () { publicarAlMundo(pub, pendiente.version); };
+    var rev = box.querySelector('#ota-revocar');
+    if (rev) rev.onclick = function () { revocarDelMundo(rev); };
+    /* Estado real: con una publicación activa, Publicar queda
+       deshabilitado y Revocar activo; sin publicación al mundo,
+       Revocar queda deshabilitado (orden del usuario) */
+    if (u && u.rol === 'super') {
+        fetch(apiUrl('/api/version'), { cache: 'no-store' })
+            .then(function (r) { return r.json(); })
+            .then(function (man) {
+                var activa = !!(man.version && man.version !== '0');
+                if (pub) pub.disabled = activa;
+                if (rev) rev.disabled = !activa;
+            }).catch(function () {});
+    }
     box.querySelectorAll('[data-ver-ota]').forEach(function (b) {
         b.onclick = function () { abrirDetalleActualizacion(h[Number(b.dataset.verOta)]); };
+    });
+    /* Eliminar: archiva en control_actualizaciones (servidor) y sale de la app */
+    box.querySelectorAll('[data-del-ota]').forEach(function (b) {
+        b.onclick = function () {
+            var r = h[Number(b.dataset.delOta)];
+            if (!confirm('¿Eliminar este registro de la app? Quedará archivado en control de actualizaciones del servidor.')) return;
+            b.disabled = true;
+            fetch(apiUrl('/api/version/historial/archivar'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro: r }) })
+                .then(function (res) { return res.json().then(function (j) { if (!res.ok || !j.ok) throw new Error(j.error || 'El servidor no archivó'); }); })
+                .then(function () {
+                    var base = otaHistorial().filter(function (e) {
+                        return !(String(e.version) === String(r.version) && e.ts === r.ts);
+                    });
+                    try { localStorage.setItem('ota-historial', JSON.stringify(base)); } catch (e3) {}
+                    showToast('Registro archivado en la base y eliminado de la app');
+                    renderRegistroActualizaciones();
+                }).catch(function (e) { showToast(e.message); b.disabled = false; });
+        };
     });
     var prev = box.querySelector('#ota-prev'), next = box.querySelector('#ota-next');
     if (prev) prev.onclick = function () { otaPagina--; renderRegistroActualizaciones(); };
     if (next) next.onclick = function () { otaPagina++; renderRegistroActualizaciones(); };
 }
 
+/* Diagnóstico OTA: muestra el manifiesto crudo del servidor (público y
+   beta) frente a la versión instalada, para verificar el canal. */
+async function probarOta() {
+    var man = {};
+    try { var res = await fetch(apiUrl('/api/version'), { cache: 'no-store' }); man = await res.json(); }
+    catch (e) { showToast('No se pudo consultar el servidor de versiones'); return; }
+    var local = await versionLocal();
+    var filas = [
+        ['Instalada (tu celular)', String(local), String(Actualizador.nombre || local)],
+        ['Pública (servidor)', String(man.version || '—'), String(man.nombre || man.version || '—')],
+        ['Prueba/beta (servidor)', man.beta ? String(man.beta.version) : '—', man.beta ? String(man.beta.nombre || man.beta.version) : '—']
+    ];
+    var oferta = (man.beta && versionMayor(man.beta.version, local)) || versionMayor(man.version, local);
+    var ov = otaModal('ota-probad',
+        '<div class="ota-head"><i class="fas fa-vial"></i><div><h3>Probador de actualizaciones</h3>' +
+        '<span class="ota-version">' + (oferta ? 'Hay actualización disponible' : 'Estás al día') + '</span></div></div>' +
+        '<table style="width:100%;font-size:.85rem;border-collapse:collapse;margin-bottom:12px">' +
+        filas.map(function (f) {
+            return '<tr><td style="padding:6px;border-bottom:1px solid var(--border-soft)">' + escapeHtml(f[0]) + '</td><td style="padding:6px;border-bottom:1px solid var(--border-soft)">seq ' + escapeHtml(f[1]) + '</td><td style="padding:6px;border-bottom:1px solid var(--border-soft)">' + escapeHtml(f[2]) + '</td></tr>';
+        }).join('') + '</table><button class="rep-cancelar" id="ota-probad-ok">Cerrar</button>');
+    ov.querySelector('#ota-probad-ok').onclick = function () { ov.remove(); };
+}
+
 function prepararBotonActualizacion() {
-    if (!document.getElementById('btn-buscar-actualizacion')) {
-        var vista = document.getElementById('view-ajustes');
-        if (!vista) return false;
-        var hr = document.createElement('hr');
-        hr.style.cssText = 'border:none;border-top:1px solid var(--border-soft);margin:0 0 10px';
-        var wrap = document.createElement('div');
-        wrap.style.cssText = 'text-align:center;margin:10px 0 0';
-        var btn = document.createElement('button');
-        btn.type = 'button'; btn.id = 'btn-buscar-actualizacion';
-        btn.className = 'emp-btn-guardar'; btn.style.margin = '0 auto';
-        btn.innerHTML = '<i class="fas fa-cloud-arrow-down"></i> Buscar actualizaciones';
-        btn.onclick = function () { revisarActualizacion(true); };
-        wrap.appendChild(btn);
-        var reg = document.createElement('div');
-        reg.id = 'ota-registro';
-        var conexion = vista.querySelector('button[onclick="probarConexion()"]');
-        var ancla = conexion || vista.querySelector('.perfil-card') || vista;
-        ancla.insertAdjacentElement('afterend', hr);
-        hr.insertAdjacentElement('afterend', wrap);
-        wrap.insertAdjacentElement('afterend', reg);
+    var u = typeof usuarioActual === 'function' ? usuarioActual() : null;
+    var wrap = document.getElementById('ota-wrap');
+    /* Usuario convencional: el bloque OTA completo nunca se ve */
+    if (!u || u.rol !== 'super') {
+        if (wrap) wrap.hidden = true;
+        return true;
     }
+    if (wrap) { wrap.hidden = false; return true; }
+    var salir = document.getElementById('btn-info-dev') || document.getElementById('btn-salir-perfil');
+    if (!salir) return false;
+    var hr = document.createElement('hr');
+    hr.style.cssText = 'border:none;border-top:1px solid var(--border-soft);margin:0 0 10px';
+    wrap = document.createElement('div');
+    wrap.id = 'ota-wrap';
+    wrap.style.cssText = 'text-align:center;margin:10px 0 0';
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.id = 'btn-buscar-actualizacion';
+    btn.className = 'emp-btn-guardar'; btn.style.margin = '0 auto';
+    btn.innerHTML = '<i class="fas fa-cloud-arrow-down"></i> Buscar actualizaciones';
+    btn.onclick = function () { revisarActualizacion(true); };
+    wrap.appendChild(btn);
+    var btnP = document.createElement('button');
+    btnP.type = 'button'; btnP.id = 'btn-probar-ota'; btnP.className = 'rep-cancelar';
+    btnP.style.margin = '8px auto 0'; btnP.style.display = 'block';
+    btnP.innerHTML = '<i class="fas fa-vial"></i> Probar actualización';
+    btnP.onclick = probarOta;
+    wrap.appendChild(btnP);
+    var reg = document.createElement('div');
+    reg.id = 'ota-registro';
+    wrap.appendChild(reg);
+    salir.insertAdjacentElement('beforebegin', hr);
+    hr.insertAdjacentElement('afterend', wrap);
+    salir.style.marginTop = '30px';
     renderRegistroActualizaciones();
     if (typeof prepararGuiaOta === 'function') prepararGuiaOta();
     if (typeof prepararFicticios === 'function') prepararFicticios();

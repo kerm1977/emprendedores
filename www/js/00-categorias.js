@@ -1,6 +1,12 @@
 /* 00-categorias.js - Catálogo de categorías de emprendimientos.
    Cada grupo tiene ícono propio; los chips filtran la vista Negocios. */
 
+/* Nota explicativa que aparece bajo el filtro al elegir la categoría */
+var NOTAS_CATEGORIA = {
+    'Artes marciales': 'Incluye Taekwondo, Karate, Jiu-Jitsu, Judo, Kickboxing, Full Contact, artes mixtas y todas las demás artes marciales.',
+    'Centro turístico': 'Aquí va la información de fincas privadas, haciendas y fincas de paso.'
+};
+
 var CATEGORIAS = [
     { grupo: 'Alimentación', icono: 'fa-utensils', items: [
         ['Cafetería', 'fa-mug-saucer'],
@@ -12,7 +18,9 @@ var CATEGORIAS = [
         ['Huevero', 'fa-egg'],
         ['Verdurero', 'fa-carrot'],
         ['Cocinero', 'fa-kitchen-set'],
-        ['Catering', 'fa-bell-concierge']
+        ['Catering', 'fa-bell-concierge'],
+        ['Frutería', 'fa-lemon'],
+        ['Heladería', 'fa-ice-cream']
     ]},
     { grupo: 'Estadía', icono: 'fa-bed', items: [
         ['Hotel', 'fa-hotel'],
@@ -20,7 +28,8 @@ var CATEGORIAS = [
         ['Cabinas', 'fa-house-chimney'],
         ['Camping', 'fa-tent'],
         ['Agencia de viajes', 'fa-plane'],
-        ['Agencia de turismo local', 'fa-map-location-dot']
+        ['Agencia de turismo local', 'fa-map-location-dot'],
+        ['Centro turístico', 'fa-mountain-city']
     ]},
     { grupo: 'Belleza y cuidado', icono: 'fa-spa', items: [
         ['Peluquería', 'fa-scissors'],
@@ -54,7 +63,8 @@ var CATEGORIAS = [
         ['Mercadeo', 'fa-chart-line'],
         ['Reciclaje de metales', 'fa-recycle'],
         ['Librería', 'fa-book'],
-        ['Bazar y Pasamanería', 'fa-store']
+        ['Bazar y Pasamanería', 'fa-store'],
+        ['Casa de empeño', 'fa-hand-holding-dollar']
     ]},
     { grupo: 'Electrónica', icono: 'fa-plug', items: [
         ['Técnico en electrónica', 'fa-microchip'],
@@ -107,7 +117,10 @@ var CATEGORIAS = [
         ['Rayos X', 'fa-x-ray'],
         ['Cuidador de pacientes', 'fa-hand-holding-heart'],
         ['Cuidador de adulto mayor', 'fa-person-cane'],
-        ['Microbiótica', 'fa-bacteria']
+        ['Microbiótica', 'fa-bacteria'],
+        ['Nutricionista', 'fa-apple-whole'],
+        ['Enfermera a domicilio', 'fa-user-nurse'],
+        ['Quiropráctico', 'fa-spine']
     ]},
     { grupo: 'Deporte', icono: 'fa-dumbbell', items: [
         ['Gimnasio', 'fa-dumbbell'],
@@ -127,12 +140,20 @@ var CATEGORIAS = [
         ['Profesor de matemáticas', 'fa-square-root-variable'],
         ['Profesor de francés', 'fa-language'],
         ['Profesor particular', 'fa-chalkboard-user'],
-        ['Tutorías', 'fa-graduation-cap']
+        ['Tutorías', 'fa-graduation-cap'],
+        ['Guardería / Cuido / Kinder', 'fa-baby-carriage'],
+        ['Academia de baile', 'fa-person-dancing'],
+        ['Escuela de manejo', 'fa-id-card']
     ]},
     { grupo: 'Legal y contable', icono: 'fa-scale-balanced', items: [
         ['Abogado', 'fa-scale-balanced'],
         ['Contador', 'fa-calculator'],
         ['Notario', 'fa-file-signature']
+    ]},
+    { grupo: 'Bienes raíces', icono: 'fa-building', items: [
+        ['Agente inmobiliario', 'fa-house-user'],
+        ['Administrador de condominios', 'fa-building-user'],
+        ['Guardamuebles / Bodega', 'fa-warehouse']
     ]},
     { grupo: 'Costura y confección', icono: 'fa-shirt', items: [
         ['Diseño', 'fa-pen-ruler'],
@@ -166,7 +187,11 @@ var CATEGORIAS = [
         ['Alquiler de trajes', 'fa-user-tie'],
         ['Alquiler trajes de matrimonio', 'fa-ring'],
         ['Alquiler trajes de fiesta', 'fa-champagne-glasses'],
-        ['Alquiler trajes de disfraces', 'fa-mask']
+        ['Alquiler trajes de disfraces', 'fa-mask'],
+        ['Salón de fiestas', 'fa-people-roof'],
+        ['Sonido e iluminación', 'fa-volume-high'],
+        ['Animador / Payaso', 'fa-face-grin-stars'],
+        ['Animación infantil', 'fa-children']
     ]},
     { grupo: 'Transporte y mensajería', icono: 'fa-truck-fast', items: [
         ['Transporte', 'fa-van-shuttle'],
@@ -184,7 +209,11 @@ var CATEGORIAS = [
         ['Coros', 'fa-people-group'],
         ['Profesor de música', 'fa-person-chalkboard'],
         ['Banda o grupo musical', 'fa-drum'],
-        ['DJ y venta instrumentos musicales', 'fa-compact-disc']
+        ['Mariachi', 'fa-guitar'],
+        ['DJ', 'fa-compact-disc'],
+        ['Venta de instrumentos musicales', 'fa-guitar'],
+        ['Alquiler de equipos musicales', 'fa-dolly'],
+        ['Sonidista', 'fa-headphones']
     ]},
     { grupo: 'Otros servicios', icono: 'fa-briefcase', items: [
         ['Fotografía', 'fa-camera'],

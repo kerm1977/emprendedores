@@ -23,7 +23,7 @@ function prepararBloqueo() {
     if (document.getElementById('btn-bloqueo')) return;
     var u = usuarioActual();
     if (!u) return;
-    var salir = document.getElementById('btn-salir-perfil');
+    var salir = document.getElementById('btn-info-dev') || document.getElementById('btn-salir-perfil');
     if (!salir) return;
     var btn = document.createElement('button');
     btn.type = 'button';

@@ -74,7 +74,7 @@ function refrescarSesionPromociones() {
 function contenedorNegociosEventos() {
     var box = document.getElementById('negocios-eventos-items');
     if (box) return box;
-    var perfil = document.querySelector('#view-perfil .perfil-card'), salir = document.getElementById('btn-salir-perfil');
+    var perfil = document.querySelector('#view-perfil .perfil-card'), salir = document.getElementById('btn-info-dev') || document.getElementById('btn-salir-perfil');
     if (!perfil || !salir) return null;
     var sec = document.createElement('details');
     sec.className = 'evt-acordeon';
@@ -92,10 +92,12 @@ function prepararPerfilPromociones() {
     if (typeof prepararBloqueo === 'function') prepararBloqueo();
     if (typeof prepararMisEmpresas === 'function') prepararMisEmpresas();
     if (typeof prepararBloqueosAdmin === 'function') prepararBloqueosAdmin();
+    if (typeof prepararNube === 'function') prepararNube();
+    if (typeof prepararReportesPerfil === 'function') prepararReportesPerfil();
     var u = usuarioActual(), cont = contenedorNegociosEventos();
     if (!cont) return;
     var btn = document.getElementById('promo-perfil');
-    if (!btn) { btn = document.createElement('button'); btn.id = 'promo-perfil'; btn.type = 'button'; btn.className = 'promo-boton'; cont.appendChild(btn); }
+    if (!btn) { btn = document.createElement('button'); btn.id = 'promo-perfil'; btn.type = 'button'; btn.className = 'perfil-btn-ajustes'; cont.appendChild(btn); }
     btn.hidden = !u;
     var panel = Promociones.panel;
     var pendientes = panel ? panel.solicitudes.filter(function (s) { return s.estado === 'pendiente'; }).length : 0;

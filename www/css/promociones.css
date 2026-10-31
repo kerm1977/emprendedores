@@ -19,4 +19,21 @@
 .promo-hoja [hidden] { display: none !important; }
 #view-emprendimientos .vista-encabezado { flex-wrap: wrap; gap: 10px; }
 #view-emprendimientos .vista-encabezado h3 { flex-basis: 100%; text-align: center; }
+/* Mis favoritos en Inicio: dos tarjetas por fila, un poco mas chicas
+   que el cintillo de Negocios; texto recortado con puntos suspensivos */
+#home-favoritos.promo-carrusel > .emprend-card { flex: 0 0 min(46vw, 168px); }
+#home-favoritos.promo-carrusel .emprend-logo { width: 44px; height: 44px; }
+#home-favoritos.promo-carrusel .emprend-nombre,
+#home-favoritos.promo-carrusel .emprend-detalle,
+#home-favoritos.promo-carrusel .emprend-ubicacion span {
+    display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#home-fav-sec { margin-top: 70px; }
+#home-fav-sec .section-title {
+    margin-bottom: 4px;
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
 @media (prefers-reduced-motion: reduce) { .promo-carrusel { scroll-behavior: auto; } }

@@ -141,41 +141,54 @@ async function abrirHistorialNotificaciones() {
 function prepararReporteSitio() {
     var u = usuarioActual();
     if (!u || document.getElementById('btn-reportar-sitio')) return;
-    var salir = document.getElementById('btn-salir-perfil');
+    var salir = document.getElementById('btn-info-dev') || document.getElementById('btn-salir-perfil');
     if (!salir) return;
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.id = 'btn-reportar-sitio';
     btn.className = 'perfil-btn-ajustes';
+    /* El super no reporta: él VE los reportes de la gente */
+    if (u.rol === 'super') {
+        btn.innerHTML = '<i class="fas fa-list-check"></i> Ver reportes del sitio';
+        salir.parentNode.insertBefore(btn, salir);
+        btn.onclick = function () { irAVista('view-dashboard', 'Reportes del sitio'); };
+        return;
+    }
     btn.innerHTML = '<i class="fas fa-bug"></i> Reportar problema con el sitio';
     salir.parentNode.insertBefore(btn, salir);
     btn.onclick = abrirReporteSitio;
 }
 
+/* Reporte de problema: pagina completa (no modal) con editor WYSIWYG
+   grande y herramientas en horizontal. */
 function abrirReporteSitio() {
-    var ov = document.createElement('div');
-    ov.className = 'modal-cat';
-    ov.innerHTML = '<div class="modal-cat-hoja edita-hoja">' +
-        '<h3><i class="fas fa-bug"></i> Reportar problema con el sitio</h3>' +
-        '<p class="rep-sub">Describí qué está pasando (hasta unas 500 palabras). Los superusuarios recibirán una notificación.</p>' +
+    var vista = document.getElementById('view-reporte-sitio');
+    if (!vista) return;
+    vista.innerHTML = '<div class="perfil-card" style="text-align:left">' +
+        '<h3 id="rep-sitio-titulo" tabindex="-1" style="outline:none"><i class="fas fa-bug"></i> Reportar problema con el sitio</h3>' +
+        '<p class="rep-sub">Describí qué está pasando (hasta unas 500 palabras). Podés usar negrita, itálica, subrayado, alineación y listas.</p>' +
         '<div id="rep-sitio-editor"></div>' +
-        '<button class="emp-btn-guardar" id="rep-sitio-enviar" disabled>Enviar reporte</button>' +
-        '<button class="rep-cancelar" id="rep-sitio-cerrar">Cancelar</button></div>';
+        '<p class="rep-sub" style="margin-top:12px">Tu reporte llega como notificación a los superusuarios, quienes lo revisan y te responden. Incluí qué estabas haciendo, qué esperabas y qué salió mal para poder ayudarte más rápido.</p>' +
+        '<button class="emp-btn-guardar" id="rep-sitio-enviar" disabled style="margin-top:18px">Enviar reporte</button>' +
+        '<button class="perfil-btn-ajustes" id="rep-sitio-volver" style="margin-top:10px"><i class="fas fa-arrow-left"></i> Volver a mi perfil</button></div>';
     var ed = wysiwygEditor('Contanos el problema con detalle...');
-    ov.querySelector('#rep-sitio-editor').appendChild(ed);
-    var enviar = ov.querySelector('#rep-sitio-enviar');
+    ed.area.style.minHeight = '240px';
+    vista.querySelector('#rep-sitio-editor').appendChild(ed);
+    var enviar = vista.querySelector('#rep-sitio-enviar');
     ed.area.addEventListener('input', function () { enviar.disabled = ed.texto().length < 10; });
-    ov.querySelector('#rep-sitio-cerrar').onclick = function () { ov.remove(); };
+    vista.querySelector('#rep-sitio-volver').onclick = function () { irAVista('view-perfil', 'Perfil'); };
     enviar.onclick = function () {
         enviar.disabled = true;
         var u = usuarioActual();
         pushNotificacion('problema', (u ? u.email : 'Usuario') + ' reportó un problema: ' + ed.texto());
         saveDataAhora();
-        ov.remove();
         reflejarNotificaciones();
+        irAVista('view-perfil', 'Perfil');
         showToast('Reporte enviado a los superusuarios');
     };
-    document.body.appendChild(ov);
+    irAVista('view-reporte-sitio', 'Reportar problema');
+    var titulo = vista.querySelector('#rep-sitio-titulo');
+    if (titulo) setTimeout(function () { titulo.focus(); }, 60);
 }
 
 /* Dashboard del super: resumen + reportes recibidos */

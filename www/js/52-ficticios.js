@@ -49,17 +49,27 @@ function prepararFicticios() {
     if (!u || u.rol !== 'super') return;
     var viejo = document.getElementById('ficticios-box');
     if (viejo) viejo.remove();
-    var destino = document.getElementById('view-ajustes');
+    var destino = typeof contenedorExtrasAjustes === 'function'
+        ? contenedorExtrasAjustes() : document.getElementById('view-ajustes');
     if (!destino) return;
     var hay = (App.data.emprendedores || []).some(function (x) { return x.ficticio; });
     var box = document.createElement('div');
     box.id = 'ficticios-box';
-    box.innerHTML = '<details class="evt-acordeon"><summary><i class="fas fa-flask-vial"></i> Datos de prueba (ficticios)</summary>' +
+    box.innerHTML = '<button class="list-group-item list-group-item-action" type="button" id="fic-fila">' +
+        '<i class="fas fa-flask-vial ajuste-icono"></i><div><div class="ajuste-titulo">Datos de prueba (ficticios)</div>' +
+        '<div class="ajuste-sub">10 contactos y 10 negocios de muestra</div></div>' +
+        '<i class="fas fa-chevron-right ajuste-flecha" id="fic-flecha"></i></button><div id="fic-panel" hidden style="padding:0 8px">' +
         '<p class="rep-sub">Cargá 10 contactos y 10 negocios ficticios para probar buscadores y vistas. Se eliminan sin tocar datos reales.</p>' +
         (hay ? '<button class="rep-cancelar" id="fic-eliminar"><i class="fas fa-trash"></i> Eliminar datos ficticios</button>'
-             : '<button class="emp-btn-guardar" id="fic-cargar"><i class="fas fa-database"></i> Cargar datos de prueba</button>') + '</details>';
+             : '<button class="emp-btn-guardar" id="fic-cargar"><i class="fas fa-database"></i> Cargar datos de prueba</button>') + '</div>';
+    box.querySelector('#fic-fila').onclick = function () {
+        var p = box.querySelector('#fic-panel'), f = box.querySelector('#fic-flecha');
+        p.hidden = !p.hidden;
+        f.className = 'fas ajuste-flecha ' + (p.hidden ? 'fa-chevron-right' : 'fa-chevron-down');
+    };
     destino.appendChild(box);
     var c = box.querySelector('#fic-cargar'), d = box.querySelector('#fic-eliminar');
     if (c) c.onclick = cargarFicticios;
     if (d) d.onclick = eliminarFicticios;
+    if (typeof prepararPlantillaPrompt === 'function') prepararPlantillaPrompt();
 }

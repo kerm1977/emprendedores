@@ -22,7 +22,8 @@ function renderEspaciosPromocionados() {
     var chip = document.getElementById('filtro-activo'); if (chip) chip.hidden = !f;
     var filtro = document.getElementById('filtro-nombre'); if (filtro) filtro.textContent = f;
     var count = document.getElementById('emprendimientos-count');
-    if (count) count.textContent = pagados.length + ' en espacio pagado · capacidad ' + Promociones.publico.capacidad;
+    if (count) count.textContent = pagados.length ?
+        pagados.length + ' en espacio pagado · capacidad ' + Promociones.publico.capacidad : '';
     cont.innerHTML = pagados.map(tarjetaEmprendimiento).join('') || '<p class="vacio">No hay promociones vigentes en esta selección.</p>';
     var pag = document.getElementById('emp-pag');
     if (pag) pag.innerHTML = '';

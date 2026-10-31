@@ -162,6 +162,47 @@ tocar cualquier pieza de aqui, PREGUNTAR al usuario.
 - **Sin autorreporte ni autolike**: el creador no ve Reportar ni corazones en sus tarjetas o detalle (arriba y abajo), tampoco puede ejecutar esas acciones directamente, incluso si es superusuario. Se conservan los likes y reportes históricos. Esta orden solo autoriza guardas de autoría; NO modificar persistencia, motivos, estados, notificaciones o vencimiento de reportes.
 - **Detalle del negocio**: logos de `/uploads/` resueltos mediante `apiUrl`; mapa del detalle aislado en `14b-detalle-mapa.js`, cerrado y bloqueado inicialmente, con activar/bloquear/centrar. No tocar el motor de ubicación del registro ni la micropágina exportada al trabajar aquí.
 - **Categorias**: Community Manager + Mercadeo en Comercio y ventas.
+- **Stats del perfil super (BLINDADO por orden del usuario)**: indicador
+  `Conectados (N)` con punto verde parpadeante en su propia fila arriba,
+  y debajo los 3 cuadros (Emprendimientos/Categorías/Contactos) en grid
+  de 3 columnas dentro de `#stats-row-super`. Diseño aprobado: PROHIBIDO
+  modificar, reubicar ni alterar su disposición.
+- **Sistema de imágenes (BLINDADO TOTAL, orden del usuario — ya quedó
+  funcionando, no destruir)**:
+  - **Ruta de almacenamiento**: `uploads_routes.py` escribe en
+    `UPLOAD_DIR = BASE_DIR/uploads` = `/home/kenth1977/syncapp/uploads/`
+    en PythonAnywhere. PROHIBIDO cambiar la ruta ni la estructura.
+  - **Nombres**: `usr-{id}.jpg` foto de perfil, `emp-{id}.jpg` logo de
+    negocio. Un solo archivo por id (subir uno nuevo borra las otras
+    extensiones); `/api/uploads/eliminar` borra todas las de un id.
+  - **Compresión 50 KB (BLINDADO)**: TODA imagen pasa por
+    `comprimirImagenApp` con `topeBytes: 50*1024` en los cuatro puntos
+    de carga (`17-registro-wizard.js`, `25-editar.js`,
+    `07b-foto-perfil.js`, `49-foto-editor.js`); el servidor rechaza
+    cargas >55 KB (`MAX_BYTES = 55*1024`). PROHIBIDO subir o quitar
+    el tope ni saltarse la compresión.
+  - **Persistencia de sesión (BLINDADO)**: tras el PUT exitoso a
+    `/api/usuarios/{id}`, `u.foto = url` y OBLIGATORIO
+    `localforage.setItem(SESION_KEY, sesion)` — sin esta línea la foto
+    se pierde al recargar. Nunca quitarla.
+  - **Avatar del topbar (BLINDADO)**: `mostrarFotoPerfil` pinta la foto
+    en `.perfil-avatar` Y en `#perfil-top` (icono junto a
+    "Emprendedores"). `.perfil-top` lleva `padding:0` +
+    `overflow:hidden` y `.perfil-top img` `width/height:100%` +
+    `object-fit:cover` para cubrir el círculo completo. Diseño
+    aprobado: PROHIBIDO modificar su presentación.
+  - **Función real de `#perfil-top` (BLINDADO TOTAL)**: ese botón abre
+    el PERFIL/ajustes. PROHIBIDO interceptar su toque con visor de
+    imágenes ni con ningún otro handler: `#perfil-top img` NUNCA puede
+    estar en el selector de `ampliarImagenPerfil` (35-interacciones.js).
+    Mostrar la foto no cambia su función.
+- **Hero de Inicio (BLINDADO)**: `.hero-nombre` = `1.15rem` (Emprendedores
+  pequeño) y `.hero-anunciate` = `padding:13px 22px`, `font-size:1rem`,
+  `font-weight:800` (botón levemente más grande, función intacta).
+- **Login huella (BLINDADO)**: el botón "Entrar con huella" queda
+  OCULTO (atributo `hidden`, nunca eliminado); el código sigue vivo en
+  `27-huella.js`. En su lugar va el texto "o ingresá con tu nombre,
+  correo electrónico y datos personales".
 
 ## Tarjeta digital: descarga BLINDADA (orden explícita del usuario)
 
@@ -205,3 +246,10 @@ puede pisar App.data antes del POST y el reporte se pierde.
 - SQLite del servidor es oficial; caché secundaria únicamente para eventos públicos vigentes. No cachear datos de pago privados ni fingir guardado remoto. Las tablas de eventos no se reemplazan importando el JSON del catálogo. Respaldo integral requiere preservar SQLite del servidor.
 - Verificar con `python herramientas/verificar_eventos.py`, `node herramientas/verificar_eventos.js` y las pruebas previas de promociones. Los tests usan bases temporales, nunca producción. Comprobar límite menor de 250 en cada archivo nuevo, ejecutar verificador global y compilar APK versionada sin sobreescribir.
 - Desplegar `app.py` y los tres módulos Python de eventos junto al backend de sesión autorizado; recargar PythonAnywhere sin reemplazar SQLite. No afirmar despliegue ni comportamiento físico de Android sin probarlos.
+
+## 11. ORDEN MAXIMA - CONEXION Y LOGIN GOOGLE (BLINDADO ABSOLUTO)
+
+- **NUNCA, JAMAS, EN LA VIDA tocar `get_users_db`, `db.py`, `auth_routes.py`, `google_routes.py`, `promo_auth.py`, ni la conexion o el logueo de Google/OAuth. PARA NADA NI PARA NADIE.**
+- Excepcion unica: orden EXPLICITA y directa del usuario para esa modificacion especifica.
+- Cualquier modulo nuevo que necesite la base de usuarios debe importar `get_users_db` (nombre EXACTO, verificado en db.py) y probarse con `python -c "import app"` ANTES de publicar.
+- Todo backend nuevo se verifica con import local y prueba del endpoint ANTES de desplegar. Un ImportError tumba TODO el servidor incluido el login.

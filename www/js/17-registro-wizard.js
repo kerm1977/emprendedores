@@ -47,6 +47,7 @@ var pasoActual = 1;
 
 function mostrarPaso(n) {
     pasoActual = n;
+    guardarBorrador();
     document.querySelectorAll('#form-emprendimiento .paso').forEach(function (p) {
         p.hidden = Number(p.dataset.paso) !== n;
     });
@@ -59,6 +60,34 @@ function mostrarPaso(n) {
     if (sig) sig.hidden = n === PASO_TOTAL;
     if (guardar) guardar.hidden = n !== PASO_TOTAL;
     if (n === 4) initMapaPick();
+}
+
+/* Borrador del registro: paso + campos en localStorage para retomar
+   exactamente donde quedó si la persona sale a mitad del registro. */
+function guardarBorrador() {
+    try {
+        var campos = {}, marca = {};
+        document.querySelectorAll('#form-emprendimiento input, #form-emprendimiento select, #form-emprendimiento textarea').forEach(function (el) {
+            if (!el.id || el.type === 'password' || el.type === 'file') return;
+            if (el.type === 'checkbox' || el.type === 'radio') marca[el.id] = el.checked;
+            else campos[el.id] = el.value;
+        });
+        localStorage.setItem('emp-borrador', JSON.stringify({ paso: pasoActual, campos: campos, marca: marca, logo: App._empLogoTmp || '' }));
+    } catch (e) {}
+}
+
+function restaurarBorrador() {
+    var b;
+    try { b = JSON.parse(localStorage.getItem('emp-borrador') || 'null'); } catch (e) { b = null; }
+    if (!b || !b.campos) { mostrarPaso(1); return; }
+    Object.keys(b.campos).forEach(function (id) { var el = document.getElementById(id); if (el) el.value = b.campos[id]; });
+    Object.keys(b.marca || {}).forEach(function (id) { var el = document.getElementById(id); if (el) el.checked = b.marca[id]; });
+    if (b.logo) {
+        App._empLogoTmp = b.logo;
+        var prev = document.getElementById('emp-logo-prev');
+        if (prev) { prev.src = b.logo; prev.hidden = false; }
+    }
+    mostrarPaso(Math.min(Math.max(1, Number(b.paso) || 1), PASO_TOTAL));
 }
 
 function validarPaso(n) {
@@ -101,30 +130,25 @@ function initWizard() {
         ojo.querySelector('i').className =
             inp.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
     });
+    if (form) {
+        form.addEventListener('input', guardarBorrador);
+        form.addEventListener('change', guardarBorrador);
+    }
     var logoIn = document.getElementById('emp-logo');
     if (logoIn) logoIn.addEventListener('change', function () {
         var f = logoIn.files && logoIn.files[0];
         if (!f) return;
-        var rd = new FileReader();
-        rd.onload = function () {
-            /* Comprimir a 256px JPEG para no saturar el blob */
-            var img = new Image();
-            img.onload = function () {
-                var cv = document.createElement('canvas');
-                var k = Math.min(1, 256 / Math.max(img.width, img.height));
-                cv.width = img.width * k;
-                cv.height = img.height * k;
-                cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-                App._empLogoTmp = cv.toDataURL('image/jpeg', 0.8);
+        /* Orden del usuario: toda imagen queda comprimida a max 50 KB */
+        comprimirImagenApp(f, { maxLado: 256, topeBytes: 50 * 1024, calidad: .8 })
+            .then(function (out) {
+                App._empLogoTmp = out;
                 var prev = document.getElementById('emp-logo-prev');
-                if (prev) { prev.src = App._empLogoTmp; prev.hidden = false; }
+                if (prev) { prev.src = out; prev.hidden = false; }
                 if (_marcador) _marcador.setIcon(_iconoEmp());
-            };
-            img.src = rd.result;
-        };
-        rd.readAsDataURL(f);
+            })
+            .catch(function (e2) { showToast(e2.message || 'No se pudo leer la imagen'); });
     });
-    mostrarPaso(1);
+    restaurarBorrador();
 }
 
 /* ============ Mapa para marcar ubicacion ============ */

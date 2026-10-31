@@ -164,10 +164,10 @@ var ALIAS_GENERAL = [
     [['pan','panes','bizcocho','queque','torta','pastel','galleta','donas','empanada','croissant','repostera'], [['Panadería','Alimentación','fa-bread-slice'],['Pastelería','Alimentación','fa-cake-candles'],['Repostería','Alimentación','fa-ice-cream']]],
     [['chef','comida a domicilio','catering','banquete','buffet evento'], [['Cocinero','Alimentación','fa-kitchen-set'],['Catering','Alimentación','fa-bell-concierge']]],
     [['hotel','hostal','cabina','cabaña','hospedaje','posada','airbnb','alojamiento','quedarse','dormir','motel','resort','albergue'], [['Hotel','Estadía','fa-hotel'],['Hostal','Estadía','fa-bed'],['Cabañas','Estadía','fa-house']],],
-    [['agencia de viajes','tour','tours','guia turistico','paseo','excursion','viajes','paquete turistico'], [['Agencia de viajes','Estadía','fa-plane'],['Agencia de turismo local','Estadía','fa-map-location-dot']]],
+    [['agencia de viajes','tour','tours','guia turistico','paseo','excursion','viajes','paquete turistico','centro turistico','atracciones','mirador','parque tematico'], [['Agencia de viajes','Estadía','fa-plane'],['Agencia de turismo local','Estadía','fa-map-location-dot'],['Centro turístico','Estadía','fa-mountain-city']]],
     [['peluqueria','barberia','corte de cabello','corte de pelo','tinte','alisado','uñas','manicure','pedicure','pestañas','cejas','maquillaje','mica','micropigmentacion','depilacion','wax','facial','barbero'], [['Peluquería','Belleza y cuidado','fa-scissors'],['Barbería','Belleza y cuidado','fa-scissors'],['Manicurista','Belleza y cuidado','fa-hand-sparkles'],['Depilación','Belleza y cuidado','fa-spa']]],
     [['perfume','fragancia','colonia','aroma'], [['Perfumería','Belleza y cuidado','fa-spray-can']]],
-    [['masaje','masajes','relajante','terapeutico','espalda','quiropractico'], [['Masajista','Belleza y cuidado','fa-hands'],['Fisioterapia','Salud','fa-hospital-user']]],
+    [['masaje','masajes','relajante','terapeutico','espalda','quiropractico','quiropraxia','ajuste quiropractico'], [['Masajista','Belleza y cuidado','fa-hands'],['Fisioterapia','Salud','fa-hospital-user'],['Quiropráctico','Salud','fa-spine']]],
     [['arreglo de carro','taller','taller mecanico','frenos','llantas','pailas','cauchos','alineacion','aceite motor','mecanico','mecanico automotriz','motor','transmision','suspension','bateria','radiador','escape','inyeccion','scaner','diagnostico'], [['Mecánico automotriz','Mecánica','fa-car'],['Cambio de aceite','Mecánica','fa-oil-can'],['Llantas','Mecánica','fa-circle-notch'],['Autorrepuestos','Mecánica','fa-gears']]],
     [['moto','motocicleta','taller de motos','arreglo moto'], [['Mecánico de motos','Mecánica','fa-motorcycle']]],
     [['laminado','enderezado','pintura de carro','carroceria','choque','abolladura','pulitura'], [['Enderezado y pintura','Mecánica','fa-spray-can']]],
@@ -206,7 +206,22 @@ var ALIAS_GENERAL = [
     [['foto','fotografia','fotografo','sesion de fotos','foto de boda','foto profesional','drone','video'], [['Fotografía','Otros servicios','fa-camera']]],
     [['ropa','vestido','camisa','pantalon','moda','boutique','accesorios','reloj','lentes de sol'], [['Moda y accesorios','Otros servicios','fa-shirt'],['Joyería','Comercio y ventas','fa-gem']]],
     [['velorio','funeral','ataud','urna','cementerio','cremacion','servicio funebre'], [['Funeraria','Otros servicios','fa-dove']]],
-    [['lavar ropa','lavanderia','planchado','tintoreria','edredon','cobija'], [['Lavandería','Otros servicios','fa-soap']]]
+    [['lavar ropa','lavanderia','planchado','tintoreria','edredon','cobija'], [['Lavandería','Otros servicios','fa-soap']]],
+    [['empeno','casa de empeno','prendario','prenda','compra venta usados','pawn'], [['Casa de empeño','Comercio y ventas','fa-hand-holding-dollar']]],
+    [['salon de fiestas','salon de eventos','animador','payaso','payasito','animacion infantil','show infantil','sonido','luces','iluminacion','sonido para fiesta','animador de fiestas'], [['Salón de fiestas','Fiesta y regalos','fa-people-roof'],['Sonido e iluminación','Fiesta y regalos','fa-volume-high'],['Animador / Payaso','Fiesta y regalos','fa-face-grin-stars'],['Animación infantil','Fiesta y regalos','fa-children'],['Organización de eventos','Fiesta y regalos','fa-champagne-glasses']]],
+    [['mariachi','mariachis','serenata','rancheras','musica mexicana'], [['Mariachi','Música','fa-guitar'],['Banda o grupo musical','Música','fa-drum']]],
+    [['inmobiliaria','bienes raices','real estate','vendo casa','compra casa','alquiler casa','corredor de propiedades','agente de bienes raices'], [['Agente inmobiliario','Bienes raíces','fa-house-user'],['Administrador de condominios','Bienes raíces','fa-building-user']]],
+    [['condominio','administrador de condominio','junta de condominio','administrar condominio'], [['Administrador de condominios','Bienes raíces','fa-building-user']]],
+    [['bodega','guardamuebles','almacenamiento','deposito','self storage','alquiler de bodega'], [['Guardamuebles / Bodega','Bienes raíces','fa-warehouse']]],
+    [['guarderia','cuido','kinder','prekinder','niñera','cuidado de niños','daycare','preescolar','maternal'], [['Guardería / Cuido / Kinder','Educación y clases','fa-baby-carriage']]],
+    [['baile','danza','academia de baile','clases de baile','ballet','salsa','bachata','folclor','tango','hip hop dance'], [['Academia de baile','Educación y clases','fa-person-dancing'],['Zumba','Deporte','fa-person-dancing']]],
+    [['escuela de manejo','clases de manejo','licencia','conducir','aprender a manejar','instructor de manejo','sacar licencia','b1'], [['Escuela de manejo','Educación y clases','fa-id-card']]],
+    [['nutricionista','nutricion','dieta','bajar de peso','plan alimenticio','dietista','alimentacion saludable','control de peso'], [['Nutricionista','Salud','fa-apple-whole']]],
+    [['enfermera','enfermeria','enfermera a domicilio','cuidado en casa','inyeccion a domicilio','suero a domicilio','curaciones'], [['Enfermera a domicilio','Salud','fa-user-nurse'],['Cuidador de pacientes','Salud','fa-hand-holding-heart']]],
+    [['fruta','frutas','fruteria','fruta fresca','piña','mango','banano','papaya'], [['Frutería','Alimentación','fa-lemon'],['Verdurero','Alimentación','fa-carrot']]],
+    [['helado','helados','heladeria','paleta','pops','nieve','granizado'], [['Heladería','Alimentación','fa-ice-cream'],['Repostería','Alimentación','fa-ice-cream']]],
+    [['taekwondo','karate','jiu jitsu','jiujitsu','judo','mma','kickboxing','full contact','artes mixtas','artes marciales mixtas','defensa personal','dojo','artes marciales academia','clases de karate','clases de taekwondo'], [['Artes marciales','Deporte','fa-hand-fist']]],
+    [['instrumentos musicales','venta de instrumentos','teclado','bateria musical','alquiler de equipos musicales','equipos de sonido','sonidista','tecnico de sonido','bocina','amplificador','consola de sonido','dj','deejay','disc jockey'], [['DJ','Música','fa-compact-disc'],['Venta de instrumentos musicales','Música','fa-guitar'],['Alquiler de equipos musicales','Música','fa-dolly'],['Sonidista','Música','fa-headphones'],['Sonido e iluminación','Fiesta y regalos','fa-volume-high']]]
 ];
 
 ALIAS_GENERAL.forEach(function (t) { ALIAS_TABLA.push(t); });

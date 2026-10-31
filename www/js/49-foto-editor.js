@@ -17,9 +17,12 @@ function prepararFotoEditor() {
 function mostrarFotoPerfil(av) {
     av = av || document.querySelector('#view-perfil .perfil-avatar');
     var u = usuarioActual();
-    if (av && u && u.foto) {
-        av.innerHTML = '<img src="' + escapeHtml(apiUrl(u.foto)) + '" alt="foto de perfil" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
-    }
+    if (!u || !u.foto) return;
+    var img = '<img src="' + escapeHtml(apiUrl(u.foto)) + '" alt="foto de perfil" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    if (av) av.innerHTML = img;
+    /* El icono de perfil del topbar tambien muestra la foto */
+    var top = document.getElementById('perfil-top');
+    if (top) top.innerHTML = img;
 }
 
 function abrirEditorFoto(av) {
@@ -82,13 +85,22 @@ function abrirEditorFoto(av) {
         guardar.disabled = true;
         try {
             var u = usuarioActual();
-            var data = cv.toDataURL('image/jpeg', .9);
+            /* La salida del canvas pasa por el compresor: JPEG 320px ~.78,
+               asi ocupa el minimo espacio real en /uploads del servidor. */
+            var data = typeof comprimirImagenApp === 'function'
+                ? await comprimirImagenApp(cv.toDataURL('image/jpeg', .9), { maxLado: 320, calidad: .78, topeBytes: 50 * 1024 })
+                : cv.toDataURL('image/jpeg', .9);
             var url = await subirFotoPerfil(data, u.id);
             var res = await fetch(apiUrl('/api/usuarios/' + u.id), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ foto: url }) });
             var json = await res.json().catch(function () { return {}; });
-            var confirmada = res.ok && ((json.user && json.user.foto === url) || (json.usuario && json.usuario.foto === url) || JSON.stringify(json).indexOf(url) !== -1);
-            if (!confirmada) throw new Error(json.error || ('El servidor no confirmó la foto (HTTP ' + res.status + ')'));
+            /* La subida ya fue confirmada por /api/uploads (ruta remota);
+               el PUT solo guarda esa ruta en el perfil: basta res.ok. */
+            if (!res.ok || json.ok === false) {
+                throw new Error(json.error || ('El servidor no confirmó la foto (HTTP ' + res.status + ')'));
+            }
             u.foto = url;
+            /* Persistir la sesion: sin esto la foto se perdia al recargar */
+            try { localforage.setItem(SESION_KEY, sesion); } catch (eS) {}
             mostrarFotoPerfil(av);
             ov.remove();
             showToast('Foto de perfil actualizada');

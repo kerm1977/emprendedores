@@ -20,10 +20,13 @@
             </svg>
             <span>Ingresar con Google</span>
         </button>
-        <button type="button" class="btn-google" onclick="entrarConHuella()">
+        <!-- BLINDADO: el boton de huella queda OCULTO (no eliminado) por
+             orden del usuario; su funcion sigue existiendo en el codigo -->
+        <button type="button" class="btn-google" onclick="entrarConHuella()" hidden>
             <i class="fas fa-fingerprint" style="color:#16a34a;font-size:18px"></i>
             <span>Entrar con huella</span>
         </button>
+        <p class="rep-sub" style="text-align:center;margin:4px 0 10px">o ingresá con tu nombre, correo electrónico y datos personales</p>
 
         <form id="form-login" class="login-form" autocomplete="off">
             <label class="login-label">Correo electrónico

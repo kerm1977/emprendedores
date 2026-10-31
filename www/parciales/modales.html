@@ -14,9 +14,14 @@
 
 <div class="modal-qr" id="modal-qr" hidden>
     <div class="modal-qr-caja" role="dialog" aria-modal="true">
-        <h3>Comparte tu código QR</h3>
+        <h3 id="qr-nombre">—</h3>
+        <p id="qr-telefono" style="margin:0 0 10px">—</p>
         <canvas id="qr-canvas" width="220" height="220"></canvas>
-        <p id="qr-nombre">—</p>
-        <button class="emp-btn-guardar" id="btn-cerrar-qr">Cerrar</button>
+        <p style="margin:8px 0 0;font-size:.72rem;letter-spacing:.14em;font-weight:800;color:var(--primary-color)">EMPRENDEDORES</p>
+        <div style="display:flex;gap:10px;margin-top:14px">
+            <button class="rep-cancelar" id="qr-png" style="flex:1"><i class="fas fa-download"></i> PNG</button>
+            <a class="rep-cancelar" id="qr-wa" target="_blank" rel="noopener" style="flex:1;text-decoration:none"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        </div>
+        <button class="emp-btn-guardar" id="btn-cerrar-qr" style="margin-top:10px">Cerrar</button>
     </div>
 </div>

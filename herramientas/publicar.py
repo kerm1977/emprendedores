@@ -23,7 +23,7 @@ USUARIO = 'kenth1977'
 HOST = 'www.pythonanywhere.com'
 DOMINIO_APP = 'kenth1977.pythonanywhere.com'
 RAIZ_REMOTA = f'/home/{USUARIO}/syncapp'
-BACKEND = ('app.py', 'auth_routes.py', 'google_routes.py', 'uploads_routes.py', 'promo_auth.py', 'promociones_store.py', 'promociones_manual.py', 'promociones_cobro.py', 'eventos_store.py', 'eventos_routes.py', 'eventos_legacy.py', 'actualizacion_routes.py')
+BACKEND = ('app.py', 'auth_routes.py', 'google_routes.py', 'uploads_routes.py', 'promo_auth.py', 'promociones_store.py', 'promociones_manual.py', 'promociones_cobro.py', 'eventos_store.py', 'eventos_routes.py', 'eventos_legacy.py', 'actualizacion_routes.py', 'instrucciones_routes.py', 'embeds_routes.py')
 
 
 def token():

@@ -17,6 +17,16 @@
     box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
     transition: transform 0.2s;
     z-index: 2;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Foto de perfil: cubre el circulo completo del boton */
+.perfil-top img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .perfil-top:active {

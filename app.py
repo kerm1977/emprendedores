@@ -15,6 +15,8 @@ from promociones_manual import promociones_bp
 from promociones_cobro import cobro_bp
 from eventos_routes import eventos_bp
 from actualizacion_routes import actualizacion_bp
+from instrucciones_routes import instrucciones_bp
+from embeds_routes import embeds_bp
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WWW_DIR = os.path.join(BASE_DIR, "www")
@@ -41,6 +43,8 @@ app.register_blueprint(promociones_bp)
 app.register_blueprint(cobro_bp)
 app.register_blueprint(eventos_bp)
 app.register_blueprint(actualizacion_bp)
+app.register_blueprint(instrucciones_bp)
+app.register_blueprint(embeds_bp)
 app.before_request(proteger_usuarios)
 app.after_request(sesion_en_respuesta)
 app.register_error_handler(HTTPException, error_seguridad)

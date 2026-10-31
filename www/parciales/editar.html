@@ -3,9 +3,13 @@
     <h3 class="section-title">Editar emprendimiento</h3>
     <form class="emp-form" id="form-editar">
         <label class="emp-campo">
-            <span>Logo (tocá el actual para cambiarlo)</span>
+            <span>Logo del emprendimiento</span>
             <div class="ed-logo-fila">
                 <img id="ed-logo" class="ed-logo" alt="">
+                <button type="button" id="ed-logo-btn" title="Cambiar imagen"
+                    style="width:52px;height:52px;border-radius:50%;border:2px solid var(--primary-color);background:var(--surface);color:var(--primary-color);font-size:1.3rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+                    <i class="fas fa-folder-open"></i>
+                </button>
                 <input type="file" id="ed-logo-in" accept="image/*" hidden>
             </div>
         </label>
@@ -60,6 +64,16 @@
             <input type="url" id="ed-instagram"></label>
         <label class="emp-campo"><span>Telegram</span>
             <input type="url" id="ed-telegram"></label>
+        <label class="emp-campo"><span>Pinterest</span>
+            <input type="url" id="ed-pinterest"></label>
+        <label class="emp-campo"><span>YouTube Shorts</span>
+            <input type="url" id="ed-ytshorts"></label>
+        <label class="emp-campo"><span>Sitio web</span>
+            <input type="url" id="ed-web"></label>
+        <label class="emp-campo"><span>Red social principal (botón flotante en la tarjeta)</span>
+            <select id="ed-red-principal">
+                <option value="">Ninguna</option>
+            </select></label>
         <div class="emp-campo">
             <span>Pluses (tocá para activar)</span>
             <div class="emp-pluses" id="ed-pluses"></div>
@@ -73,6 +87,10 @@
         </button>
         <button type="button" class="ed-eliminar" id="ed-eliminar">
             <i class="fas fa-trash"></i> Eliminar emprendimiento
+        </button>
+        <button type="button" id="ed-fab-guardar" title="Guardar cambios"
+            style="position:fixed;right:16px;bottom:125px;z-index:99999;width:52px;height:52px;border-radius:50%;border:none;background:var(--primary-color);color:#fff;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer">
+            <i class="fas fa-floppy-disk"></i>
         </button>
         <button type="submit" class="emp-btn-guardar">
             <i class="fas fa-check"></i> Guardar cambios</button>

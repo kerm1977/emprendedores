@@ -1,6 +1,7 @@
-var MAX_FOTO_PERFIL = 800 * 1024;
+var MAX_FOTO_PERFIL = 50 * 1024;
 
-/* Compresion de foto de perfil: max 640px, JPEG, nunca >1.4MB */
+/* Compresion de foto de perfil (orden del usuario): JPEG max 50 KB,
+   bajando calidad y luego dimensiones hasta entrar bajo el tope */
 function comprimirFotoUsuario(file) {
     return new Promise(function (resolve, reject) {
         var img = new Image();
@@ -28,7 +29,7 @@ function comprimirFotoUsuario(file) {
                     if (calidad > .5) calidad -= .1;
                     else lado *= .75;
                 }
-                reject(new Error('No se pudo comprimir la foto por debajo de 800 KB'));
+                reject(new Error('No se pudo comprimir la foto por debajo de 50 KB'));
             } catch (error) { reject(error); }
             finally { URL.revokeObjectURL(origen); }
         };

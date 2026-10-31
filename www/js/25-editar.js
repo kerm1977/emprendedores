@@ -1,4 +1,47 @@
 /* 25-editar.js - Pagina de edicion del emprendimiento (completa) */
+
+/* Validación de plataforma por campo (registro y edición): un enlace
+   de YouTube no cabe en el campo de Facebook — avisa y limpia. */
+document.addEventListener('change', function (ev) {
+    var el = ev.target.closest('input[id$="-facebook"],input[id$="-tiktok"],input[id$="-instagram"],input[id$="-telegram"],input[id$="-pinterest"],input[id$="-ytshorts"]');
+    if (!el || !el.value.trim()) return;
+    var url = el.value.trim().toLowerCase();
+    var plataforma = /youtu\.be|youtube\.com/.test(url) ? 'YouTube'
+        : /instagram\.com/.test(url) ? 'Instagram'
+        : /tiktok\.com/.test(url) ? 'TikTok'
+        : /pinterest\./.test(url) ? 'Pinterest'
+        : /facebook\.com|fb\.watch/.test(url) ? 'Facebook'
+        : /t\.me|telegram/.test(url) ? 'Telegram' : '';
+    if (!plataforma) return;
+    var campo = el.id.replace(/^(emp|ed)-/, '');
+    var esperado = { facebook: 'Facebook', tiktok: 'TikTok', instagram: 'Instagram',
+        telegram: 'Telegram', pinterest: 'Pinterest', ytshorts: 'YouTube Shorts' }[campo];
+    var coincide = (campo === 'ytshorts' && plataforma === 'YouTube') || esperado === plataforma;
+    if (!coincide) {
+        showToast('Este campo es para ' + esperado + ', no para ' + plataforma);
+        el.value = '';
+        el.focus();
+    }
+}, true);
+
+/* Registro: el selector de red principal se llena solo con las redes
+   que ya tienen enlace escrito. */
+document.addEventListener('change', function (ev) {
+    if (!ev.target.closest('input[id^="emp-"]')) return;
+    var sel = document.getElementById('emp-red-principal');
+    if (!sel) return;
+    var campos = [['facebook', 'Facebook'], ['instagram', 'Instagram'],
+        ['tiktok', 'TikTok'], ['pinterest', 'Pinterest'],
+        ['ytshorts', 'YouTube Shorts'], ['telegram', 'Telegram']];
+    var actual = sel.value;
+    sel.innerHTML = '<option value="">Ninguna</option>' + campos.filter(function (c) {
+        var el2 = document.getElementById('emp-' + c[0]);
+        return el2 && el2.value.trim();
+    }).map(function (c) {
+        return '<option value="' + c[0] + '">' + c[1] + '</option>';
+    }).join('');
+    sel.value = actual;
+});
 var _edEmp = null, _edMapa = null, _edMarcador = null, _edLogoTmp = '';
 var _prepararAccionesEdicion = null, _edMapaActivo = false;
 
@@ -77,27 +120,25 @@ async function initEditar() {
     };
     var form = document.getElementById('form-editar');
     if (form) form.addEventListener('submit', guardarEdicion);
+    var fab = document.getElementById('ed-fab-guardar');
+    if (fab) fab.onclick = function () { if (form) form.requestSubmit(); };
     var lg = document.getElementById('ed-logo');
     if (lg) lg.onclick = function () {
+        document.getElementById('ed-logo-in').click(); };
+    var lgBtn = document.getElementById('ed-logo-btn');
+    if (lgBtn) lgBtn.onclick = function () {
         document.getElementById('ed-logo-in').click(); };
     var lin = document.getElementById('ed-logo-in');
     if (lin) lin.onchange = function () {
         var f = lin.files[0]; if (!f) return;
-        var rd = new FileReader();
-        rd.onload = function () {
-            var img = new Image();
-            img.onload = function () {
-                var cv = document.createElement('canvas');
-                var k = Math.min(1, 256 / Math.max(img.width, img.height));
-                cv.width = img.width * k; cv.height = img.height * k;
-                cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-                _edLogoTmp = cv.toDataURL('image/jpeg', 0.8);
-                lg.src = _edLogoTmp;
+        /* Orden del usuario: toda imagen queda comprimida a max 50 KB */
+        comprimirImagenApp(f, { maxLado: 256, topeBytes: 50 * 1024, calidad: .8 })
+            .then(function (out) {
+                _edLogoTmp = out;
+                lg.src = out;
                 _edMarcar();
-            };
-            img.src = rd.result;
-        };
-        rd.readAsDataURL(f);
+            })
+            .catch(function (e2) { showToast(e2.message || 'No se pudo leer la imagen'); });
     };
     var geo = document.getElementById('ed-geo');
     if (geo) geo.onclick = function () {
@@ -112,6 +153,12 @@ async function initEditar() {
 }
 
 function abrirEdicion(e) {
+    /* Solo el autor (e.owner) o un superusuario puede editar el negocio */
+    if (typeof puedeVerEstadisticasNegocio === 'function' &&
+        !puedeVerEstadisticasNegocio(e, usuarioActual())) {
+        showToast('Solo el autor o un superusuario puede editar este negocio');
+        return;
+    }
     _edEmp = e;
     if (_prepararAccionesEdicion) _prepararAccionesEdicion(e);
     _edLogoTmp = e.logo || '';
@@ -126,6 +173,21 @@ function abrirEdicion(e) {
     set('ed-lugar', e.lugar); set('ed-lat', e.lat); set('ed-lng', e.lng);
     set('ed-facebook', e.facebook); set('ed-tiktok', e.tiktok);
     set('ed-instagram', e.instagram); set('ed-telegram', e.telegram);
+    set('ed-pinterest', e.pinterest); set('ed-ytshorts', e.ytshorts);
+    set('ed-web', e.web);
+    /* Red principal: solo se ofrecen las redes que tienen enlace */
+    var selRed = document.getElementById('ed-red-principal');
+    if (selRed) {
+        var campos = [['facebook', 'Facebook'], ['instagram', 'Instagram'],
+            ['tiktok', 'TikTok'], ['pinterest', 'Pinterest'],
+            ['ytshorts', 'YouTube Shorts'], ['telegram', 'Telegram']];
+        selRed.innerHTML = '<option value="">Ninguna</option>' + campos.filter(function (c) {
+            return e[c[0]];
+        }).map(function (c) {
+            return '<option value="' + c[0] + '">' + c[1] + '</option>';
+        }).join('');
+        selRed.value = e.redPrincipal || '';
+    }
     set('ed-horario', e.horario); set('ed-desc', e.desc);
     var lg = document.getElementById('ed-logo');
     if (lg && _edLogoTmp) lg.src = urlLogoNegocio(_edLogoTmp);
@@ -234,6 +296,10 @@ function guardarEdicion(ev) {
     e.lat = gv('ed-lat'); e.lng = gv('ed-lng');
     e.facebook = gv('ed-facebook'); e.tiktok = gv('ed-tiktok');
     e.instagram = gv('ed-instagram'); e.telegram = gv('ed-telegram');
+    e.pinterest = gv('ed-pinterest'); e.ytshorts = gv('ed-ytshorts');
+    e.web = gv('ed-web'); e.redPrincipal = gv('ed-red-principal');
+    /* Si la red principal quedó en Ninguna o su enlace se borró, no persistir */
+    if (!e.redPrincipal || !e[e.redPrincipal]) e.redPrincipal = '';
     e.horario = gv('ed-horario'); e.desc = gv('ed-desc');
     e.logo = _edLogoTmp;
     e.pluses = [];

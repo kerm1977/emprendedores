@@ -25,8 +25,7 @@ function wysiwygEditor(placeholder) {
     comandos.forEach(function (c) {
         var b = document.createElement('button');
         b.type = 'button';
-        b.className = 'rep-cancelar';
-        b.style.cssText = 'padding:6px 10px;margin:0';
+        b.style.cssText = 'width:36px;height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0;border:1px solid var(--border-soft);border-radius:8px;background:var(--bg-soft);color:var(--text-dark);cursor:pointer;flex:0 0 auto';
         b.innerHTML = '<i class="fas ' + c[1] + '"></i>';
         b.title = c[2];
         b.onmousedown = function (ev) {

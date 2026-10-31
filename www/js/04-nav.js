@@ -79,9 +79,9 @@ function irAVista(viewId, titulo) {
     App.vistaActual = viewId;
     /* En el registro de emprendimiento el buscador no se muestra */
     var tb = document.querySelector('.topbar-buscar');
-    if (tb) tb.hidden = (viewId === 'view-registro-emp' || viewId === 'view-emprendimiento' || viewId === 'view-contacto');
+    if (tb) tb.hidden = (viewId === 'view-registro-emp' || viewId === 'view-emprendimiento' || viewId === 'view-contacto' || viewId === 'view-reporte-sitio' || viewId === 'view-nube');
     var res = document.getElementById('resultados-global');
-    if (res && (viewId === 'view-registro-emp' || viewId === 'view-emprendimiento' || viewId === 'view-contacto')) res.hidden = true;
+    if (res && (viewId === 'view-registro-emp' || viewId === 'view-emprendimiento' || viewId === 'view-contacto' || viewId === 'view-reporte-sitio' || viewId === 'view-nube')) res.hidden = true;
     /* El placeholder del buscador refleja el motor de cada vista */
     var busc = document.getElementById('buscar-global');
     if (busc) {
@@ -117,6 +117,20 @@ function actualizarFab(viewId) {
     }
     fab.hidden = !(viewId === 'view-notas' ||
         (viewId === 'view-inicio' && !!App.subcatActiva));
+    /* Boton flotante de volver (izquierda, sobre la barra): en los
+       formularios sin retorno directo vuelve al Perfil del usuario */
+    var volver = document.getElementById('fab-volver');
+    if (!volver) {
+        volver = document.createElement('button');
+        volver.type = 'button';
+        volver.id = 'fab-volver';
+        volver.innerHTML = '<i class="fas fa-arrow-left"></i>';
+        volver.title = 'Volver a mi perfil';
+        volver.setAttribute('style', 'position:fixed;left:16px;bottom:121px;z-index:99999;width:52px;height:52px;border-radius:50%;border:none;background:var(--primary-color);color:#fff;font-size:1.1rem;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer');
+        volver.onclick = function () { irAVista('view-perfil', 'Perfil'); };
+        document.body.appendChild(volver);
+    }
+    volver.hidden = viewId !== 'view-registro-emp';
 }
 
 document.addEventListener('click', function (e) {
@@ -132,3 +146,37 @@ document.addEventListener('click', function (e) {
         actualizarFab(App.vistaActual);
     }
 });
+
+/* Swipe entre pestañas principales (orden del usuario): arrastrar de
+   derecha a izquierda avanza Inicio->Negocios->Directorio...; el
+   sentido contrario retrocede. No dispara sobre carruseles. */
+(function () {
+    var x0 = 0, y0 = 0, t0 = 0;
+    var enZonaScroll = function (el) {
+        return !!(el && el.closest('.promo-carrusel, [style*="overflow-x"], .det-acciones-pie'));
+    };
+    document.addEventListener('touchstart', function (ev) {
+        if (ev.touches.length !== 1 || enZonaScroll(ev.target)) { x0 = 0; return; }
+        x0 = ev.touches[0].clientX; y0 = ev.touches[0].clientY; t0 = Date.now();
+    }, { passive: true });
+    document.addEventListener('touchend', function (ev) {
+        if (!x0 || Date.now() - t0 > 600) { x0 = 0; return; }
+        var dx = ev.changedTouches[0].clientX - x0;
+        var dy = ev.changedTouches[0].clientY - y0;
+        x0 = 0;
+        if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+        var vistas = ['view-inicio', 'view-emprendimientos',
+            'view-directorio', 'view-eventos'];
+        var items = Array.prototype.slice.call(
+            document.querySelectorAll('.magic-item[data-view]'))
+            .filter(function (li) {
+                return vistas.indexOf(li.dataset.view) !== -1; });
+        var idx = items.findIndex(function (li) {
+            return li.dataset.view === App.vistaActual; });
+        if (idx === -1) return;
+        var siguiente = idx + (dx < 0 ? 1 : -1);
+        if (siguiente < 0 || siguiente >= items.length) return;
+        var li = items[siguiente];
+        irAVista(li.dataset.view, li.dataset.title);
+    }, { passive: true });
+})();

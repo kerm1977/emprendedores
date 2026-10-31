@@ -63,16 +63,19 @@
                     <i class="fas fa-bullhorn"></i> Anúnciate
                 </button>
             </div>
-            <div class="stats-row" id="stats-row"></div>
-            <h3 class="section-title">Categorías</h3>
+            <h3 class="section-title" id="titulo-categorias-inicio">Categorías</h3>
             <div id="home-categorias"></div>
             <h3 class="section-title" id="titulo-destacados" hidden>Destacados</h3>
             <div id="home-destacados" class="cards-grid" hidden></div>
+            <section id="home-fav-sec" hidden>
+                <h3 class="section-title">Mis favoritos</h3>
+                <div id="home-favoritos" class="promo-carrusel" aria-label="Negocios que me gustaron"></div>
+            </section>
         </section>
 
         <section class="app-view" id="view-emprendimientos">
             <div class="vista-encabezado">
-                <h3 class="section-title mb-0">Emprendimientos · Espacio pagado</h3>
+                <h3 class="section-title mb-0" style="text-transform:none">Emprendimientos · <span class="espacio-pagado-blink" style="color:var(--primary-color);font-size:1.05em">Espacio pagado</span></h3>
                 <button class="filtro-chip" id="filtro-activo" hidden>
                     <span id="filtro-nombre"></span><i class="fas fa-xmark"></i>
                 </button>
@@ -104,6 +107,16 @@
 
         <!-- VISTA: Bloqueos administrativos (se construye por JS) -->
         <section class="app-view" id="view-bloqueos"></section>
+
+        <!-- VISTA: Reportar problema con el sitio (se construye por JS) -->
+        <section class="app-view" id="view-reporte-sitio"></section>
+        <!-- VISTA: Página exclusiva por subcategoría (se construye por JS) -->
+        <section class="app-view" id="view-categoria"></section>
+        <!-- VISTA: Mi historial del usuario (se construye por JS) -->
+        <section class="app-view" id="view-mi-historial"></section>
+
+        <!-- VISTA: Programar desde la nube (se construye por JS) -->
+        <section class="app-view" id="view-nube"></section>
 
     </main>
 
@@ -218,8 +231,14 @@
     <script src="js/50-super-tarjeta.js"></script>
     <script src="js/51-bloqueo.js"></script>
     <script src="js/52-ficticios.js"></script>
+    <script src="js/57-plantilla-prompt.js"></script>
     <script src="js/53-mis-empresas.js"></script>
     <script src="js/54-bloqueos-admin.js"></script>
+    <script src="js/55-compresor.js"></script>
+    <script src="js/56-nube-instrucciones.js"></script>
+    <script src="js/58-mi-historial.js"></script>
+    <script src="js/59-reportes-perfil.js"></script>
+    <script src="js/60-presencia.js"></script>
     <script src="vendor/js/qrious.min.js"></script>
     <script src="vendor/js/socket.io.min.js"></script>
     <script src="js/99-init.js"></script>

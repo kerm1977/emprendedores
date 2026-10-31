@@ -24,7 +24,9 @@ function ampliarImagenPerfil(img) {
 }
 
 document.addEventListener('click', function (ev) {
-    var img = ev.target.closest('.perfil-avatar img, .emprend-logo img, #det-logo, .topbar-avatar img, #perfil-top img');
+    /* BLINDADO: #perfil-top NO entra en el visor - ese boton abre el
+       perfil/ajustes (funcion real aprobada por el usuario) */
+    var img = ev.target.closest('.perfil-avatar img, .emprend-logo img, #det-logo, .topbar-avatar img');
     if (!img) return;
     ev.preventDefault(); ev.stopPropagation(); ampliarImagenPerfil(img);
 }, true);

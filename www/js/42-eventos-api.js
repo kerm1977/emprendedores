@@ -78,7 +78,7 @@ function prepararAccesoEventos() {
     var cont = typeof contenedorNegociosEventos === 'function' ? contenedorNegociosEventos() : document.querySelector('#view-perfil .perfil-card');
     if (!cont) return;
     var btn = document.getElementById('evt-perfil');
-    if (!btn) { btn = document.createElement('button'); btn.type = 'button'; btn.id = 'evt-perfil'; btn.className = 'evt-boton'; btn.textContent = 'Administrar y promocionar eventos'; cont.appendChild(btn); }
+    if (!btn) { btn = document.createElement('button'); btn.type = 'button'; btn.id = 'evt-perfil'; btn.className = 'perfil-btn-ajustes'; btn.innerHTML = '<i class="fas fa-calendar-check"></i> Administrar y promocionar eventos'; cont.appendChild(btn); }
     btn.hidden = !u; btn.onclick = async function () {
         btn.disabled = true;
         try { await abrirAdministracionEventos(); }

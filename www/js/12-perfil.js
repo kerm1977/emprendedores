@@ -4,6 +4,31 @@
    El avatar redondo del topbar abre la vista; el item de la barra
    cambia a "Salir" cuando hay sesion activa. */
 
+/* Informacion del desarrollador: modal con datos de quien hizo la app.
+   Orden del usuario: boton antes de Cerrar sesion en todos los perfiles. */
+document.addEventListener('click', function (ev) {
+    if (!ev.target.closest('#btn-info-dev')) return;
+    var viejo = document.getElementById('modal-info-dev');
+    if (viejo) viejo.remove();
+    var ov = document.createElement('div');
+    ov.id = 'modal-info-dev';
+    ov.setAttribute('style', 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px');
+    ov.innerHTML = '<div style="background:var(--surface,#fff);border-radius:18px;padding:26px;max-width:360px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3);max-height:88vh;overflow-y:auto">' +
+        '<i class="fas fa-circle-info" style="font-size:2rem;color:var(--primary-color,#eb760b)"></i>' +
+        '<h3 style="margin:12px 0 6px">Emprendedores</h3>' +
+        '<p style="margin:0 0 14px;font-size:.85rem;color:var(--text-soft,#64748b)">Directorio de emprendimientos — Costa Rica · Desarrollado por La Tribu de los Libres</p>' +
+        '<p style="margin:0 0 14px;font-size:.82rem;color:var(--text-soft,#64748b);text-align:justify;line-height:1.5">Este sitio nació inspirado a ideas del grupo de senderismo llamado La Tribu de los Libres, de La Unión de Cartago, Costa Rica, y a las diferentes herramientas administrativas de este grupo.</p>' +
+        '<p style="margin:0 0 14px;font-size:.82rem;color:var(--text-soft,#64748b);text-align:justify;line-height:1.5">Para comunicarse con alguno de los administradores de este sitio lo puedes hacer en el botón de WhatsApp o a través del correo electrónico.</p>' +
+        '<a href="https://wa.me/50686227500" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;background:#15803d;color:#fff;text-decoration:none;font-weight:700;margin-bottom:10px"><i class="fab fa-whatsapp" style="font-size:1.3rem"></i> +506 8622 7500</a>' +
+        '<a href="mailto:lthikingcr@gmail.com" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;background:#1967d2;color:#fff;text-decoration:none;font-weight:700;margin-bottom:10px"><i class="fas fa-envelope"></i> lthikingcr@gmail.com</a>' +
+        '<a href="https://www.latribu.top" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;background:#0d6efd;color:#fff;text-decoration:none;font-weight:700;margin-bottom:16px"><i class="fas fa-globe"></i> www.latribu.top</a>' +
+        '<button class="perfil-btn-ajustes" id="info-dev-cerrar" style="width:100%"><i class="fas fa-xmark"></i> Cerrar</button></div>';
+    document.body.appendChild(ov);
+    ov.onclick = function (e2) {
+        if (e2.target === ov || e2.target.closest('#info-dev-cerrar')) ov.remove();
+    };
+});
+
 function setTexto(id, t) {
     var el = document.getElementById(id);
     if (el) el.textContent = t;
@@ -157,6 +182,12 @@ function actualizarNavSesion() {
     if (btnAjustes) btnAjustes.hidden = !(u && u.rol === 'super');
     var btnDash = document.getElementById('btn-dashboard');
     if (btnDash) btnDash.hidden = !(u && u.rol === 'super');
+    /* Bloques reservados a super: si quedaron creados, se esconden */
+    var otaW = document.getElementById('ota-wrap');
+    if (otaW) otaW.hidden = !(u && u.rol === 'super');
+    var nubeB = document.getElementById('btn-nube');
+    if (nubeB) nubeB.hidden = !(u && u.rol === 'super');
+    if (logueado && typeof prepararMiHistorial === 'function') prepararMiHistorial();
     if (item) {
         var icono = item.querySelector('.magic-icon i');
         var texto = item.querySelector('.magic-text');

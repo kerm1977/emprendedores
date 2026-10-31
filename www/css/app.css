@@ -139,6 +139,26 @@ body {
     margin: 20px 0 12px;
 }
 
+/* Orden del usuario: "Categorías" de Inicio centrada, más grande,
+   separada ~50px del cuadro naranja de emprendedores */
+#titulo-categorias-inicio {
+    text-align: center;
+    font-size: 1.05rem;
+    /* Mismo espacio arriba (hacia el cuadro) que abajo (hacia
+       Alimentación): simetría exacta pedida por el usuario */
+    margin-top: 24px;
+}
+
+/* Parpadeo leve del texto "Espacio pagado" en Negocios (orden del
+   usuario): aviso sutil sin mover ni tocar la pagina de Negocios */
+.espacio-pagado-blink {
+    animation: espacioBlink 2.4s ease-in-out infinite;
+}
+@keyframes espacioBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
 .vista-encabezado {
     display: flex;
     justify-content: space-between;
@@ -176,7 +196,7 @@ body {
 }
 
 .hero-nombre {
-    font-size: 1.5rem;
+    font-size: 1.15rem;
     font-weight: 800;
     margin: 0;
 }
@@ -192,13 +212,13 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
+    padding: 13px 22px;
     border: none;
     border-radius: 999px;
     background: #fff;
     color: var(--primary-dark);
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 800;
+    font-size: 1rem;
     white-space: nowrap;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     animation: anunciate-pulso 2s ease-in-out infinite;

@@ -37,6 +37,9 @@ async function guardarEmprendimiento(e) {
         instagram: document.getElementById('emp-instagram').value.trim(),
         web: document.getElementById('emp-web').value.trim(),
         telegram: document.getElementById('emp-telegram').value.trim(),
+        pinterest: document.getElementById('emp-pinterest').value.trim(),
+        ytshorts: document.getElementById('emp-ytshorts').value.trim(),
+        redPrincipal: (document.getElementById('emp-red-principal') || {}).value || '',
         maps: document.getElementById('emp-maps').value.trim(),
         waze: document.getElementById('emp-waze').value.trim(),
         pluses: plusesSeleccionados(),
@@ -58,6 +61,7 @@ async function guardarEmprendimiento(e) {
     }
     App.data.emprendimientos = App.data.emprendimientos || [];
     App.data.emprendimientos.push(emp);
+    try { localStorage.removeItem('emp-borrador'); } catch (e2) {}
     if (typeof logActividad === 'function') {
         var _u = typeof usuarioActual === 'function' ?
                  usuarioActual() : null;
@@ -141,7 +145,8 @@ async function crearCuentaFondo(emp, pass) {
     }
 }
 
-/* QR del emprendimiento: dibuja en el modal con QRious */
+/* QR del emprendimiento: nombre arriba, telefono, PNG, WhatsApp,
+   marca EMPRENDEDORES abajo. El codigo abre la tarjeta del negocio. */
 function mostrarQR(id) {
     var emp = (App.data.emprendimientos || []).find(function (x) {
         return String(x.id) === String(id);
@@ -149,16 +154,50 @@ function mostrarQR(id) {
     if (!emp) return;
     var modal = document.getElementById('modal-qr');
     var canvas = document.getElementById('qr-canvas');
-    var nombre = document.getElementById('qr-nombre');
     if (!modal || !canvas) return;
-    var contenido = emp.qr ||
-        'EMPRENDEDORES|' + (emp.nombre || '') + '|' + (emp.telefono || '');
+    var link = apiUrl('/app/') + '?negocio=' + encodeURIComponent(String(id));
     if (typeof QRious !== 'undefined') {
-        new QRious({ element: canvas, value: contenido, size: 220 });
+        new QRious({ element: canvas, value: link, size: 220 });
     }
+    var nombre = document.getElementById('qr-nombre');
     if (nombre) nombre.textContent = emp.nombre || '';
+    var tel = document.getElementById('qr-telefono');
+    if (tel) tel.textContent = emp.telefono || emp.whatsapp || '';
+    var png = document.getElementById('qr-png');
+    if (png) png.onclick = function () {
+        var a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'QR-' + (emp.nombre || 'emprendimiento').replace(/\s+/g, '-') + '.png';
+        a.click();
+    };
+    var wa = document.getElementById('qr-wa');
+    if (wa) wa.href = 'https://wa.me/?text=' +
+        encodeURIComponent('Mirá ' + (emp.nombre || 'este emprendimiento') + ' en Emprendedores: ' + link);
+    /* Mismos iconos de marca + video Shorts de la tarjeta, en el QR */
+    var qrRedes = document.getElementById('qr-redes');
+    if (!qrRedes) {
+        qrRedes = document.createElement('div');
+        qrRedes.id = 'qr-redes';
+        qrRedes.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center';
+        modal.querySelector('.modal-qr-caja').appendChild(qrRedes);
+    }
+    qrRedes.innerHTML = typeof iconosRedesDe === 'function' ? iconosRedesDe(emp) : '';
     modal.hidden = false;
 }
+
+/* Deep-link: ?negocio=ID abre la tarjeta del emprendimiento (lo usa el QR) */
+document.addEventListener('DOMContentLoaded', function () {
+    var m = location.search.match(/[?&]negocio=([^&]+)/);
+    if (!m) return;
+    var id = m[1], intentos = 0;
+    var t = setInterval(function () {
+        var emp = (App.data.emprendimientos || []).find(function (x) {
+            return String(x.id) === id;
+        });
+        if (emp) { clearInterval(t); verEmprendimiento(emp.id); }
+        else if (++intentos > 20) clearInterval(t);
+    }, 500);
+});
 
 function cerrarQR() {
     var modal = document.getElementById('modal-qr');

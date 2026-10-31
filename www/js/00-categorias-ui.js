@@ -51,11 +51,32 @@ function renderCategorias() {
         }
         var chip = e.target.closest('.cat-chip');
         if (!chip) return;
-        App.filtroCategoria = chip.dataset.cat;
-            App.paginaEmp = 0;
-        renderEmprendimientos();
-        irAVista('view-emprendimientos', 'Negocios');
+        abrirPaginaCategoria(chip.dataset.cat);
     });
+}
+
+/* Página exclusiva por subcategoría (NO es Negocios): lista TODOS los
+   emprendimientos de esa categoría con su nota explicativa si existe. */
+function abrirPaginaCategoria(cat) {
+    var vista = document.getElementById('view-categoria');
+    if (!vista) return;
+    var lista = (App.data.emprendimientos || []).filter(function (e) {
+        return !e.pausa && e.categoria === cat;
+    });
+    if (typeof dedupeNegocios === 'function') lista = dedupeNegocios(lista);
+    var nota = (typeof NOTAS_CATEGORIA !== 'undefined' && NOTAS_CATEGORIA[cat]) || '';
+    vista.innerHTML = '<div style="text-align:left;margin-top:30px">' +
+        '<h3><i class="fas ' + iconoDeCategoria(cat) + '"></i> ' + escapeHtml(cat) + '</h3>' +
+        '<p class="rep-sub">' + lista.length + ' emprendimiento' + (lista.length === 1 ? '' : 's') + ' en esta categoría</p>' +
+        (nota ? '<p class="rep-sub"><i class="fas fa-circle-info"></i> ' + escapeHtml(nota) + '</p>' : '') +
+        '<div>' + (lista.map(tarjetaEmprendimiento).join('') || '<div class="vacio"><i class="fas fa-store"></i>Todavía no hay emprendimientos en esta categoría.</div>') + '</div>' +
+        '<button class="perfil-btn-ajustes" id="cat-volver" style="margin-top:14px"><i class="fas fa-arrow-left"></i> Volver</button></div>';
+    vista.querySelector('#cat-volver').onclick = function () { irAVista('view-inicio', 'Inicio'); };
+    vista.addEventListener('click', function (ev) {
+        var t = ev.target.closest('[data-id]');
+        if (t) verEmprendimiento(t.dataset.id);
+    });
+    irAVista('view-categoria', cat);
 }
 
 /* Abre un grupo del acordeón por nombre; opcional resalta una categoría */

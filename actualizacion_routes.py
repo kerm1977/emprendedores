@@ -6,7 +6,9 @@ GET /descargas/<nombre>     -> bundles www y APKs publicados por publicar.py."""
 import json
 import os
 import re
-from flask import Blueprint, jsonify, send_from_directory
+import time
+from flask import Blueprint, jsonify, request, send_from_directory
+from db import get_db
 from promo_auth import actor_promocion, super_promocion
 
 actualizacion_bp = Blueprint('actualizacion', __name__)
@@ -22,7 +24,9 @@ def _manifesto(nombre):
         cambios = datos.get('cambios')
         if not isinstance(cambios, list):
             cambios = []
-        return dict(version=str(datos.get('version', '0')), url=str(datos.get('url', '')),
+        return dict(version=str(datos.get('version', '0')),
+                    nombre=str(datos.get('nombre', datos.get('version', '0'))),
+                    url=str(datos.get('url', '')),
                     checksum=str(datos.get('checksum', '')), apk=str(datos.get('apk', '')),
                     cambios=[str(c)[:300] for c in cambios][:20])
     except (OSError, ValueError, TypeError):
@@ -54,6 +58,55 @@ def publicar_version():
         f.write(contenido)
     os.replace(temporal, os.path.join(DESCARGAS, 'version.json'))
     return jsonify(_manifesto('version.json'))
+
+
+@actualizacion_bp.post('/api/version/revocar')
+def revocar_version():
+    """Solo super: retira la publicacion al publico. El manifiesto publico
+    queda archivado en control_actualizaciones y version.json vuelve a 0:
+    las pruebas siguen por beta para superusuarios solamente."""
+    actor = super_promocion()
+    ruta = os.path.join(DESCARGAS, 'version.json')
+    try:
+        with open(ruta, encoding='utf-8') as f:
+            anterior = json.load(f)
+    except (OSError, ValueError):
+        return jsonify(error='No hay una publicación activa'), 404
+    db = get_db()
+    db.execute("CREATE TABLE IF NOT EXISTS control_actualizaciones ("
+               "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+               "registro TEXT NOT NULL,"
+               "eliminado_ts INTEGER NOT NULL,"
+               "eliminado_por TEXT DEFAULT '')")
+    db.execute("INSERT INTO control_actualizaciones (registro,eliminado_ts,eliminado_por) VALUES (?,?,?)",
+               (json.dumps({'accion': 'revocada', 'manifiesto': anterior}, ensure_ascii=False),
+                int(time.time()), (actor or {}).get('email', '')))
+    db.commit()
+    os.replace(ruta, os.path.join(
+        DESCARGAS, 'version-revocada-{}.json'.format(int(time.time()))))
+    return jsonify(ok=True, version=str(anterior.get('version', '')))
+
+
+@actualizacion_bp.post('/api/version/historial/archivar')
+def archivar_historial():
+    """Solo super: guarda el registro eliminado de la app en la tabla
+    control_actualizaciones (tribu.sqlite) con fecha y hora."""
+    actor = super_promocion()
+    datos = request.get_json(silent=True) or {}
+    registro = datos.get('registro')
+    if not isinstance(registro, dict):
+        return jsonify(error='Registro inválido'), 400
+    db = get_db()
+    db.execute("CREATE TABLE IF NOT EXISTS control_actualizaciones ("
+               "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+               "registro TEXT NOT NULL,"
+               "eliminado_ts INTEGER NOT NULL,"
+               "eliminado_por TEXT DEFAULT '')")
+    db.execute("INSERT INTO control_actualizaciones (registro,eliminado_ts,eliminado_por) VALUES (?,?,?)",
+               (json.dumps(registro, ensure_ascii=False), int(time.time()),
+                (actor or {}).get('email', '')))
+    db.commit()
+    return jsonify(ok=True)
 
 
 @actualizacion_bp.get('/descargas/<nombre>')

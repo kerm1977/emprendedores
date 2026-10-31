@@ -1,1 +1,1 @@
-Limpieza: se elimina el monolito base.html (queda solo en historial GitHub); la raiz ahora redirige directo a /app/.
+Botones Reportar/corazon 25px mas abajo del HR; huella de login oculta con texto alternativo; blindajes en AGENTS.md.

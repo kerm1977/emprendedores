@@ -32,7 +32,7 @@ function tarjetaEmprendimiento(e) {
     return '' +
         '<div class="emprend-card" data-id="' + escapeHtml(String(e.id)) + '">' +
             '<div class="emprend-logo">' +
-                (logo ? '<img data-logo-negocio src="' + escapeHtml(logo) + '" alt="Logo de ' + escapeHtml(e.nombre) + '">' : '') +
+                (logo ? '<img data-logo-negocio src="' + escapeHtml(logo) + '" alt="Logo de ' + escapeHtml(e.nombre) + '" onerror="this.remove();this.nextElementSibling.hidden=false">' : '') +
                 '<i' + (logo ? ' hidden' : '') + ' class="fas ' + iconoDeCategoria(e.categoria) + '"></i>' +
             '</div>' +
             '<div class="emprend-info">' +
@@ -41,8 +41,8 @@ function tarjetaEmprendimiento(e) {
                     escapeHtml(e.categoria) +
                 '</div>' +
                 '<div class="emprend-ubicacion">' +
-                    '<span>Provincia: ' + escapeHtml(e.provincia || 'No indicada') + '</span>' +
-                    '<span>Distrito: ' + escapeHtml(e.distrito || 'No indicado') + '</span>' +
+                    '<span>' + escapeHtml(e.provincia || 'No indicada') +
+                    (e.distrito ? ', ' + escapeHtml(e.distrito) : '') + '</span>' +
                 '</div>' +
             '</div>' +
         '</div>';
@@ -84,13 +84,39 @@ async function toggleDestacado(id) {
 function renderHome() {
     var lista = App.data.emprendimientos || [];
 
-    document.getElementById('stats-row').innerHTML =
+    var statsHtml =
         '<div class="stat-card"><div class="stat-numero">' + lista.length + '</div>' +
             '<div class="stat-label">Emprendim.</div></div>' +
         '<div class="stat-card"><div class="stat-numero">' + totalCategorias() + '</div>' +
             '<div class="stat-label">Categorías</div></div>' +
         '<div class="stat-card"><div class="stat-numero">' + (App.data.emprendedores || []).length + '</div>' +
             '<div class="stat-label">Contactos</div></div>';
+    /* Los cuadros ya no van en Inicio: SOLO en el perfil del superusuario */
+    var viejoStats = document.getElementById('stats-row-super');
+    if (viejoStats) viejoStats.remove();
+    var uHome = typeof usuarioActual === 'function' ? usuarioActual() : null;
+    var perfilCard = document.querySelector('#view-perfil .perfil-card');
+    if (uHome && uHome.rol === 'super' && perfilCard) {
+        /* Contenedor propio (sin clase stats-row): fila 1 = indicador
+           Conectados verde parpadeante; fila 2 = los 3 cuadros en grid
+           3 columnas que jamas desbordan los lados de la vista. */
+        var wrap = document.createElement('div');
+        wrap.id = 'stats-row-super';
+        wrap.setAttribute('style', 'width:100%;box-sizing:border-box;margin:0 0 12px');
+        wrap.innerHTML =
+            '<div style="display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:8px;font-size:.78rem;font-weight:800;color:#15803d">' +
+            '<i class="fas fa-circle" style="color:#16a34a;font-size:.6rem;animation:espacioBlink 1.6s ease-in-out infinite"></i>' +
+            ' Conectados (<b id="stat-conectados-n">—</b>)</div>' +
+            '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' + statsHtml + '</div>';
+        perfilCard.insertBefore(wrap, perfilCard.firstChild);
+        /* Personas conectadas ahora (solo el super lo ve) */
+        if (typeof conectadosAhora === 'function' && navigator.onLine) {
+            conectadosAhora().then(function (n) {
+                var el = document.getElementById('stat-conectados-n');
+                if (el) el.textContent = n === null ? '—' : n;
+            });
+        }
+    }
 
     /* Destacados de Inicio = solo emprendimientos del espacio pagado
        con promocion vigente (orden del usuario) */
@@ -110,6 +136,62 @@ function renderHome() {
     grid.innerHTML = muestra.length
         ? muestra.map(tarjetaEmprendimiento).join('')
         : '';
+
+    /* Mis favoritos (orden del usuario): los negocios a los que el
+       usuario logueado dio like, en cintillo tipo carrusel cuando son
+       3 o mas. Tarjetas un poco mas chicas que las de Negocios. */
+    var favSec = document.getElementById('home-fav-sec');
+    var favBox = document.getElementById('home-favoritos');
+    var uFav = typeof usuarioActual === 'function' ? usuarioActual() : null;
+    var miEmail = uFav ? String(uFav.email || '').trim().toLowerCase() : '';
+    var favs = miEmail ? lista.filter(function (e) {
+        return (e.likes || []).some(function (l) {
+            return !l.retiradoEn &&
+                String(l && typeof l === 'object' ? (l.email || l.by || '') : l || '')
+                    .trim().toLowerCase() === miEmail;
+        });
+    }) : [];
+    if (favSec) favSec.hidden = !favs.length;
+    if (favBox) {
+        var firmaFav = miEmail + '|' + favs.map(function (e) { return e.id; }).join(',');
+        if (firmaFav !== _favFirma) {
+            _favFirma = firmaFav;
+            var htmlFav = favs.map(tarjetaEmprendimiento).join('');
+            favBox.innerHTML = favs.length >= 3 ? htmlFav + htmlFav : htmlFav;
+        }
+        if (!favBox._favListo) {
+            favBox._favListo = true;
+            favBox.onclick = function (ev) {
+                var t = ev.target.closest('[data-id]');
+                if (t) verEmprendimiento(t.dataset.id);
+            };
+            favBox.addEventListener('pointerdown', function () { _favTocando = true; }, { passive: true });
+            document.addEventListener('pointerup', function () { _favTocando = false; });
+            document.addEventListener('pointercancel', function () { _favTocando = false; });
+        }
+        iniciarMovimientoFavoritos();
+    }
+}
+
+var _favFirma = '', _favTocando = false, _favFrame = null;
+/* Cintillo de Mis favoritos: misma marquesina infinita que el
+   carrusel de Negocios, solo activo en Inicio */
+function iniciarMovimientoFavoritos() {
+    if (_favFrame) return;
+    var anterior = 0;
+    function avanzar(ts) {
+        var delta = Math.min(50, ts - (anterior || ts)); anterior = ts;
+        var el = document.getElementById('home-favoritos');
+        if (!_favTocando && !document.hidden && App.vistaActual === 'view-inicio' && el && !el.hidden) {
+            var mitad = el.scrollWidth / 2;
+            if (mitad > el.clientWidth) {
+                el.scrollLeft += delta * .025;
+                if (el.scrollLeft >= mitad) el.scrollLeft -= mitad;
+            }
+        }
+        _favFrame = requestAnimationFrame(avanzar);
+    }
+    _favFrame = requestAnimationFrame(avanzar);
 }
 
 /* Cada toque en una tarjeta cuenta como "consulta" (offline-first) */
